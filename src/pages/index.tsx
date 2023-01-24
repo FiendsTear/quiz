@@ -34,7 +34,7 @@ export default function IndexPage() {
       {mutation.isSuccess ? <div>{mutation.data?.name}</div> : null}
       <button
         onClick={() => {
-          mutation.mutate("something");
+          mutation.mutate("new quiz");
         }}
       >
         Create Todo
