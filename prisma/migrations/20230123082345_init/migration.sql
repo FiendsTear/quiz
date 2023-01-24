@@ -1,0 +1,11 @@
+-- CreateTable
+CREATE TABLE "quiz" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "name" TEXT NOT NULL
+);
+
+-- CreateTable
+CREATE TABLE "question" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "body" TEXT NOT NULL
+);
