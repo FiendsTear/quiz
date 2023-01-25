@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -21,7 +21,7 @@ model Question {
   body   String
   quiz   Quiz     @relation(fields: [quizID], references: [id])
   quizID Int
-  Answer Answer[]
+  answers Answer[]
 }
 
 model Answer {

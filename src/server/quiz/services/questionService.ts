@@ -1,16 +1,17 @@
 import { PrismaClient } from "@prisma/client";
+import { CreateQuestionDTO } from "../dto/createQuestionDTO";
 
 const prisma = new PrismaClient();
 
-export async function addQuestion(input: string) {
-  const user = await prisma.question.create({
+export async function addQuestion(input: CreateQuestionDTO) {
+  const question = await prisma.question.create({
     data: {
-      body: "something",
+      body: input.body,
       quiz: {
-        connect: { id: 1 },
+        connect: { id: input.quizID },
       },
     },
   });
   await prisma.$disconnect();
-  return user;
+  return question;
 }
