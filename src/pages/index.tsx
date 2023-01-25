@@ -13,7 +13,7 @@ export default function IndexPage() {
   if (mutation.isLoading) {
     return (
       <div style={styles}>
-        <h1>Loading...</h1>
+        <h1>Загрузка...</h1>
       </div>
     );
   }
