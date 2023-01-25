@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 export async function addQuiz(input: QuizDTO) {
   const quiz = await prisma.quiz.create({
     data: {
-      name: input,
+      name: input.name,
     },
   });
   await prisma.$disconnect();

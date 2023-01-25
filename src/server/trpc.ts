@@ -8,8 +8,11 @@
  * @see https://trpc.io/docs/v10/procedures
  */
 import { initTRPC } from "@trpc/server";
+import SuperJSON from "superjson";
 
-const t = initTRPC.create();
+const t = initTRPC.create({
+    transformer: SuperJSON
+});
 
 /**
  * Unprotected procedure
