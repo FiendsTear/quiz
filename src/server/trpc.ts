@@ -9,17 +9,28 @@
  */
 import { initTRPC } from "@trpc/server";
 import { CreateNextContextOptions } from "@trpc/server/adapters/next";
+import { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
+import { IncomingMessage } from "http";
+import { getSession } from "next-auth/react";
 import SuperJSON from "superjson";
+import ws from 'ws';
 
-export const createContext = async (opts: CreateNextContextOptions) => {};
+export const createContext = async (
+  opts:
+    | CreateNextContextOptions
+    | NodeHTTPCreateContextFnOptions<IncomingMessage, ws>
+) => {
+  const session = await getSession({ req: opts.req });
+
+  return {
+    session,
+  };
+};
 
 const t = initTRPC.context<typeof createContext>().create({
   transformer: SuperJSON,
 });
 
-/**
- * Unprotected procedure
- **/
 export const router = t.router;
 export const middleware = t.middleware;
 export const procedure = t.procedure;
