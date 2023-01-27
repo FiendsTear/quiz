@@ -18,3 +18,9 @@ export async function getQuizzes() {
   await prisma.$disconnect();
   return quizzes;
 }
+
+export async function getQuiz(quizID: number) {
+  const quiz = await prisma.quiz.findFirst({ where: { id: quizID } });
+  await prisma.$disconnect();
+  return quiz;
+}

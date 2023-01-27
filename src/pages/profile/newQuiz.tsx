@@ -1,9 +1,11 @@
 import React, { ChangeEvent, FormEventHandler, useState } from "react";
 import { trpc } from "../../utils/trpc";
+import { QuizDTO } from "../../server/quiz/dto/quizDTO";
 
 export default function NewQuizPage() {
-  const [quizData, setQuizData] = useState({
+  const [quizData, setQuizData] = useState<QuizDTO>({
     name: "",
+    questions: [],
   });
   const mutation = trpc.quiz.addQuiz.useMutation();
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +25,31 @@ export default function NewQuizPage() {
         value={quizData.name}
         onChange={handleChange}
       ></input>
+      <ul>
+        {quizData.questions.map((question) => {
+          return (
+            <li key={question.body}>
+              <input
+                type="text"
+                name="body"
+                value={question.body}
+                onChange={handleChange}
+              ></input>
+            </li>
+          );
+        })}
+      </ul>
+      <button
+        type="button"
+        onClick={() =>
+          setQuizData((prevData) => ({
+            ...prevData,
+            questions: [...prevData.questions, { body: "" }],
+          }))
+        }
+      >
+        Добавить вопрос
+      </button>
       <button type="submit">Создать</button>
     </form>
   );
