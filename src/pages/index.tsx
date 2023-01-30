@@ -4,37 +4,45 @@
 import Link from "next/link";
 import { trpc } from "../utils/trpc";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 export default function IndexPage() {
-  // const mutation = trpc.quiz.addQuiz.useMutation();
-  // const query = trpc.quiz.getQuizzes.useQuery();
+  const { push } = useRouter();
 
-  // mutation.mutate("something");
+  const gamesQuery = trpc.game.getGames.useQuery();
+  const gameEnterMutation = trpc.game.enter.useMutation();
 
-  const [input, setInput] = useState("");
-  const mutation = trpc.game.add.useMutation();
+  const [input, setInput] = useState({ quizID: 1 });
+  const mutation = trpc.game.create.useMutation();
   function handleClick() {
     mutation.mutate(input);
   }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setInput(e.target.value);
+    setInput({ quizID: +e.target.value });
   }
 
-  const subscription = trpc.game.onAdd.useSubscription(undefined, {
-    onData(input) {
-      console.log("ws works " + input);
-    },
-    onError(err) {
-      console.error(err);
-    },
-  });
+  function handleGameEnter(gameID: string) {
+    gameEnterMutation.mutate(gameID);
+    push(`/games/${gameID}`);
+  }
 
   return (
     <main>
       <Link href="profile">Профиль</Link>
       <input onChange={handleChange}></input>
-      <button onClick={handleClick}></button>
+      <button onClick={handleClick}>Новая игра</button>
+      <ul>
+        {gamesQuery.data?.map((game) => {
+          return (
+            <li key={game.id}>
+              <button onClick={() => handleGameEnter(game.id.toString())}>
+                Enter Game {game.id}
+              </button>
+            </li>
+          );
+        })}
+      </ul>
     </main>
   );
 }
