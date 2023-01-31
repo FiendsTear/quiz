@@ -3,11 +3,11 @@ import { QuizDTO } from "../dto/quizDTO";
 
 const prisma = new PrismaClient();
 
-export async function addQuiz(input: QuizDTO) {
-  const quiz = await prisma.quiz.create({
-    data: {
-      name: input.name,
-    },
+export async function addOrUpdateQuiz(input: QuizDTO) {
+  const quiz = await prisma.quiz.upsert({
+    where: { id: input.id },
+    update: { name: input.name },
+    create: { name: input.name }
   });
   await prisma.$disconnect();
   return quiz;
@@ -19,8 +19,8 @@ export async function getQuizzes() {
   return quizzes;
 }
 
-export async function getQuiz(quizID: number) {
-  const quiz = await prisma.quiz.findFirst({ where: { id: quizID } });
+export async function getQuiz(quizID: string) {
+  const quiz = await prisma.quiz.findFirst({ where: { id: +quizID } });
   await prisma.$disconnect();
   return quiz;
 }
