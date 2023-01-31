@@ -14,13 +14,14 @@ model Quiz {
   id        Int        @id @unique @default(autoincrement())
   name      String
   questions Question[]
+  Game      Game[]
 }
 
 model Question {
-  id     Int      @id @unique @default(autoincrement())
-  body   String
-  quiz   Quiz     @relation(fields: [quizID], references: [id])
-  quizID Int
+  id      Int      @id @unique @default(autoincrement())
+  body    String
+  quiz    Quiz     @relation(fields: [quizID], references: [id])
+  quizID  Int
   answers Answer[]
 }
 
@@ -36,4 +37,10 @@ model User {
   id       Int    @id @unique @default(autoincrement())
   username String
   password String
+}
+
+model Game {
+  id     Int  @id @unique @default(autoincrement())
+  quiz   Quiz @relation(fields: [quizID], references: [id])
+  quizID Int
 }
