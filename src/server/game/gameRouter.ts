@@ -25,7 +25,7 @@ export const gameRouter = router({
   // }),
 
   getGames: procedure.query(async () => {
-    return await getGames();
+    return await getGames(Object.keys(emitters).map(Number));
   }),
 
   // host created a game

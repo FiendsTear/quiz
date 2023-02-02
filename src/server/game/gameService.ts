@@ -15,6 +15,6 @@ export async function createGame(input: GameDTO) {
   return game;
 }
 
-export async function getGames() {
-  return await prisma.game.findMany();
+export async function getGames(gameIDs: number[]) {
+  return await prisma.game.findMany({ where: { id: { in: gameIDs } } });
 }
