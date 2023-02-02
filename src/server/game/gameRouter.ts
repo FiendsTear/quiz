@@ -37,9 +37,6 @@ export const gameRouter = router({
 
   // player entered a game
   enter: procedure.input(z.string()).mutation(({ input }) => {
-    console.log(input);
-    console.log(emitters);
-    console.log(emitters[input]);
     if (!emitters[input]) throw new TRPCError({ code: "BAD_REQUEST" });
     emitters[input].emit("PLAYER_ENTERED", input);
     return "entered";

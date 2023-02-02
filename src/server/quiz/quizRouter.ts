@@ -2,19 +2,27 @@ import { procedure, router } from "../trpc";
 import { addOrUpdateQuiz, getQuiz, getQuizzes } from "./services/quizService";
 import { quizDTO } from "./dto/quizDTO";
 import { questionDTO } from "./dto/questionDTO";
-import { addOrUpdateQuestion } from "./services/questionService";
-import { createAnswerDTO } from "./dto/createAnswerDTO";
-import { addAnswer } from "./services/answerService";
+import { addOrUpdateQuestion, getQuestion } from "./services/questionService";
+import { answerDTO } from "./dto/createAnswerDTO";
+import { addOrUpdateAnswer } from "./services/answerService";
 import { z } from "zod";
 export const quizRouter = router({
-  addOrUpdateQuiz: procedure.input(quizDTO).mutation(({ input }) => addOrUpdateQuiz(input)),
-  getQuiz: procedure.input(z.string()).query(({ input }) => getQuiz(input)),
+  // quizzes
   getQuizzes: procedure.query(() => getQuizzes()),
+  getQuiz: procedure.input(z.string()).query(({ input }) => getQuiz(input)),
+  addOrUpdateQuiz: procedure
+    .input(quizDTO)
+    .mutation(({ input }) => addOrUpdateQuiz(input)),
+
+  //questions
+  getQuestion: procedure
+    .input(z.number())
+    .query(({ input }) => getQuestion(input)),
   addOrUpdateQuestion: procedure
     .input(questionDTO)
     .mutation(({ input }) => addOrUpdateQuestion(input)),
-  addAnswer: procedure
-    .input(createAnswerDTO)
-    .mutation(({ input }) => addAnswer(input)),
+  addOrUpdateAnswer: procedure
+    .input(answerDTO)
+    .mutation(({ input }) => addOrUpdateAnswer(input)),
 });
 // export type definition of API

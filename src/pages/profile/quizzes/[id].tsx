@@ -4,15 +4,21 @@ import { QuizDTO } from "../../../server/quiz/dto/quizDTO";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
+import { Question, Quiz } from "@prisma/client";
+import QuestionEditor from "../../../components/quiz/QuestionEditor";
 
 export default function NewQuizPage() {
   const { query, isReady } = useRouter();
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const { register, handleSubmit } = useForm<QuizDTO>();
 
   const quizID = query.id as string;
 
-  const getQuizQuery = trpc.quiz.getQuiz.useQuery(quizID, { enabled: isReady });
+  const getQuizQuery = trpc.quiz.getQuiz.useQuery(quizID, {
+    enabled: isReady,
+    onSuccess: (data) => setQuestions(data.questions),
+  });
+
   const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
 
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
@@ -23,9 +29,14 @@ export default function NewQuizPage() {
   }
 
   function handleNewQuestion() {
-    questionMutation.mutate({ quizID: +quizID }, {
-      onSuccess: (data) => {setQuestions}
-    });
+    questionMutation.mutate(
+      { quizID: +quizID },
+      {
+        onSuccess: (data) => {
+          setQuestions([...questions, data]);
+        },
+      }
+    );
   }
 
   if (getQuizQuery.isLoading) return <div>Загрузка</div>;
@@ -37,9 +48,18 @@ export default function NewQuizPage() {
         defaultValue={getQuizQuery.data?.name}
         {...register("name", { onChange: debounce(handleNameChange, 700) })}
       ></input>
-
+      <ul>
+        {questions.map((question) => {
+          return (
+            <QuestionEditor
+              key={question.id}
+              question={question}
+            ></QuestionEditor>
+          );
+        })}
+      </ul>
       <button type="button" onClick={handleNewQuestion}>
-        Добавить вопрос
+        Add Question
       </button>
     </article>
   );

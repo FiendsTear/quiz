@@ -1,17 +1,19 @@
 import { PrismaClient } from "@prisma/client";
-import { CreateAnswerDTO } from "../dto/createAnswerDTO";
+import { AnswerDTO } from "../dto/createAnswerDTO";
 
 const prisma = new PrismaClient();
 
-export async function addAnswer(input: CreateAnswerDTO) {
-  const answer = await prisma.answer.create({
-    data: {
-      body: input.body,
-      isCorrect: input.isCorrect,
-      question: {
-        connect: { id: input.questionID },
-      },
+export async function addOrUpdateAnswer(input: AnswerDTO) {
+  const { body, isCorrect } = input;
+  const answer = await prisma.answer.upsert({
+    where: { id: input.id },
+    create: {
+      body,
+      isCorrect,
+      question: { connect: { id: input.questionID } },
     },
+    update: { body, isCorrect },
+    include: { question: true },
   });
   await prisma.$disconnect();
   return answer;

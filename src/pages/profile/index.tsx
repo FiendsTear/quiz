@@ -12,7 +12,8 @@ export default function ProfilePage() {
       { name: "new quiz" },
       {
         onSuccess: (data) => {
-          router.push(`profile/quizzes/${data.id}`);
+          // router.push(`profile/quizzes/${data.id}`);
+          query.refetch();
         },
       }
     );

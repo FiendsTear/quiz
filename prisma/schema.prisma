@@ -19,7 +19,7 @@ model Quiz {
 
 model Question {
   id      Int      @id @unique @default(autoincrement())
-  body    String
+  body    String?
   quiz    Quiz     @relation(fields: [quizID], references: [id])
   quizID  Int
   answers Answer[]
@@ -27,7 +27,7 @@ model Question {
 
 model Answer {
   id         Int      @id @unique @default(autoincrement())
-  body       String
+  body       String?   
   isCorrect  Boolean
   question   Question @relation(fields: [questionID], references: [id])
   questionID Int
