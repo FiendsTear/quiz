@@ -94,7 +94,7 @@ export default function QuestionEditor(props: { question: Question }) {
         })}
       </fieldset>
       <button type="button" onClick={createAnswer}>
-        Добавить вариант ответа
+        Add answer variant
       </button>
     </form>
   );
