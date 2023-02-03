@@ -27,7 +27,7 @@ model Question {
 
 model Answer {
   id         Int      @id @unique @default(autoincrement())
-  body       String?   
+  body       String?
   isCorrect  Boolean
   question   Question @relation(fields: [questionID], references: [id])
   questionID Int
@@ -40,7 +40,14 @@ model User {
 }
 
 model Game {
-  id     Int  @id @unique @default(autoincrement())
-  quiz   Quiz @relation(fields: [quizID], references: [id])
+  id     Int        @id @unique @default(autoincrement())
+  quiz   Quiz       @relation(fields: [quizID], references: [id])
   quizID Int
+  status GameStatus @default(CREATED)
+}
+
+enum GameStatus {
+  CREATED
+  STARTED
+  FINISHED
 }

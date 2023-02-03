@@ -2,9 +2,10 @@ import { observable } from "@trpc/server/observable";
 import { EventEmitter } from "events";
 import { z } from "zod";
 import { router, procedure } from "../trpc";
-import { createGame, getGames } from "./gameService";
-import { gameDTO } from "./createGameDTO";
+import { createGame, getGame, getGames, updateGame } from "./gameService";
+import { gameDTO } from "./dto/createGameDTO";
 import { TRPCError } from "@trpc/server";
+import { updateGameDTO } from "./dto/updateGameDTO";
 
 interface IEmittersist {
   [key: string]: EventEmitter;
@@ -30,6 +31,11 @@ export const gameRouter = router({
     return await getGames(activeGamesID.map(Number));
   }),
 
+  getGame: procedure.input(z.number()).query(({ input }) => {
+    const game = getGame(input);
+    return game;
+  }),
+
   // host created a game
   create: procedure.input(gameDTO).mutation(async ({ input }) => {
     const game = await createGame(input);
@@ -44,7 +50,7 @@ export const gameRouter = router({
     return "entered";
   }),
 
-  onEnter: procedure.input(z.string()).subscription(({ input }) => {
+  onEnter: procedure.input(z.number()).subscription(({ input }) => {
     return observable<string>((emit) => {
       const onEnter = (data: string) => {
         emit.next(data);
@@ -57,18 +63,19 @@ export const gameRouter = router({
   }),
 
   // host started a game
-  start: procedure.mutation(() => {
-    return "started";
+  start: procedure.input(updateGameDTO).mutation(async ({ input }) => {
+    emitters[input.id].emit("GAME_STARTED", input);
+    return await updateGame(input);
   }),
 
-  onStart: procedure.subscription(() => {
+  onStart: procedure.input(z.number()).subscription(({ input }) => {
     return observable<string>((emit) => {
       const onStart = (data: string) => {
         emit.next(data);
       };
-      emitters["1"].on("start", onStart);
+      emitters[input].on("GAME_STARTED", onStart);
       return () => {
-        emitters["1"].off("start", onStart);
+        emitters[input].off("GAME_STARTED", onStart);
       };
     });
   }),
