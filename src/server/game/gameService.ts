@@ -33,5 +33,7 @@ export async function updateGame(dto: UpdateGameDTO) {
 }
 
 export async function getGames(gameIDs: number[]) {
-  return await prisma.game.findMany({ where: { id: { in: gameIDs } } });
+  return await prisma.game.findMany({
+    where: { id: { in: gameIDs }, status: GameStatus.CREATED },
+  });
 }
