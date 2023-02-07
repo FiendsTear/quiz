@@ -9,7 +9,11 @@ export default function GamesPage() {
   const gameEnterMutation = trpc.game.enter.useMutation();
 
   const [input, setInput] = useState({ quizID: 1 });
-  const mutation = trpc.game.create.useMutation();
+  const mutation = trpc.game.create.useMutation({
+    onSuccess: (data) => {
+      push(`/games/${data.id}`);
+    },
+  });
   function handleClick() {
     mutation.mutate(input);
   }

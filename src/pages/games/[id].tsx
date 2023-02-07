@@ -21,7 +21,7 @@ export default function GamePage() {
   const startMutation = trpc.game.start.useMutation();
   const onStartSub = trpc.game.onStart.useSubscription(gameID, {
     onData(data) {
-      console.log(data);
+      getGameQuery.refetch();
     },
   });
 
