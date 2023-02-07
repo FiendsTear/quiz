@@ -6,6 +6,7 @@ import { createGame, getGame, getGames, updateGame } from "./gameService";
 import { gameDTO } from "./dto/createGameDTO";
 import { TRPCError } from "@trpc/server";
 import { updateGameDTO } from "./dto/updateGameDTO";
+import { enterGameDTO } from "./dto/enterGameDTO";
 
 interface IEmittersist {
   [key: string]: EventEmitter;
@@ -44,20 +45,21 @@ export const gameRouter = createTRPCRouter({
   }),
 
   // player entered a game
-  enter: publicProcedure.input(z.string()).mutation(({ input }) => {
-    if (!emitters[input]) throw new TRPCError({ code: "BAD_REQUEST" });
-    emitters[input].emit("PLAYER_ENTERED", input);
+  enter: publicProcedure.input(enterGameDTO).mutation(({ ctx, input }) => {
+    if (!emitters[input.gameID]) throw new TRPCError({ code: "BAD_REQUEST" });
+    ctx.prisma.game.update({ where: { id: input.gameID }, data: { players: { connect: { id: input.playerID } } } });
+    emitters[input.gameID].emit("PLAYER_ENTERED", input);
     return "entered";
   }),
 
-  onEnter: publicProcedure.input(z.number()).subscription(({ input }) => {
+  onEnter: publicProcedure.input(enterGameDTO).subscription(({ input }) => {
     return observable<string>((emit) => {
       const onEnter = (data: string) => {
         emit.next(data);
       };
-      emitters[input].on("PLAYER_ENTERED", onEnter);
+      emitters[input.gameID].on("PLAYER_ENTERED", onEnter);
       return () => {
-        emitters[input].off("PLAYER_ENTERED", onEnter);
+        emitters[input.gameID].off("PLAYER_ENTERED", onEnter);
       };
     });
   }),

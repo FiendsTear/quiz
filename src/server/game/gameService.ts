@@ -26,9 +26,10 @@ export async function createGame(input: GameDTO) {
 }
 
 export async function updateGame(dto: UpdateGameDTO) {
-  const game = await prisma.game.update({
+  return await prisma.game.update({
     where: { id: dto.id },
-    data: { status: dto.status },
+    data: { status: dto.status, players: { connect: dto.players } },
+
   });
 }
 
