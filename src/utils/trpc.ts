@@ -2,7 +2,6 @@ import { AppRouter } from "@/server/mainRouter";
 import {
   createWSClient,
   httpBatchLink,
-  httpLink,
   loggerLink,
   splitLink,
   wsLink,
@@ -60,6 +59,11 @@ export const trpc = createTRPCNext<AppRouter>({
       transformer: SuperJSON,
       queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
       links: [
+        loggerLink({
+          enabled: (opts) =>
+            process.env.NODE_ENV === "development" ||
+            (opts.direction === "down" && opts.result instanceof Error),
+        }),
         splitLink({
           condition(op) {
             return op.path.split('.')[0] === 'game';
@@ -69,14 +73,6 @@ export const trpc = createTRPCNext<AppRouter>({
             url: getBaseUrl() + "/api/trpc",
           }),
         }),
-
-        // loggerLink({
-        //   enabled: (opts) =>
-        //     (process.env.NODE_ENV === "development" &&
-        //       typeof window !== "undefined") ||
-        //     (opts.direction === "down" && opts.result instanceof Error),
-        // }),
-        // getEndingLink(ctx),
       ],
     };
   },

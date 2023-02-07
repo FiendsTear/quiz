@@ -1,10 +1,10 @@
 import { quizRouter } from "./quiz/quizRouter";
-import { router } from "./trpc";
-import { userRouter } from "./user/userRouter";
+import { createTRPCRouter } from "./trpc";
+// import { userRouter } from "./user/userRouter";
 import { gameRouter } from "./game/gameRouter";
-export const appRouter = router({
+export const appRouter = createTRPCRouter({
   quiz: quizRouter,
-  user: userRouter,
+  // user: userRouter,
   game: gameRouter,
 });
 

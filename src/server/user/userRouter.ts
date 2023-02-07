@@ -1,7 +1,7 @@
 import { z } from "zod";
-import { procedure, router } from "../trpc";
+import { publicProcedure, createTRPCRouter } from "../trpc";
 import { addUser } from "./services/userService";
-export const userRouter = router({
-  addUser: procedure.input(z.string()).mutation(({ input }) => addUser()),
-});
+// export const userRouter = createTRPCRouter({
+//   addUser: publicProcedure.input().mutation(({ input }) => addUser()),
+// });
 // export type definition of API
