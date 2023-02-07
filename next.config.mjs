@@ -6,6 +6,8 @@
  */
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
 
+const { i18n } = require('./next-i18next.config')
+
 /** @type {import("next").NextConfig} */
 const config = {
   reactStrictMode: true,
@@ -16,10 +18,7 @@ const config = {
    *
    * @see https://github.com/vercel/next.js/issues/41980
    */
-  i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
-  },
+  i18n,
   publicRuntimeConfig: {
     APP_URL: process.env.APP_URL,
     WS_URL: process.env.WS_URL,

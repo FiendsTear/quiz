@@ -5,6 +5,7 @@ import Layout from "./layout";
 import { SessionProvider } from "next-auth/react";
 
 import "../styles/globals.css";
+import { appWithTranslation } from "next-i18next";
 
 const MyApp: AppType<{ session: Session | null }> = ({
   Component,
@@ -19,4 +20,4 @@ const MyApp: AppType<{ session: Session | null }> = ({
   );
 };
 
-export default trpc.withTRPC(MyApp);
+export default trpc.withTRPC(appWithTranslation(MyApp));
