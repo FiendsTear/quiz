@@ -9,7 +9,7 @@ export default function NavBar() {
   return (
     <main className="flex bg-emerald-400">
       <section className="flex gap-2">
-        <Link href="/profile">{t("PROFILE")}</Link>
+        <Link href="/profile">{t("Profile")}</Link>
         <Link href="/games">Games</Link>
       </section>
       <section className="flex grow justify-end gap-2">

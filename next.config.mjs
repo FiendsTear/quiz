@@ -6,7 +6,8 @@
  */
 !process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.mjs"));
 
-const { i18n } = require('./next-i18next.config')
+const { default: i18nConfig } = await import("./next-i18next.config.js");
+const { i18n } = i18nConfig;
 
 /** @type {import("next").NextConfig} */
 const config = {

@@ -1,16 +1,12 @@
 import { serverSideTranslations } from "next-i18next/serverSideTranslations";
 import { useTranslation } from "next-i18next";
+import { getTranslations } from "../common/getTranslations";
 
 export default function IndexPage() {
   const { t } = useTranslation("common");
-  return <>{t("PROFILE")}</>;
+  return <>{t("Profile")}</>;
 }
 
 export async function getStaticProps({ locale }: { locale: string }) {
-  return {
-    props: {
-      ...(await serverSideTranslations(locale, ["common", "footer"])),
-      // Will be passed to the page component as props
-    },
-  };
+  getTranslations(locale);
 }
