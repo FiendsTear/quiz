@@ -8,5 +8,5 @@ export default function IndexPage() {
 }
 
 export async function getStaticProps({ locale }: { locale: string }) {
-  getTranslations(locale);
+  return getTranslations({ locale });
 }
