@@ -17,6 +17,14 @@ export async function getGame(id: number) {
 
 export async function createGame(input: GameDTO) {
   const game = await prisma.game.create({
+    select: {
+      id: true,
+      quiz: {
+        include: {
+          questions: { orderBy: { order: "asc" }, include: { answers: true } },
+        },
+      },
+    },
     data: {
       quiz: {
         connect: { id: input.quizID },

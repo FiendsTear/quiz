@@ -1,9 +1,11 @@
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function GamesPage() {
   const { push } = useRouter();
+  const { data: sessionData } = useSession();
 
   const gamesQuery = trpc.game.getGames.useQuery();
   const gameEnterMutation = trpc.game.enter.useMutation();
@@ -11,7 +13,7 @@ export default function GamesPage() {
   const [input, setInput] = useState({ quizID: 1 });
   const mutation = trpc.game.create.useMutation({
     onSuccess: (data) => {
-      push(`/games/${data.id}`);
+      push(`/games/${data.id}/host`);
     },
   });
   function handleClick() {
@@ -22,7 +24,7 @@ export default function GamesPage() {
     setInput({ quizID: +e.target.value });
   }
 
-  function handleGameEnter(gameID: string) {
+  function handleGameEnter(gameID: number) {
     gameEnterMutation.mutate(gameID);
     push(`/games/${gameID}`);
   }
@@ -35,7 +37,7 @@ export default function GamesPage() {
         {gamesQuery.data?.map((game) => {
           return (
             <li key={game.id}>
-              <button onClick={() => handleGameEnter(game.id.toString())}>
+              <button onClick={() => handleGameEnter(game.id)}>
                 Enter Game {game.id}
               </button>
             </li>
