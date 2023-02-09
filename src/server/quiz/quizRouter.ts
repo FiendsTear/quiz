@@ -8,7 +8,7 @@ import { addOrUpdateAnswer } from "./services/answerService";
 import { z } from "zod";
 export const quizRouter = createTRPCRouter({
   // quizzes
-  getQuizzes: protectedProcedure.query(() => getQuizzes()),
+  getQuizzes: protectedProcedure.query(({ ctx }) => getQuizzes(ctx.session)),
   getQuiz: protectedProcedure.input(z.string()).query(({ input }) => getQuiz(input)),
   addOrUpdateQuiz: protectedProcedure
     .input(quizDTO)

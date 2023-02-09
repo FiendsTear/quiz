@@ -16,8 +16,10 @@ export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
   return quiz;
 }
 
-export async function getQuizzes() {
-  const quizzes = await prisma.quiz.findMany();
+export async function getQuizzes(session: Session) {
+  const quizzes = await prisma.quiz.findMany({
+    where: { userId: session.user.id },
+  });
   await prisma.$disconnect();
   return quizzes;
 }
