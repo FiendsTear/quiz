@@ -1,13 +1,16 @@
 import { PrismaClient } from "@prisma/client";
 import { QuizDTO } from "../dto/quizDTO";
+import { Session } from 'next-auth';
 
 const prisma = new PrismaClient();
 
-export async function addOrUpdateQuiz(input: QuizDTO) {
+export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
   const quiz = await prisma.quiz.upsert({
     where: { id: input.id },
-    update: { name: input.name },
-    create: { name: input.name },
+    update: { name: input.name,
+              userId: session.user.id },
+    create: { name: input.name, 
+              userId: session.user.id },
   });
   await prisma.$disconnect();
   return quiz;

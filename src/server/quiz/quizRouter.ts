@@ -1,4 +1,4 @@
-import { publicProcedure, createTRPCRouter } from "../trpc";
+import { protectedProcedure, createTRPCRouter } from "../trpc";
 import { addOrUpdateQuiz, getQuiz, getQuizzes } from "./services/quizService";
 import { quizDTO } from "./dto/quizDTO";
 import { questionDTO } from "./dto/questionDTO";
@@ -8,20 +8,20 @@ import { addOrUpdateAnswer } from "./services/answerService";
 import { z } from "zod";
 export const quizRouter = createTRPCRouter({
   // quizzes
-  getQuizzes: publicProcedure.query(() => getQuizzes()),
-  getQuiz: publicProcedure.input(z.string()).query(({ input }) => getQuiz(input)),
-  addOrUpdateQuiz: publicProcedure
+  getQuizzes: protectedProcedure.query(() => getQuizzes()),
+  getQuiz: protectedProcedure.input(z.string()).query(({ input }) => getQuiz(input)),
+  addOrUpdateQuiz: protectedProcedure
     .input(quizDTO)
-    .mutation(({ input }) => addOrUpdateQuiz(input)),
+    .mutation(({ input, ctx }) => addOrUpdateQuiz(input, ctx.session)),
 
   //questions
-  getQuestion: publicProcedure
+  getQuestion: protectedProcedure
     .input(z.number())
     .query(({ input }) => getQuestion(input)),
-  addOrUpdateQuestion: publicProcedure
+  addOrUpdateQuestion: protectedProcedure
     .input(questionDTO)
     .mutation(({ input }) => addOrUpdateQuestion(input)),
-  addOrUpdateAnswer: publicProcedure
+  addOrUpdateAnswer: protectedProcedure
     .input(answerDTO)
     .mutation(({ input }) => addOrUpdateAnswer(input)),
 });
