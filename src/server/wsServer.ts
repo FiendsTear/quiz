@@ -1,12 +1,12 @@
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import ws from "ws";
-import { createContext } from "./trpc";
+import { createTRPCContext, createWSContext } from './trpc';
 import { appRouter } from "./mainRouter";
 
 const wss = new ws.Server({
   port: 3100,
 });
-const handler = applyWSSHandler({ wss, router: appRouter, createContext });
+const handler = applyWSSHandler({ wss, router: appRouter, createContext: createWSContext });
 wss.on("connection", (ws) => {
   console.log(`➕➕ Connection (${wss.clients.size})`);
   ws.once("close", () => {

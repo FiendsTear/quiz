@@ -16,9 +16,9 @@
  * database, the session, etc.
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { type Session } from "next-auth";
+import { getServerSession, type Session } from "next-auth";
 
-import { getServerAuthSession } from "./auth";
+import { getServerAuthSession, authOptions } from "./auth";
 import { prisma } from "./db";
 
 type CreateContextOptions = {
@@ -59,6 +59,15 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   });
 };
 
+export const createWSContext = async (
+  opts:
+    | CreateNextContextOptions
+    | NodeHTTPCreateContextFnOptions<IncomingMessage, ws>
+) => {
+  const session = await getSession(opts);
+  return createInnerTRPCContext({ session });
+};
+
 /**
  * 2. INITIALIZATION
  *
@@ -67,6 +76,10 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
+import { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
+import { IncomingMessage } from "http";
+import { getSession } from "next-auth/react";
+import ws from "ws";
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,

@@ -22,6 +22,7 @@ model Question {
   body    String?
   quiz    Quiz     @relation(fields: [quizID], references: [id])
   quizID  Int
+  order   Int
   answers Answer[]
 }
 

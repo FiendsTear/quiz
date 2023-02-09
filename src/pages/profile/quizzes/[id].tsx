@@ -30,7 +30,7 @@ export default function NewQuizPage() {
 
   function handleNewQuestion() {
     questionMutation.mutate(
-      { quizID: +quizID },
+      { quizID: +quizID, order: questions.length },
       {
         onSuccess: (data) => {
           setQuestions([...questions, data]);

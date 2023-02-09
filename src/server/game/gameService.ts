@@ -7,7 +7,9 @@ const prisma = new PrismaClient();
 export async function getGame(id: number) {
   const game = await prisma.game.findFirstOrThrow({
     where: { id },
-    include: { quiz: { include: { questions: true } } },
+    include: {
+      quiz: { include: { questions: { orderBy: { order: "asc" } } } },
+    },
   });
   await prisma.$disconnect();
   return game;
@@ -28,8 +30,7 @@ export async function createGame(input: GameDTO) {
 export async function updateGame(dto: UpdateGameDTO) {
   return await prisma.game.update({
     where: { id: dto.id },
-    data: { status: dto.status, players: { connect: dto.players } },
-
+    data: { status: dto.status },
   });
 }
 

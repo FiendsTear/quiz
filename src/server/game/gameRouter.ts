@@ -47,7 +47,6 @@ export const gameRouter = createTRPCRouter({
   // player entered a game
   enter: publicProcedure.input(enterGameDTO).mutation(({ ctx, input }) => {
     if (!emitters[input.gameID]) throw new TRPCError({ code: "BAD_REQUEST" });
-    ctx.prisma.game.update({ where: { id: input.gameID }, data: { players: { connect: { id: input.playerID } } } });
     emitters[input.gameID].emit("PLAYER_ENTERED", input);
     return "entered";
   }),
