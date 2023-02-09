@@ -9,11 +9,11 @@ export default function NavBar() {
   return (
     <main className="flex bg-emerald-400">
       <section className="flex gap-2">
-        <Link href="/profile">{t("Profile")}</Link>
+        <Link href="/">Home</Link>
         <Link href="/games">Games</Link>
       </section>
       <section className="flex grow justify-end gap-2">
-        <p>{sessionData && <span>{sessionData.user?.name}</span>}</p>
+        <Link href="/profile">{sessionData && <span>{sessionData.user?.name}</span>}</Link>
         <button
           onClick={sessionData ? () => void signOut() : () => void signIn()}
         >
