@@ -62,9 +62,10 @@ export default function QuestionEditor(props: { question: Question }) {
     <form>
       <input
         type="text"
+        className="mb-3"
         {...register("body", { onChange: debounce(handleChange, 500) })}
       ></input>
-      <fieldset>
+      <fieldset className="flex flex-col gap-2">
         {fields.map((field, index) => {
           return (
             <section key={field.fieldID}>

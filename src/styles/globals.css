@@ -1,3 +1,21 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    input {
+        @apply outline-1;
+        @apply outline;
+        @apply outline-fuchsia-300;
+        @apply rounded;
+        @apply focus-visible:outline-fuchsia-500;
+        @apply shadow;
+        @apply shadow-fuchsia-100;
+        @apply border-none;
+    }
+    button {
+        @apply bg-emerald-300;
+        @apply border-none;
+        @apply rounded-md;
+    }
+}

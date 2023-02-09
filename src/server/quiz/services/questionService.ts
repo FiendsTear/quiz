@@ -15,7 +15,7 @@ export async function getQuestion(questionID: number) {
 export async function addOrUpdateQuestion(input: QuestionDTO) {
   const question = await prisma.question.upsert({
     where: { id: input.id },
-    create: { body: input.body, quiz: { connect: { id: input.quizID } } },
+    create: { body: input.body, order: input.order, quiz: { connect: { id: input.quizID } } },
     update: { body: input.body },
   });
   await prisma.$disconnect();

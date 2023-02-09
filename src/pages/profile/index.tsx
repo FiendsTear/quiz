@@ -23,16 +23,18 @@ export default function ProfilePage() {
   return (
     <article>
       <h1>Профиль</h1>
-      <ul>
+      <ul className="grid grid-cols-auto-200 justify-center">
         {query.data?.map((quiz) => {
           return (
-            <li key={quiz.id}>
-              <Link href={`profile/quizzes/${quiz.id}`}>{quiz.name}</Link>
+            <li key={quiz.id} className="hover:bg-emerald-200">
+              <Link href={`profile/quizzes/${quiz.id}`} className='w-full block'>{quiz.name}</Link>
             </li>
           );
         })}
+        <li>
+          <button onClick={handleNewQuiz}>Сreate New Quiz</button>
+        </li>
       </ul>
-      <button onClick={handleNewQuiz}>Сreate New Quiz</button>
     </article>
   );
 }

@@ -46,9 +46,10 @@ export default function NewQuizPage() {
       <input
         type="text"
         defaultValue={getQuizQuery.data?.name}
+        className="mb-5"
         {...register("name", { onChange: debounce(handleNameChange, 700) })}
       ></input>
-      <ul>
+      <ul className="flex flex-col gap-5">
         {questions.map((question) => {
           return (
             <QuestionEditor
