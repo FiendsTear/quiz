@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer base {
+    body {
+        @apply text-stone-700;
+    }
     input {
         @apply outline-1;
         @apply outline;
@@ -17,5 +20,10 @@
         @apply bg-emerald-300;
         @apply border-none;
         @apply rounded-md;
+        @apply text-inherit;
+    }
+    a {
+        @apply no-underline;
+        @apply text-inherit;
     }
 }

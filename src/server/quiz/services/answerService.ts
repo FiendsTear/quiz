@@ -15,6 +15,5 @@ export async function addOrUpdateAnswer(input: AnswerDTO) {
     update: { body, isCorrect },
     include: { question: true },
   });
-  await prisma.$disconnect();
   return answer;
 }

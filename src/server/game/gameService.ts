@@ -1,41 +1,95 @@
-import { GameStatus, PrismaClient } from "@prisma/client";
-import { GameDTO } from "./dto/createGameDTO";
-import { updateGameDTO, UpdateGameDTO } from "./dto/updateGameDTO";
+import { EventEmitter } from "events";
+import { Question, Answer } from "@prisma/client";
+import { createGame, GameWithAnswers, getGamesByID } from "./gameRepository";
+import { TRPCError } from "@trpc/server";
+import { observable } from "@trpc/server/observable";
 
-const prisma = new PrismaClient();
+enum GameStatus {
+  Created,
+  Ongoing,
+  Finished,
+}
 
-export async function getGame(id: number) {
-  const game = await prisma.game.findFirstOrThrow({
-    where: { id },
-    include: {
-      quiz: { include: { questions: { orderBy: { order: "asc" } } } },
-    },
+enum GameEvents {
+  Started = "STARTED",
+  PlayerEntered = "PLAYER_ENTERED",
+}
+
+type GameState = {
+  status: GameStatus;
+  currentQuestion: Question & { answers: Answer[] };
+  players: string[];
+};
+
+interface IActiveGame {
+  gameState: GameState;
+  gameData: GameWithAnswers;
+  emitter: EventEmitter;
+}
+
+const activeGames: Map<number, IActiveGame> = new Map();
+
+export async function updateGameState() {}
+
+export async function getActiveGames() {
+  const gamesID = [...activeGames.keys()];
+  return await getGamesByID(gamesID);
+}
+
+export async function getGameState(gameID: number) {
+  const game = getGame(gameID);
+  return game.gameState;
+}
+
+export async function addGame(input: number) {
+  const gameData = await createGame(input);
+  console.log(gameData.quiz);
+  const gameState = {
+    status: GameStatus.Created,
+    players: [],
+    currentQuestion: gameData.quiz.questions[0],
+  };
+  const activeGame = {
+    emitter: new EventEmitter(),
+    gameData,
+    gameState,
+  };
+  activeGames.set(gameData.id, activeGame);
+  return activeGame;
+}
+
+export async function startGame(gameID: number) {
+  const game = getGame(gameID);
+  game.gameState.status = GameStatus.Ongoing;
+  game.emitter.emit(GameEvents.Started, game.gameState);
+  return game.gameState;
+}
+
+export async function subscribeToGame(gameID: number) {
+  const game = getGame(gameID);
+
+  return observable<string>((emit) => {
+    const onChange = (data: string) => {
+      emit.next(data);
+    };
+    game.emitter.on(GameEvents.Started, onChange);
+    game.emitter.on(GameEvents.PlayerEntered, onChange);
+    return () => {
+      game.emitter.off(GameEvents.Started, onChange);
+      game.emitter.off(GameEvents.PlayerEntered, onChange);
+    };
   });
-  await prisma.$disconnect();
+}
+
+export async function enterGame(gameID: number, playerID: string) {
+  const game = getGame(gameID);
+  game.gameState.players.push(playerID);
+  game.emitter.emit(GameEvents.PlayerEntered, playerID);
+  return game.gameState.players;
+}
+
+function getGame(gameID: number) {
+  const game = activeGames.get(gameID);
+  if (!game) throw new TRPCError({ code: "BAD_REQUEST" });
   return game;
-}
-
-export async function createGame(input: GameDTO) {
-  const game = await prisma.game.create({
-    data: {
-      quiz: {
-        connect: { id: input.quizID },
-      },
-    },
-  });
-  await prisma.$disconnect();
-  return game;
-}
-
-export async function updateGame(dto: UpdateGameDTO) {
-  return await prisma.game.update({
-    where: { id: dto.id },
-    data: { status: dto.status },
-  });
-}
-
-export async function getGames(gameIDs: number[]) {
-  return await prisma.game.findMany({
-    where: { id: { in: gameIDs }, status: GameStatus.CREATED },
-  });
 }
