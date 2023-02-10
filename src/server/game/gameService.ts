@@ -43,6 +43,7 @@ export async function getGameState(gameID: number) {
 
 export async function addGame(input: number) {
   const gameData = await createGame(input);
+  console.log(gameData.quiz);
   const gameState = {
     status: GameStatus.Created,
     players: [],

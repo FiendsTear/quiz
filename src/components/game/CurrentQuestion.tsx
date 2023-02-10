@@ -8,7 +8,7 @@ export default function CurrentQuestion(props: { questionData: QuestionData }) {
   const { questionData } = props;
   return (
     <div>
-      <div>{questionData.id}</div>
+      <div>{questionData.body}</div>
       {questionData.answers.map((answer) => (
         <div key={answer.id}>{answer.body}</div>
       ))}
