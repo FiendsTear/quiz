@@ -88,6 +88,12 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
   },
 });
 
+const wsT = initTRPC.context<typeof createWSContext>().create({
+  transformer: superjson,
+  errorFormatter({ shape }) {
+    return shape;
+  },
+})
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
  *
@@ -101,6 +107,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
  * @see https://trpc.io/docs/router
  */
 export const createTRPCRouter = t.router;
+export const createWSRouter = wsT.router;
 
 /**
  * Public (unauthenticated) procedure
@@ -110,6 +117,7 @@ export const createTRPCRouter = t.router;
  * can still access user session data if they are logged in.
  */
 export const publicProcedure = t.procedure;
+export const publicWSProcedure = wsT.procedure;
 
 /**
  * Reusable middleware that enforces users are logged in before running the
@@ -127,6 +135,17 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
+const enforceWSUserIsAuthed = wsT.middleware(({ ctx, next }) => {
+  if (!ctx.session || !ctx.session.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
 /**
  * Protected (authenticated) procedure
  *
@@ -137,3 +156,4 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
+export const protectedWSProcedure = wsT.procedure.use(enforceWSUserIsAuthed);

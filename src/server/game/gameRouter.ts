@@ -1,100 +1,50 @@
 import { observable } from "@trpc/server/observable";
-import { EventEmitter } from "events";
-import { object, z } from "zod";
-import { createTRPCRouter, protectedProcedure } from "../trpc";
-import { createGame, getGame, getGames, updateGame } from "./gameService";
-import { gameDTO } from "./dto/createGameDTO";
-import { TRPCError } from "@trpc/server";
-import { updateGameDTO } from "./dto/updateGameDTO";
-import { Question, Answer, User } from "@prisma/client";
+import { z } from "zod";
+import { protectedProcedure, createWSRouter } from "../trpc";
+import {
+  addGame,
+  enterGame,
+  getActiveGames,
+  getGameState,
+  startGame,
+  subscribeToGame,
+} from "./gameService";
 
-enum GameStatus {
-  Created,
-  Ongoing,
-  Finished,
-}
-
-enum GameEvents {
-  Started = "STARTED",
-  PlayerEntered = "PLAYER_ENTERED",
-}
-
-interface IGameState {
-  status: GameStatus;
-  currentQuestion: Question & { answers: Answer[] };
-  participants: string[];
-}
-interface IGames {
-  [key: string]: {
-    emitter: EventEmitter;
-    gameState: IGameState;
-  };
-}
-const games: IGames = {};
-
-export const gameRouter = createTRPCRouter({
-  getGames: protectedProcedure.query(async () => {
-    const activeGamesID = Object.keys(games);
-    return await getGames(activeGamesID.map(Number));
+export const gameRouter = createWSRouter({
+  getActiveGames: protectedProcedure.query(async ({ ctx }) => {
+    return await getActiveGames();
   }),
 
-  getGame: protectedProcedure.input(z.number()).query(({ input }) => {
-    const game = getGame(input);
+  getGameState: protectedProcedure.input(z.number()).query(({ input }) => {
+    const game = getGameState(input);
     return game;
   }),
 
   // host created a game
-  create: protectedProcedure.input(gameDTO).mutation(async ({ input }) => {
-    const game = await createGame(input);
-    games[game.id] = {
-      emitter: new EventEmitter(),
-      gameState: {
-        status: GameStatus.Created,
-        currentQuestion: game.quiz.questions[0],
-        participants: [],
-      },
-    };
-    return game;
-  }),
+  create: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ input, ctx }) => {
+      const game = await addGame(input);
+      return game.gameData.id;
+    }),
+
+  subcribeToGame: protectedProcedure
+    .input(z.number())
+    .subscription(async ({ input }) => {
+      return await subscribeToGame(input);
+    }),
 
   // player entered a game
-  enter: protectedProcedure.input(z.number()).mutation(({ ctx, input }) => {
-    const game = games[input];
-    if (!game) throw new TRPCError({ code: "BAD_REQUEST" });
-    game.gameState.participants.push(ctx.session.user.id);
-    game.emitter.emit(GameEvents.PlayerEntered, input);
-    return "entered";
-  }),
-
-  onEnter: protectedProcedure.input(z.number()).subscription(({ input }) => {
-    return observable<string>((emit) => {
-      const onEnter = (data: string) => {
-        emit.next(data);
-      };
-      games[input].emitter.on(GameEvents.PlayerEntered, onEnter);
-      return () => {
-        games[input].emitter.off(GameEvents.PlayerEntered, onEnter);
-      };
-    });
-  }),
+  enter: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ ctx, input }) => {
+      const playerID = ctx.session.user.id;
+      const players = await enterGame(input, playerID);
+      return players;
+    }),
 
   // host started a game
-  start: protectedProcedure.input(updateGameDTO).mutation(async ({ input }) => {
-    const game = games[input.id];
-    if (!game) throw new TRPCError({ code: "BAD_REQUEST" });
-    game.emitter.emit(GameEvents.Started, game.gameState);
-    return await updateGame(input);
-  }),
-
-  onStart: protectedProcedure.input(z.number()).subscription(({ input }) => {
-    return observable<IGameState>((emit) => {
-      const onStart = (data: IGameState) => {
-        emit.next(data);
-      };
-      games[input].emitter.on(GameEvents.Started, onStart);
-      return () => {
-        games[input].emitter.off(GameEvents.Started, onStart);
-      };
-    });
+  start: protectedProcedure.input(z.number()).mutation(async ({ input }) => {
+    return await startGame(input);
   }),
 });

@@ -1,16 +1,18 @@
-import { trpc } from "@/utils/trpc";
+import { GameStatus, trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
-import { GameStatus } from "@prisma/client";
 import { useState } from "react";
+import CurrentQuestion from '../../../components/game/CurrentQuestion';
 
 export default function GameHostPage() {
   const { query, isReady } = useRouter();
   const gameID = Number(query.id?.toString());
 
-  const [ gameState, setGameState ] = useState();
-  const getGameQuery = trpc.game.getGame.useQuery(gameID, { enabled: isReady });
+  const [gameState, setGameState] = useState();
+  const getGameQuery = trpc.game.getGameState.useQuery(gameID, {
+    enabled: isReady,
+  });
 
-  const onEnterSub = trpc.game.onEnter.useSubscription(gameID, {
+  const onEnterSub = trpc.game.subcribeToGame.useSubscription(gameID, {
     onData(input: any) {
       console.log(input);
     },
@@ -21,30 +23,25 @@ export default function GameHostPage() {
 
   const startMutation = trpc.game.start.useMutation({
     onSuccess(data) {
-      console.log('start mut');
+      console.log("start mut");
       console.log(data);
-    }
-  });
-  trpc.game.onStart.useSubscription(gameID, {
-    onData(data) {
-      
     },
   });
 
   function startGame() {
-    startMutation.mutate({ id: gameID, status: GameStatus.STARTED });
+    startMutation.mutate(gameID);
   }
 
   if (getGameQuery.isLoading) return <div>Загрузка</div>;
 
-//   if (getGameQuery.data?.status === GameStatus.STARTED)
-//     return <CurrentQuestion questionData={getGameQuery.data}></CurrentQuestion>;
+    if (getGameQuery.data?.status === GameStatus.Ongoing)
+      return <CurrentQuestion questionData={getGameQuery.data.currentQuestion}></CurrentQuestion>;
 
   return (
     <section>
       Game
       <br />
-      {getGameQuery.data?.quiz.name}
+      {getGameQuery.data?.status}
       <br />
       <button type="button" onClick={startGame}>
         Start game

@@ -12,13 +12,11 @@ export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
     create: { name: input.name, 
               userId: session.user.id },
   });
-  await prisma.$disconnect();
   return quiz;
 }
 
 export async function getQuizzes() {
   const quizzes = await prisma.quiz.findMany();
-  await prisma.$disconnect();
   return quizzes;
 }
 
@@ -27,6 +25,5 @@ export async function getQuiz(quizID: string) {
     where: { id: +quizID },
     include: { questions: true },
   });
-  await prisma.$disconnect();
   return quiz;
 }

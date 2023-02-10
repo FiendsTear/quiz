@@ -8,7 +8,6 @@ export async function getQuestion(questionID: number) {
     where: { id: questionID },
     include: { answers: true },
   });
-  await prisma.$disconnect();
   return question;
 }
 
@@ -18,6 +17,5 @@ export async function addOrUpdateQuestion(input: QuestionDTO) {
     create: { body: input.body, order: input.order, quiz: { connect: { id: input.quizID } } },
     update: { body: input.body },
   });
-  await prisma.$disconnect();
   return question;
 }

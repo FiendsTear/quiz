@@ -7,6 +7,5 @@ export async function addUser(input: CreateUserDTO) {
   const user = await prisma.user.create({
     data: input,
   });
-  await prisma.$disconnect();
   return user;
 }
