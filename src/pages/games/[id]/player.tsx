@@ -1,5 +1,6 @@
 import { GameStatus, trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
+import CurrentQuestion from "../../../components/game/CurrentQuestion";
 
 export default function GamePlayerPage() {
   const { query, isReady } = useRouter();
@@ -17,10 +18,9 @@ export default function GamePlayerPage() {
 
   if (getGameQuery.data?.status === GameStatus.Ongoing)
     return (
-      <></>
-      //   <CurrentQuestion
-      //     questionData={getGameQuery.data.quiz.questions[0]}
-      //   ></CurrentQuestion>
+      <CurrentQuestion
+        questionData={getGameQuery.data.currentQuestion}
+      ></CurrentQuestion>
     );
 
   return <section>Ожидаем старта</section>;

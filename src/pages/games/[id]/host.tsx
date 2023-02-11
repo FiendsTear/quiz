@@ -5,9 +5,7 @@ import CurrentQuestion from "../../../components/game/CurrentQuestion";
 
 export default function GameHostPage() {
   const { query, isReady } = useRouter();
-  console.log(query);
   const gameID = Number(query.id?.toString());
-  console.log(gameID);
   const [gameState, setGameState] = useState();
   const getGameQuery = trpc.game.getGameState.useQuery(gameID, {
     enabled: isReady,

@@ -7,7 +7,6 @@ export default function GamesPage() {
   const { push } = useRouter();
 
   const gamesQuery = trpc.game.getActiveGames.useQuery();
-  const gameEnterMutation = trpc.game.enter.useMutation();
 
   const [input, setInput] = useState(0);
   const mutation = trpc.game.create.useMutation({
@@ -25,8 +24,7 @@ export default function GamesPage() {
   }
 
   function handleGameEnter(gameID: number) {
-    gameEnterMutation.mutate(gameID);
-    push(`/games/${gameID}`);
+    push(`/games/${gameID}/gateway`);
   }
 
   return (

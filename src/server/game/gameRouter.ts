@@ -1,8 +1,10 @@
 import { observable } from "@trpc/server/observable";
 import { z } from "zod";
 import { protectedProcedure, createWSRouter } from "../trpc";
+import { addPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
 import {
   addGame,
+  addPlayerAnswer,
   enterGame,
   getActiveGames,
   getGameState,
@@ -47,4 +49,10 @@ export const gameRouter = createWSRouter({
   start: protectedProcedure.input(z.number()).mutation(async ({ input }) => {
     return await startGame(input);
   }),
+
+  answer: protectedProcedure
+    .input(addPlayerAnswerDTO)
+    .mutation(async ({ input, ctx }) => {
+      return await addPlayerAnswer(input, ctx.session.user.id);
+    }),
 });
