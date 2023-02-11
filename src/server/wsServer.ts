@@ -1,6 +1,6 @@
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
 import ws from "ws";
-import { createTRPCContext, createWSContext } from './trpc';
+import { createWSContext } from './trpc';
 import { appRouter } from "./mainRouter";
 
 const wss = new ws.Server({
@@ -13,7 +13,7 @@ wss.on("connection", (ws) => {
     console.log(`➖➖ Connection (${wss.clients.size})`);
   });
 });
-console.log("✅ WebSocket Server listening on ws://localhost:3001");
+console.log("✅ WebSocket Server listening on ws://localhost:3100");
 process.on("SIGTERM", () => {
   console.log("SIGTERM");
   handler.broadcastReconnectNotification();

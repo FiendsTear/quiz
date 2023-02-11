@@ -1,6 +1,5 @@
-import { observable } from "@trpc/server/observable";
 import { z } from "zod";
-import { protectedProcedure, createWSRouter } from "../trpc";
+import { createWSRouter, protectedWSProcedure } from "../trpc";
 import { addPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
 import {
   addGame,
@@ -13,31 +12,31 @@ import {
 } from "./gameService";
 
 export const gameRouter = createWSRouter({
-  getActiveGames: protectedProcedure.query(async ({ ctx }) => {
+  getActiveGames: protectedWSProcedure.query(async ({ ctx }) => {
     return await getActiveGames();
   }),
 
-  getGameState: protectedProcedure.input(z.number()).query(({ input }) => {
+  getGameState: protectedWSProcedure.input(z.number()).query(({ input }) => {
     const game = getGameState(input);
     return game;
   }),
 
   // host created a game
-  create: protectedProcedure
+  create: protectedWSProcedure
     .input(z.number())
     .mutation(async ({ input, ctx }) => {
       const game = await addGame(input);
       return game.gameData.id;
     }),
 
-  subcribeToGame: protectedProcedure
+  subcribeToGame: protectedWSProcedure
     .input(z.number())
     .subscription(async ({ input }) => {
       return await subscribeToGame(input);
     }),
 
   // player entered a game
-  enter: protectedProcedure
+  enter: protectedWSProcedure
     .input(z.number())
     .mutation(async ({ ctx, input }) => {
       const playerID = ctx.session.user.id;
@@ -46,11 +45,11 @@ export const gameRouter = createWSRouter({
     }),
 
   // host started a game
-  start: protectedProcedure.input(z.number()).mutation(async ({ input }) => {
+  start: protectedWSProcedure.input(z.number()).mutation(async ({ input }) => {
     return await startGame(input);
   }),
 
-  answer: protectedProcedure
+  answer: protectedWSProcedure
     .input(addPlayerAnswerDTO)
     .mutation(async ({ input, ctx }) => {
       return await addPlayerAnswer(input, ctx.session.user.id);

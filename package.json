@@ -3,8 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"next dev -p 3001\" \"cross-env PORT=3001 tsx watch src/server/wsServer.ts --tsconfig tsconfig.server.json\"",
-    "dev:wss": "cross-env PORT=3001 tsx watch src/server/wsServer.ts --tsconfig tsconfig.server.json",
+    "dev": "concurrently \"next dev -p 3001\" \"tsx watch src/server/wsServer.ts --tsconfig tsconfig.server.json\"",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
