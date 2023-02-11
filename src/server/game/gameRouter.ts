@@ -7,6 +7,7 @@ import {
   enterGame,
   getActiveGames,
   getGameState,
+  leaveGame,
   startGame,
   subscribeToGame,
 } from "./gameService";
@@ -41,6 +42,7 @@ export const gameRouter = createWSRouter({
     .mutation(async ({ ctx, input }) => {
       const playerID = ctx.session.user.id;
       const players = await enterGame(input, playerID);
+      ctx.req?.socket.on('close', () => leaveGame(input, playerID));
       return players;
     }),
 
@@ -54,4 +56,8 @@ export const gameRouter = createWSRouter({
     .mutation(async ({ input, ctx }) => {
       return await addPlayerAnswer(input, ctx.session.user.id);
     }),
+
+  disconnect: protectedWSProcedure.mutation(() => {
+    console.log('disconnect');
+  })
 });

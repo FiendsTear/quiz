@@ -28,6 +28,7 @@ import ws from "ws";
 
 type CreateContextOptions = {
   session: Session | null;
+  req?: IncomingMessage;
 };
 
 /**
@@ -44,6 +45,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
+    req: opts.req
   };
 };
 
@@ -60,17 +62,15 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
-    session,
+    session
   });
 };
 
 export const createWSContext = async (
-  opts:
-    | CreateNextContextOptions
-    | NodeHTTPCreateContextFnOptions<IncomingMessage, ws>
+  opts: NodeHTTPCreateContextFnOptions<IncomingMessage, ws>
 ) => {
   const session = await getSession(opts);
-  return createInnerTRPCContext({ session });
+  return createInnerTRPCContext({ session, req: opts.req });
 };
 
 /**
@@ -81,8 +81,6 @@ export const createWSContext = async (
  */
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-
-
 
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
@@ -138,17 +136,6 @@ const enforceUserIsAuthed = t.middleware(({ ctx, next }) => {
   });
 });
 
-const enforceWSUserIsAuthed = wsT.middleware(({ ctx, next }) => {
-  if (!ctx.session || !ctx.session.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED" });
-  }
-  return next({
-    ctx: {
-      // infers the `session` as non-nullable
-      session: { ...ctx.session, user: ctx.session.user },
-    },
-  });
-});
 /**
  * Protected (authenticated) procedure
  *
@@ -159,4 +146,4 @@ const enforceWSUserIsAuthed = wsT.middleware(({ ctx, next }) => {
  * @see https://trpc.io/docs/procedures
  */
 export const protectedProcedure = t.procedure.use(enforceUserIsAuthed);
-export const protectedWSProcedure = wsT.procedure.use(enforceWSUserIsAuthed);
+export const protectedWSProcedure = wsT.procedure.use(enforceUserIsAuthed);

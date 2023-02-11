@@ -38,7 +38,7 @@ interface IActiveGame {
 
 const activeGames: Map<number, IActiveGame> = new Map();
 
-export async function updateGameState() {}
+export async function updateGameState() { }
 
 export async function getActiveGames() {
   const gamesID = [...activeGames.keys()];
@@ -52,7 +52,6 @@ export async function getGameState(gameID: number) {
 
 export async function addGame(input: number) {
   const gameData = await createGame(input);
-  console.log(gameData.quiz);
   const gameState = {
     status: GameStatus.Created,
     players: [],
@@ -116,6 +115,13 @@ export async function addPlayerAnswer(
   }
 }
 
+export async function leaveGame(gameID: number, playerID: string) {
+  const game = getGame(gameID);
+  const { players } = game.gameState;
+  const playerIndex = players.findIndex((player) => (player.id = playerID));
+  players.splice(playerIndex, 1);
+}
+
 function getGame(gameID: number) {
   const game = activeGames.get(gameID);
   if (!game) throw new TRPCError({ code: "BAD_REQUEST" });
@@ -126,6 +132,11 @@ function getPlayer(gameState: GameState, playerID: string) {
   const player = gameState.players.find((player) => (player.id = playerID));
   if (!player) throw new TRPCError({ code: "BAD_REQUEST" });
   return player;
+}
+
+function getPlayerByGameID(gameID: number, playerID: string) {
+  const game = getGame(gameID);
+  return getPlayer(game.gameState, playerID);
 }
 
 function finishQuestion(game: IActiveGame) {

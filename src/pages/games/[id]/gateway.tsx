@@ -1,19 +1,20 @@
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 export default function GameGatewayPage() {
-  const { push, query } = useRouter();
-  const enterMutation = trpc.game.enter.useMutation();
-  console.log(enterMutation.isSuccess);
-  if (!enterMutation.isSuccess) {
-    enterMutation.mutate(Number(query.id?.toString()), {
-      onSuccess() {
-        console.log("enter");
-        console.log(enterMutation.isSuccess);
-        push(`/games/${query.id}/player`);
-      },
-    });
-  }
+  const { push, query, isReady } = useRouter();
+  const enterMutation = trpc.game.enter.useMutation({
+    onSuccess(data) {
+      console.log("enter");
+      console.log(enterMutation);
+      push(`/games/${query.id}/player`);
+    },
+  });
+  useEffect(() => {
+    if (enterMutation.isIdle && isReady)
+      enterMutation.mutate(Number(query.id?.toString()));
+  }, [query]);
 
   return <></>;
 }

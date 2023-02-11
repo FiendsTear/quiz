@@ -11,7 +11,9 @@ export default function GamePlayerPage() {
   });
 
   trpc.game.subcribeToGame.useSubscription(gameID, {
-    onData(data) {},
+    onData(data) {
+      console.log(data);
+    },
   });
 
   if (getGameQuery.isLoading) return <div>Загрузка</div>;
