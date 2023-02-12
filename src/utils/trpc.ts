@@ -85,18 +85,17 @@ export const trpc = createTRPCNext<AppRouter>({
  *
  * @example type HelloInput = RouterInputs['example']['hello']
  **/
- export type RouterInputs = inferRouterInputs<AppRouter>;
+export type RouterInputs = inferRouterInputs<AppRouter>;
 
- /**
-  * Inference helper for outputs.
-  *
-  * @example type HelloOutput = RouterOutputs['example']['hello']
-  **/
- export type RouterOutputs = inferRouterOutputs<AppRouter>;
+/**
+ * Inference helper for outputs.
+ *
+ * @example type HelloOutput = RouterOutputs['example']['hello']
+ **/
+export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
- export enum GameStatus {
-    Created,
-    Ongoing,
-    Finished,
-  }
-  
+export enum GameStatus {
+  Created,
+  Ongoing,
+  Finished,
+}

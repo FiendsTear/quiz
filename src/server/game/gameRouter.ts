@@ -54,6 +54,7 @@ export const gameRouter = createWSRouter({
   answer: protectedWSProcedure
     .input(addPlayerAnswerDTO)
     .mutation(async ({ input, ctx }) => {
+      console.log(ctx.session);
       return await addPlayerAnswer(input, ctx.session.user.id);
     }),
 

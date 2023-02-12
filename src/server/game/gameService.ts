@@ -11,11 +11,16 @@ enum GameStatus {
   Finished,
 }
 
+// enum GameEvents {
+//   Started = "STARTED",
+//   PlayerEntered = "PLAYER_ENTERED",
+//   PlayerAnswered = "PLAYER_ANSWERED",
+//   QuestionFinished = "QUESTION_FINISHED",
+//   QuestionNext = "QUESTION_NEXT"
+// }
+
 enum GameEvents {
-  Started = "STARTED",
-  PlayerEntered = "PLAYER_ENTERED",
-  PlayerAnswered = "PLAYER_ANSWERED",
-  QuestionFinished = "QUESTION_FINISHED",
+  Changed = 'CHANGED'
 }
 
 type Player = {
@@ -28,6 +33,7 @@ type GameState = {
   currentQuestion: Question & { answers: Answer[] };
   players: Player[];
   playersAnsweredCount: number;
+  currentCorrectAnswers: Answer[];
 };
 
 interface IActiveGame {
@@ -57,6 +63,7 @@ export async function addGame(input: number) {
     players: [],
     currentQuestion: gameData.quiz.questions[0],
     playersAnsweredCount: 0,
+    currentCorrectAnswers: []
   };
   const activeGame = {
     emitter: new EventEmitter(),
@@ -70,32 +77,31 @@ export async function addGame(input: number) {
 export async function startGame(gameID: number) {
   const game = getGame(gameID);
   game.gameState.status = GameStatus.Ongoing;
-  game.emitter.emit(GameEvents.Started, game.gameState);
+  game.emitter.emit(GameEvents.Changed, game.gameState);
   return game.gameState;
 }
 
 export async function subscribeToGame(gameID: number) {
   const game = getGame(gameID);
 
-  return observable<string>((emit) => {
-    const onChange = (data: string) => {
+  return observable<GameState>((emit) => {
+    function onChange(data: GameState) {
       emit.next(data);
-    };
-    game.emitter.on(GameEvents.Started, onChange);
-    game.emitter.on(GameEvents.PlayerEntered, onChange);
-    game.emitter.on(GameEvents.QuestionFinished, onChange);
+    }
+    game.emitter.on(GameEvents.Changed, onChange);
     return () => {
-      game.emitter.off(GameEvents.Started, onChange);
-      game.emitter.off(GameEvents.PlayerEntered, onChange);
-      game.emitter.off(GameEvents.QuestionFinished, onChange);
+      game.emitter.off(GameEvents.Changed, onChange);
     };
   });
 }
 
+
 export async function enterGame(gameID: number, playerID: string) {
   const game = getGame(gameID);
+  const playerRegistered = game.gameState.players.findIndex(player => player.id = playerID);
+  if (playerRegistered != -1) return 'alreadyRegistered';
   game.gameState.players.push({ id: playerID });
-  game.emitter.emit(GameEvents.PlayerEntered, playerID);
+  game.emitter.emit(GameEvents.Changed, game.gameState);
   return game.gameState.players;
 }
 
@@ -107,7 +113,7 @@ export async function addPlayerAnswer(
   const player = getPlayer(game?.gameState, playerID);
 
   player.currentAnswerID = dto.answerID;
-  game.emitter.emit(GameEvents.PlayerAnswered, player.id);
+  game.emitter.emit(GameEvents.Changed, game.gameState);
 
   game.gameState.playersAnsweredCount++;
   if (game.gameState.playersAnsweredCount === game.gameState.players.length) {
@@ -124,13 +130,13 @@ export async function leaveGame(gameID: number, playerID: string) {
 
 function getGame(gameID: number) {
   const game = activeGames.get(gameID);
-  if (!game) throw new TRPCError({ code: "BAD_REQUEST" });
+  if (!game) throw new TRPCError({ code: "BAD_REQUEST", message: 'Game not found' });
   return game;
 }
 
 function getPlayer(gameState: GameState, playerID: string) {
   const player = gameState.players.find((player) => (player.id = playerID));
-  if (!player) throw new TRPCError({ code: "BAD_REQUEST" });
+  if (!player) throw new TRPCError({ code: "BAD_REQUEST", message: 'Player not found' });
   return player;
 }
 
@@ -140,5 +146,14 @@ function getPlayerByGameID(gameID: number, playerID: string) {
 }
 
 function finishQuestion(game: IActiveGame) {
-  game.emitter.emit(GameEvents.QuestionFinished, "NEXT QUESTION");
+  const questionIndex = game.gameData.quiz.questions.findIndex(question => question.id === game.gameState.currentQuestion.id);
+  const currentQuestion = game.gameData.quiz.questions[questionIndex];
+  game.gameState.currentCorrectAnswers = currentQuestion.answers.filter(answer => answer.isCorrect === true);
+  game.emitter.emit(GameEvents.Changed, game.gameState);
+  setTimeout(() => {
+    game.gameState.currentCorrectAnswers = [];
+    game.gameState.playersAnsweredCount = 0;
+    game.gameState.currentQuestion = game.gameData.quiz.questions[questionIndex + 1];
+    game.emitter.emit(GameEvents.Changed, game.gameState);
+  }, 2000);
 }
