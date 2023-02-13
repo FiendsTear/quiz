@@ -9,19 +9,14 @@ export default function GamesPage() {
   const gamesQuery = trpc.game.getActiveGames.useQuery();
   const quizQuery = trpc.quiz.getQuizzes.useQuery();
 
-  const [input, setInput] = useState(0);
   const mutation = trpc.game.create.useMutation({
     onSuccess: (data) => {
       push(`/games/${data}/host`);
     },
   });
 
-  function handleClick() {
-    mutation.mutate(input);
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
-    setInput(+e.target.value);
+  function handleClick(quizID: number) {
+    mutation.mutate(quizID);
   }
 
   function handleGameEnter(gameID: number) {
@@ -29,37 +24,54 @@ export default function GamesPage() {
   }
 
   function quizSelect() {
-    const options = quizQuery.data?.map((quiz) => (
-      <option key={quiz.id} value={quiz.id}>{quiz.name}</option>
+    const items = quizQuery.data?.map((quiz) => (
+      <li key={quiz.id} value={quiz.id} className="hover:bg-emerald-100 flex flex-col gap-2 p-4">
+        {quiz.name}
+        <div className="flex gap-2">
+          <button>Singleplayer</button>
+          <button onClick={() => handleClick(quiz.id)}>Multiplayer</button>
+        </div>
+      </li>
     ));
-    if (!options || !options.length)
-      return (<div>Quizzes not found</div>)
+    if (!items || !items.length)
+      return (
+        <div>Quizzes not found</div>
+      )
     else
       return (
-        <>
-          <select onChange={handleChange}>
-            {options}
-          </select>
-          <button onClick={handleClick}>Сreate New Game</button>
-        </>
+        <ul className="grid grid-cols-auto-200 gap-4 justify-center">
+          {items}
+        </ul>
+      )
+  }
+
+  function gameSelect() {
+    const items = gamesQuery.data?.map((game) => (        
+      <li key={game.id}>
+        <button onClick={() => handleGameEnter(game.id)}>
+          Enter Game {game.id}
+        </button>
+      </li>
+    ));
+    if (!items || !items.length)
+      return (
+        <div>Games not found</div>
+      )
+    else
+      return (
+        <ul className="grid grid-cols-auto-200 gap-4 justify-center">
+          {items}
+        </ul>
       )
   }
 
   return (
     <article>
       <h1>Games</h1>
+      <h2>Create Game</h2>
       {quizSelect()}
-      <ul>
-        {gamesQuery.data?.map((game) => {
-          return (
-            <li key={game.id}>
-              <button onClick={() => handleGameEnter(game.id)}>
-                Enter Game {game.id}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <h2>Enter Game</h2>
+      {gameSelect()}
     </article>
   );
 }
