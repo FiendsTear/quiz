@@ -6,45 +6,71 @@ export default function GamesPage() {
   const { push } = useRouter();
 
   const gamesQuery = trpc.game.getActiveGames.useQuery();
+  const quizQuery = trpc.quiz.getQuizzes.useQuery();
 
-  const [input, setInput] = useState(0);
   const mutation = trpc.game.create.useMutation({
     onSuccess: async (data) => {
       await push(`/games/${data}/host`);
     },
   });
 
-  function handleClick() {
-    mutation.mutate(input);
-  }
-
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setInput(+e.target.value);
+  function handleClick(quizID: number) {
+    mutation.mutate(quizID);
   }
 
   function handleGameEnter(gameID: number) {
     push(`/games/${gameID}/player`).catch((err) => console.error(err));
   }
 
+  function quizSelect() {
+    const items = quizQuery.data?.map((quiz) => (
+      <li key={quiz.id} value={quiz.id} className="hover:bg-emerald-100 flex flex-col gap-2 p-4">
+        {quiz.name}
+        <div className="flex gap-2">
+          <button>Singleplayer</button>
+          <button onClick={() => handleClick(quiz.id)}>Multiplayer</button>
+        </div>
+      </li>
+    ));
+    if (!items || !items.length)
+      return (
+        <div>Quizzes not found</div>
+      )
+    else
+      return (
+        <ul className="grid grid-cols-auto-200 gap-4 justify-center">
+          {items}
+        </ul>
+      )
+  }
+
+  function gameSelect() {
+    const items = gamesQuery.data?.map((game) => (        
+      <li key={game.id}>
+        <button onClick={() => handleGameEnter(game.id)}>
+          Enter Game {game.id}
+        </button>
+      </li>
+    ));
+    if (!items || !items.length)
+      return (
+        <div>Games not found</div>
+      )
+    else
+      return (
+        <ul className="grid grid-cols-auto-200 gap-4 justify-center">
+          {items}
+        </ul>
+      )
+  }
+
   return (
     <article>
-      <input onChange={handleChange} value={input}></input>
-      <button onClick={handleClick}>New game</button>
-      <ul>
-        {gamesQuery.data?.map((game) => {
-          return (
-            <li key={game.id}>
-              <button
-                onClick={() => {
-                  handleGameEnter(game.id);
-                }}
-              >
-                Enter Game {game.id}
-              </button>
-            </li>
-          );
-        })}
-      </ul>
+      <h1>Games</h1>
+      <h2>New Game</h2>
+      {quizSelect()}
+      <h2>Enter Game</h2>
+      {gameSelect()}
     </article>
   );
 }
