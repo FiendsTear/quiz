@@ -2,7 +2,6 @@ import { GameStatus, trpc } from "@/utils/trpc";
 import { useState, useEffect } from "react";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
-import useGameState from "../../../modules/game/useGameState";
 import { RouterOutputs } from "../../../utils/trpc";
 
 export default function PlayerGamePage() {
@@ -61,5 +60,5 @@ export default function PlayerGamePage() {
     );
   }
 
-  return <section>Ожидаем старта</section>;
+  return <section>Waiting for start</section>;
 }

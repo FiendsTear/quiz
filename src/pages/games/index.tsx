@@ -29,7 +29,7 @@ export default function GamesPage() {
   return (
     <article>
       <input onChange={handleChange} value={input}></input>
-      <button onClick={handleClick}>Новая игра</button>
+      <button onClick={handleClick}>New game</button>
       <ul>
         {gamesQuery.data?.map((game) => {
           return (

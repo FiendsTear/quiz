@@ -43,7 +43,9 @@ export default function NewQuizPage() {
 
   return (
     <article>
+      <label htmlFor="quiz-name">Quiz name</label>
       <input
+        id="quiz-name"
         type="text"
         defaultValue={getQuizQuery.data?.name}
         className="mb-5"
