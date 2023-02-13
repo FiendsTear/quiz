@@ -18,12 +18,23 @@ export default function CurrentQuestion(props: { questionData: QuestionData }) {
 
   return (
     <div>
-      <div>{questionData.body}</div>
-      {questionData.answers.map((answer) => (
-        <div key={answer.id} onClick={() => handleAnswerClick(answer.id)}>
-          {answer.body}
-        </div>
-      ))}
+      <div className="text-center">{questionData.body}</div>
+      <ul className="grid grid-cols-1 gap-3 justify-center">
+        {questionData.answers.map((answer) => (
+          <li
+            className=""
+            key={answer.id}
+            onClick={() => handleAnswerClick(answer.id)}
+          >
+            <button
+              type="button"
+              className="w-full bg-amber-100 hover:bg-amber-200"
+            >
+              {answer.body}
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

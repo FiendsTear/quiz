@@ -42,10 +42,12 @@ export default function HostGamePage() {
 
   return (
     <section>
-      Game
-      <br />
-      {gameState.status}
-      <br />
+      <div>Players:</div>
+      <ul>
+        {gameState.players?.map((player) => {
+          return <li key={player.id}>{player.name}</li>;
+        })}
+      </ul>
       <button type="button" onClick={startGame}>
         Start game
       </button>
