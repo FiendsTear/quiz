@@ -1,23 +1,24 @@
 import { GameStatus, trpc } from "@/utils/trpc";
-import { useRouter } from "next/router";
-import { useState } from "react";
-import CurrentQuestion from "../../../components/game/CurrentQuestion";
+import CurrentQuestion from "../../../modules/game/CurrentQuestion";
+import withSubscription from "../../../modules/game/useGameState";
 
-export default function GameHostPage() {
+import { useRouter } from "next/router";
+import useGameState from "../../../modules/game/useGameState";
+import { RouterOutputs } from "../../../utils/trpc";
+import { useState } from "react";
+
+export default function HostGamePage() {
   const { query, isReady } = useRouter();
   const gameID = Number(query.id?.toString());
-  const [gameState, setGameState] = useState();
-  const getGameQuery = trpc.game.getGameState.useQuery(gameID, {
-    enabled: isReady,
-  });
+  //   const gameState = useGameState(gameID);
 
-  const onEnterSub = trpc.game.subcribeToGame.useSubscription(gameID, {
-    enabled: isReady,
-    onData(input: any) {
-      console.log(input);
-    },
-    onError(err) {
-      console.log(err);
+  const [gameState, setGameState] = useState<
+    RouterOutputs["game"]["getGameState"]
+  >({} as RouterOutputs["game"]["getGameState"]);
+
+  trpc.game.subcribeToGame.useSubscription(gameID, {
+    onData(message) {
+      setGameState({ ...gameState, ...message });
     },
   });
 
@@ -32,12 +33,10 @@ export default function GameHostPage() {
     startMutation.mutate(gameID);
   }
 
-  if (getGameQuery.isLoading) return <div>Загрузка</div>;
-
-  if (getGameQuery.data?.status === GameStatus.Ongoing)
+  if (gameState.status === GameStatus.Ongoing)
     return (
       <CurrentQuestion
-        questionData={getGameQuery.data.currentQuestion}
+        questionData={gameState.currentQuestion}
       ></CurrentQuestion>
     );
 
@@ -45,7 +44,7 @@ export default function GameHostPage() {
     <section>
       Game
       <br />
-      {getGameQuery.data?.status}
+      {gameState.status}
       <br />
       <button type="button" onClick={startGame}>
         Start game

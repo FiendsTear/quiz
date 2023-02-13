@@ -32,33 +32,31 @@ export const gameRouter = createWSRouter({
 
   subcribeToGame: protectedWSProcedure
     .input(z.number())
-    .subscription(async ({ input }) => {
-      return await subscribeToGame(input);
+    .subscription(({ input }) => {
+      return subscribeToGame(input);
     }),
 
   // player entered a game
-  enter: protectedWSProcedure
-    .input(z.number())
-    .mutation(async ({ ctx, input }) => {
-      const playerID = ctx.session.user.id;
-      const players = await enterGame(input, playerID);
-      ctx.req?.socket.on('close', () => leaveGame(input, playerID));
-      return players;
-    }),
+  enter: protectedWSProcedure.input(z.number()).mutation(({ ctx, input }) => {
+    const player = ctx.session.user;
+    const gameState = enterGame(input, player);
+    ctx.req?.socket.on("close", () => leaveGame(input, player.id));
+    return gameState;
+  }),
 
   // host started a game
-  start: protectedWSProcedure.input(z.number()).mutation(async ({ input }) => {
-    return await startGame(input);
+  start: protectedWSProcedure.input(z.number()).mutation(({ input }) => {
+    return startGame(input);
   }),
 
   answer: protectedWSProcedure
     .input(addPlayerAnswerDTO)
-    .mutation(async ({ input, ctx }) => {
+    .mutation(({ input, ctx }) => {
       console.log(ctx.session);
-      return await addPlayerAnswer(input, ctx.session.user.id);
+      return addPlayerAnswer(input, ctx.session.user.id);
     }),
 
   disconnect: protectedWSProcedure.mutation(() => {
-    console.log('disconnect');
-  })
+    console.log("disconnect");
+  }),
 });

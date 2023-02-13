@@ -1,9 +1,11 @@
 import { EventEmitter } from "events";
-import { Question, Answer } from "@prisma/client";
-import { createGame, GameWithAnswers, getGamesByID } from "./gameRepository";
+import type { Question, Answer, User } from "@prisma/client";
+import type { GameWithAnswers } from "./gameRepository";
+import { createGame, getGamesByID } from "./gameRepository";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
-import { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
+import type { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
+import { DefaultSession, Session } from "next-auth";
 
 enum GameStatus {
   Created,
@@ -20,12 +22,14 @@ enum GameStatus {
 // }
 
 enum GameEvents {
-  Changed = 'CHANGED'
+  Changed = "CHANGED",
 }
 
 type Player = {
   id: string;
   currentAnswerID?: number;
+  score: number;
+  name: string;
 };
 
 type GameState = {
@@ -44,14 +48,15 @@ interface IActiveGame {
 
 const activeGames: Map<number, IActiveGame> = new Map();
 
-export async function updateGameState() { }
-
 export async function getActiveGames() {
-  const gamesID = [...activeGames.keys()];
-  return await getGamesByID(gamesID);
+  const availableGamesID: number[] = [];
+  activeGames.forEach((game, id) => {
+    if (game.gameState.status === GameStatus.Created) availableGamesID.push(id);
+  });
+  return await getGamesByID(availableGamesID);
 }
 
-export async function getGameState(gameID: number) {
+export function getGameState(gameID: number) {
   const game = getGame(gameID);
   return game.gameState;
 }
@@ -63,7 +68,7 @@ export async function addGame(input: number) {
     players: [],
     currentQuestion: gameData.quiz.questions[0],
     playersAnsweredCount: 0,
-    currentCorrectAnswers: []
+    currentCorrectAnswers: [],
   };
   const activeGame = {
     emitter: new EventEmitter(),
@@ -74,17 +79,17 @@ export async function addGame(input: number) {
   return activeGame;
 }
 
-export async function startGame(gameID: number) {
+export function startGame(gameID: number) {
   const game = getGame(gameID);
   game.gameState.status = GameStatus.Ongoing;
   game.emitter.emit(GameEvents.Changed, game.gameState);
   return game.gameState;
 }
 
-export async function subscribeToGame(gameID: number) {
+export function subscribeToGame(gameID: number) {
   const game = getGame(gameID);
 
-  return observable<GameState>((emit) => {
+  const gameObservable = observable<GameState>((emit) => {
     function onChange(data: GameState) {
       emit.next(data);
     }
@@ -93,22 +98,26 @@ export async function subscribeToGame(gameID: number) {
       game.emitter.off(GameEvents.Changed, onChange);
     };
   });
+  return gameObservable;
 }
 
-
-export async function enterGame(gameID: number, playerID: string) {
+export function enterGame(gameID: number, player: Session["user"]) {
   const game = getGame(gameID);
-  const playerRegistered = game.gameState.players.findIndex(player => player.id = playerID);
-  if (playerRegistered != -1) return 'alreadyRegistered';
-  game.gameState.players.push({ id: playerID });
+  const playerRegistered = game.gameState.players.find(
+    (registeredPlayer) => registeredPlayer.id === player.id
+  );
+  // already registered, just give state in case player refreshed page
+  if (playerRegistered) return game.gameState;
+  game.gameState.players.push({
+    id: player.id,
+    score: 0,
+    name: player.name as string,
+  });
   game.emitter.emit(GameEvents.Changed, game.gameState);
-  return game.gameState.players;
+  return game.gameState;
 }
 
-export async function addPlayerAnswer(
-  dto: AddPlayerAnswerDTO,
-  playerID: string
-) {
+export function addPlayerAnswer(dto: AddPlayerAnswerDTO, playerID: string) {
   const game = getGame(dto.gameID);
   const player = getPlayer(game?.gameState, playerID);
 
@@ -121,7 +130,7 @@ export async function addPlayerAnswer(
   }
 }
 
-export async function leaveGame(gameID: number, playerID: string) {
+export function leaveGame(gameID: number, playerID: string) {
   const game = getGame(gameID);
   const { players } = game.gameState;
   const playerIndex = players.findIndex((player) => (player.id = playerID));
@@ -130,30 +139,45 @@ export async function leaveGame(gameID: number, playerID: string) {
 
 function getGame(gameID: number) {
   const game = activeGames.get(gameID);
-  if (!game) throw new TRPCError({ code: "BAD_REQUEST", message: 'Game not found' });
+  if (!game)
+    throw new TRPCError({ code: "BAD_REQUEST", message: "Game not found" });
   return game;
 }
 
 function getPlayer(gameState: GameState, playerID: string) {
   const player = gameState.players.find((player) => (player.id = playerID));
-  if (!player) throw new TRPCError({ code: "BAD_REQUEST", message: 'Player not found' });
+  if (!player)
+    throw new TRPCError({ code: "BAD_REQUEST", message: "Player not found" });
   return player;
 }
 
-function getPlayerByGameID(gameID: number, playerID: string) {
-  const game = getGame(gameID);
-  return getPlayer(game.gameState, playerID);
-}
-
 function finishQuestion(game: IActiveGame) {
-  const questionIndex = game.gameData.quiz.questions.findIndex(question => question.id === game.gameState.currentQuestion.id);
-  const currentQuestion = game.gameData.quiz.questions[questionIndex];
-  game.gameState.currentCorrectAnswers = currentQuestion.answers.filter(answer => answer.isCorrect === true);
-  game.emitter.emit(GameEvents.Changed, game.gameState);
+  const { gameState, gameData, emitter } = game;
+  const questionIndex = gameData.quiz.questions.findIndex(
+    (question) => question.id === gameState.currentQuestion.id
+  );
+  const currentQuestion = gameData.quiz.questions[questionIndex];
+  const currentCorrectAnswers = currentQuestion.answers.filter(
+    (answer) => answer.isCorrect === true
+  );
+  gameState.currentCorrectAnswers = currentCorrectAnswers;
+  emitter.emit(GameEvents.Changed, game.gameState);
+  gameState.players.forEach((player) => {
+    currentCorrectAnswers.forEach((answer) => {
+      if (answer.id === player.currentAnswerID) {
+        player.score++;
+      }
+    });
+  });
   setTimeout(() => {
-    game.gameState.currentCorrectAnswers = [];
-    game.gameState.playersAnsweredCount = 0;
-    game.gameState.currentQuestion = game.gameData.quiz.questions[questionIndex + 1];
-    game.emitter.emit(GameEvents.Changed, game.gameState);
+    gameState.currentCorrectAnswers = [];
+    gameState.playersAnsweredCount = 0;
+    gameState.currentQuestion = gameData.quiz.questions[questionIndex + 1];
+    if (questionIndex + 1 === gameData.quiz.questions.length)
+      gameState.status = GameStatus.Finished;
+    else {
+      gameState.currentQuestion = gameData.quiz.questions[questionIndex + 1];
+    }
+    emitter.emit(GameEvents.Changed, gameState);
   }, 2000);
 }

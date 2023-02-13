@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 import { Question, Quiz } from "@prisma/client";
-import QuestionEditor from "../../../components/quiz/QuestionEditor";
+import QuestionEditor from "../../../modules/quiz/QuestionEditor";
 
 export default function NewQuizPage() {
   const { query, isReady } = useRouter();
