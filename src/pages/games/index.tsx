@@ -7,6 +7,7 @@ export default function GamesPage() {
   const { push } = useRouter();
 
   const gamesQuery = trpc.game.getActiveGames.useQuery();
+  const quizQuery = trpc.quiz.getQuizzes.useQuery();
 
   const [input, setInput] = useState(0);
   const mutation = trpc.game.create.useMutation({
@@ -19,7 +20,7 @@ export default function GamesPage() {
     mutation.mutate(input);
   }
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
     setInput(+e.target.value);
   }
 
@@ -27,10 +28,27 @@ export default function GamesPage() {
     push(`/games/${gameID}/gateway`);
   }
 
+  function quizSelect() {
+    const options = quizQuery.data?.map((quiz) => (
+      <option key={quiz.id} value={quiz.id}>{quiz.name}</option>
+    ));
+    if (!options || !options.length)
+      return (<div>Quizzes not found</div>)
+    else
+      return (
+        <>
+          <select onChange={handleChange}>
+            {options}
+          </select>
+          <button onClick={handleClick}>Сreate New Game</button>
+        </>
+      )
+  }
+
   return (
     <article>
-      <input onChange={handleChange} value={input}></input>
-      <button onClick={handleClick}>Новая игра</button>
+      <h1>Games</h1>
+      {quizSelect()}
       <ul>
         {gamesQuery.data?.map((game) => {
           return (
