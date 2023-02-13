@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { trpc } from "../../utils/trpc";
 
 export default function ProfilePage() {
-  const router = useRouter();
+  const { push } = useRouter();
   const query = trpc.quiz.getQuizzes.useQuery();
 
   const mutation = trpc.quiz.addOrUpdateQuiz.useMutation();
@@ -12,8 +12,8 @@ export default function ProfilePage() {
       { name: "new quiz" },
       {
         onSuccess: (data) => {
-          // router.push(`profile/quizzes/${data.id}`);
-          query.refetch();
+          push(`profile/quizzes/${data.id}`).catch((err) => console.error(err));
+          //   query.refetch();
         },
       }
     );
@@ -22,12 +22,17 @@ export default function ProfilePage() {
   if (query.isLoading) return <div>Загрузка</div>;
   return (
     <article>
-      <h1>Профиль</h1>
+      <h1>Profile</h1>
       <ul className="grid grid-cols-auto-200 justify-center">
         {query.data?.map((quiz) => {
           return (
             <li key={quiz.id} className="hover:bg-emerald-200">
-              <Link href={`profile/quizzes/${quiz.id}`} className='w-full block'>{quiz.name}</Link>
+              <Link
+                href={`profile/quizzes/${quiz.id}`}
+                className="w-full block"
+              >
+                {quiz.name}
+              </Link>
             </li>
           );
         })}

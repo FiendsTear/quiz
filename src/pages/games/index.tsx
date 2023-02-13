@@ -67,7 +67,7 @@ export default function GamesPage() {
   return (
     <article>
       <h1>Games</h1>
-      <h2>Create Game</h2>
+      <h2>New Game</h2>
       {quizSelect()}
       <h2>Enter Game</h2>
       {gameSelect()}

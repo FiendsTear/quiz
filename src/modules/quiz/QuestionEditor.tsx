@@ -1,9 +1,10 @@
 import { trpc } from "../../utils/trpc";
-import { Answer, Question } from "@prisma/client";
+import type { Answer, Question } from "@prisma/client";
 import { useState } from "react";
 import React from "react";
 import debounce from "lodash.debounce";
 import { useFieldArray, useForm } from "react-hook-form";
+import AnswerEditor from "./AnswerEditor";
 
 type QuestionWithAnswers = Question & { answers: Answer[] };
 
@@ -39,19 +40,8 @@ export default function QuestionEditor(props: { question: Question }) {
     answerMutation.mutate(
       { questionID: question.id },
       {
-        onSuccess: (data) => {
-          getQuestionQuery.refetch();
-        },
-      }
-    );
-  }
-
-  function handleAnswerChange(changedValue: Partial<Answer>, answer: Answer) {
-    answerMutation.mutate(
-      { ...answer, ...changedValue },
-      {
-        onSuccess: (data) => {
-          getQuestionQuery.refetch();
+        onSuccess: () => {
+          getQuestionQuery.refetch().catch((err) => console.error(err));
         },
       }
     );
@@ -60,7 +50,9 @@ export default function QuestionEditor(props: { question: Question }) {
   if (getQuestionQuery.isLoading) return <div>Загрузка</div>;
   return (
     <form>
+      <label htmlFor="question-body">Question text</label>
       <input
+        id="question-body"
         type="text"
         className="mb-3"
         {...register("body", { onChange: debounce(handleChange, 500) })}
@@ -68,29 +60,7 @@ export default function QuestionEditor(props: { question: Question }) {
       <fieldset className="flex flex-col gap-2">
         {fields.map((field, index) => {
           return (
-            <section key={field.fieldID}>
-              <input
-                {...register(`answers.${index}.body`, {
-                  onChange: debounce((e) => {
-                    handleAnswerChange({ body: e.target.value }, field);
-                  }, 500),
-                })}
-              />
-              <input
-                type="checkbox"
-                {...register(`answers.${index}.isCorrect`,
-                {
-                  onChange: debounce(
-                    (e) =>
-                      handleAnswerChange(
-                        { isCorrect: e.target.checked },
-                        field
-                      ),
-                    500
-                  ),
-                })}
-              ></input>
-            </section>
+            <AnswerEditor key={field.fieldID} answer={field}></AnswerEditor>
           );
         })}
       </fieldset>
