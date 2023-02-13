@@ -1,7 +1,6 @@
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 
 export default function GamesPage() {
   const { push } = useRouter();
@@ -10,8 +9,8 @@ export default function GamesPage() {
   const quizQuery = trpc.quiz.getQuizzes.useQuery();
 
   const mutation = trpc.game.create.useMutation({
-    onSuccess: (data) => {
-      push(`/games/${data}/host`);
+    onSuccess: async (data) => {
+      await push(`/games/${data}/host`);
     },
   });
 
@@ -20,7 +19,7 @@ export default function GamesPage() {
   }
 
   function handleGameEnter(gameID: number) {
-    push(`/games/${gameID}/gateway`);
+    push(`/games/${gameID}/player`).catch((err) => console.error(err));
   }
 
   function quizSelect() {

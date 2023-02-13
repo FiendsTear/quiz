@@ -1,36 +1,42 @@
-import { GameStatus, RouterOutputs, trpc } from "@/utils/trpc";
+import { GameStatus, trpc } from "@/utils/trpc";
+import { useState, useEffect } from "react";
+import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
-import { useState } from "react";
-import CurrentQuestion from "../../../components/game/CurrentQuestion";
+import useGameState from "../../../modules/game/useGameState";
+import { RouterOutputs } from "../../../utils/trpc";
 
-export default function GamePlayerPage() {
+export default function PlayerGamePage() {
   const { query, isReady } = useRouter();
+  const gameID = Number(query.id?.toString());
+  //   const gameState = useGameState(gameID);
+
   const [gameState, setGameState] = useState<
     RouterOutputs["game"]["getGameState"]
   >({} as RouterOutputs["game"]["getGameState"]);
-  const gameID = Number(query.id?.toString());
-
-  const getGameQuery = trpc.game.getGameState.useQuery(gameID, {
-    enabled: isReady,
-    staleTime: Infinity,
-    onSuccess(data) {
-      setGameState(data);
-    },
-  });
 
   trpc.game.subcribeToGame.useSubscription(gameID, {
     onData(message) {
-      setGameState(message);
+      setGameState({ ...gameState, ...message });
     },
+  });
+
+  const [connected, setConnected] = useState(false);
+  const enterMutation = trpc.game.enter.useMutation({
+    onSuccess(data) {
+      setGameState({ ...gameState, ...data });
+      setConnected(true);
+    },
+  });
+  useEffect(() => {
+    if (!connected) enterMutation.mutate(gameID);
   });
 
   if (!gameState) return <div>Загрузка</div>;
   if (gameState.currentCorrectAnswers?.length) {
-    console.log(gameState.currentCorrectAnswers);
     return (
       <div>
         {gameState.currentCorrectAnswers.map((answer) => (
-          <div>{answer.body}</div>
+          <div key={answer.id}>{answer.body}</div>
         ))}
       </div>
     );
@@ -42,6 +48,18 @@ export default function GamePlayerPage() {
         questionData={gameState.currentQuestion}
       ></CurrentQuestion>
     );
+
+  if (gameState.status === GameStatus.Finished) {
+    return (
+      <section>
+        {gameState.players.map((player) => {
+          return (
+            <div key={player.id}>{`${player.name}   ${player.score}`}</div>
+          );
+        })}
+      </section>
+    );
+  }
 
   return <section>Ожидаем старта</section>;
 }
