@@ -49,12 +49,21 @@ export const authOptions: NextAuthOptions = {
       return session;
     },
   },
-  adapter: PrismaAdapter(prisma),
+  adapter: {
+    ...PrismaAdapter(prisma),
+    linkAccount: async ({ ok, state, ...data }) => {
+      if (data.provider === "vk") {
+        delete data.user_id;
+        delete data.email;
+      }
+      await prisma.account.create({ data });
+    },
+  },
   providers: [
-    // VKProvider({
-    //   clientId: env.VK_CLIENT_ID,
-    //   clientSecret: env.VK_CLIENT_SECRET,
-    // }),
+    VKProvider({
+      clientId: env.VK_CLIENT_ID,
+      clientSecret: env.VK_CLIENT_SECRET,
+    }),
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,

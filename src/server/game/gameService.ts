@@ -173,9 +173,10 @@ function finishQuestion(game: IActiveGame) {
     gameState.currentCorrectAnswers = [];
     gameState.playersAnsweredCount = 0;
     gameState.currentQuestion = gameData.quiz.questions[questionIndex + 1];
-    if (questionIndex + 1 === gameData.quiz.questions.length)
+    if (questionIndex + 1 === gameData.quiz.questions.length) {
       gameState.status = GameStatus.Finished;
-    else {
+      activeGames.delete(gameData.id);
+    } else {
       gameState.currentQuestion = gameData.quiz.questions[questionIndex + 1];
     }
     emitter.emit(GameEvents.Changed, gameState);
