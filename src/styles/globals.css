@@ -27,14 +27,12 @@
     }
     button {
         @apply bg-emerald-300;
+        @apply hover:bg-emerald-200;
         @apply border-none;
         @apply rounded-md;
         @apply text-inherit;
         @apply p-1;
         @apply cursor-pointer;
-    }
-    button:hover {
-        @apply bg-emerald-200;
     }
     a {
         @apply no-underline;
