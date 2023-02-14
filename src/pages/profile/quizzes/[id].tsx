@@ -43,12 +43,13 @@ export default function NewQuizPage() {
 
   return (
     <article>
+      <h1>Edit Quiz</h1>
       <label htmlFor="quiz-name">Quiz name</label>
       <input
         id="quiz-name"
         type="text"
         defaultValue={getQuizQuery.data?.name}
-        className="mb-5"
+        className="mb-3"
         {...register("name", { onChange: debounce(handleNameChange, 700) })}
       ></input>
       <ul className="flex flex-col gap-5">
