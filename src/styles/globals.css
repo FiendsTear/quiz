@@ -3,10 +3,27 @@
 @tailwind utilities;
 
 @layer base {
+
+    html,
+    body,
+    #__next {
+        @apply w-full;
+        @apply h-full;
+        @apply m-0;
+        @apply p-0;
+    }
+
+    #__next {
+        @apply flex;
+        @apply flex-col;
+    }
+
     body {
         @apply text-stone-700;
     }
-    input[type=text], textarea {
+
+    input[type=text],
+    textarea {
         @apply w-full;
         @apply outline-1;
         @apply outline;
@@ -17,14 +34,17 @@
         @apply shadow-fuchsia-100;
         @apply border-none;
     }
+
     textarea {
         @apply resize-y;
     }
+
     fieldset {
         @apply border-none;
         @apply bg-fuchsia-100;
         @apply rounded-lg;
     }
+
     button {
         @apply bg-emerald-300;
         @apply hover:bg-emerald-200;
@@ -34,11 +54,17 @@
         @apply p-1;
         @apply cursor-pointer;
     }
+
     a {
         @apply no-underline;
         @apply text-inherit;
     }
+
     ul {
         @apply list-none;
+    }
+
+    h1 {
+        @apply m-0;
     }
 }
