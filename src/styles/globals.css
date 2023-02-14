@@ -6,7 +6,8 @@
     body {
         @apply text-stone-700;
     }
-    input {
+    input[type=text], textarea {
+        @apply w-full;
         @apply outline-1;
         @apply outline;
         @apply outline-fuchsia-300;
@@ -16,14 +17,30 @@
         @apply shadow-fuchsia-100;
         @apply border-none;
     }
+    textarea {
+        @apply resize-y;
+    }
+    fieldset {
+        @apply border-none;
+        @apply bg-fuchsia-100;
+        @apply rounded-lg;
+    }
     button {
         @apply bg-emerald-300;
         @apply border-none;
         @apply rounded-md;
         @apply text-inherit;
+        @apply p-1;
+        @apply cursor-pointer;
+    }
+    button:hover {
+        @apply bg-emerald-200;
     }
     a {
         @apply no-underline;
         @apply text-inherit;
+    }
+    ul {
+        @apply list-none;
     }
 }

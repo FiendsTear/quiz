@@ -49,7 +49,7 @@ export default function QuestionEditor(props: { question: Question }) {
 
   if (getQuestionQuery.isLoading) return <div>Загрузка</div>;
   return (
-    <form>
+    <form className='border border-solid border-emerald-500 rounded-lg p-4'>
       <label htmlFor="question-body">Question text</label>
       <input
         id="question-body"
@@ -57,7 +57,7 @@ export default function QuestionEditor(props: { question: Question }) {
         className="mb-3"
         {...register("body", { onChange: debounce(handleChange, 500) })}
       ></input>
-      <fieldset className="flex flex-col gap-2">
+      <fieldset className="flex flex-col gap-2 mb-3">
         {fields.map((field, index) => {
           return (
             <AnswerEditor key={field.fieldID} answer={field}></AnswerEditor>

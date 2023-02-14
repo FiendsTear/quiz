@@ -24,7 +24,7 @@ export default function GamesPage() {
 
   function quizSelect() {
     const items = quizQuery.data?.map((quiz) => (
-      <li key={quiz.id} value={quiz.id} className="hover:bg-emerald-100 flex flex-col gap-2 p-4">
+      <li key={quiz.id} value={quiz.id} className="flex flex-col justify-between border border-solid border-emerald-500 rounded-lg gap-2 p-4">
         {quiz.name}
         <div className="flex gap-2">
           <button>Singleplayer</button>
