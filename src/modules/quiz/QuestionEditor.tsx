@@ -56,7 +56,7 @@ export default function QuestionEditor(props: { question: Question }) {
     <form className='border border-solid border-emerald-500 rounded-lg p-4'>
       <div className="flex gap-4">
         <div className="w-3/4">
-          <label className='w-full' htmlFor="question-body">Question text</label>
+          <label htmlFor="question-body">Question text</label>
           <input
             id="question-body"
             type="text"
@@ -65,7 +65,7 @@ export default function QuestionEditor(props: { question: Question }) {
           ></input>
         </div>
         <div className="w-1/4">
-          <label className='w-full' htmlFor="answer-weight">Answer weight</label>
+          <label htmlFor="answer-weight">Answer weight</label>
           <input
             id="answer-weight"
             type="number"
