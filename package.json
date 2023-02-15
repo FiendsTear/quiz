@@ -10,6 +10,9 @@
     "migrate": "prisma migrate dev"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.3.0",
+    "@fortawesome/free-solid-svg-icons": "^6.3.0",
+    "@fortawesome/react-fontawesome": "^0.2.0",
     "@next-auth/prisma-adapter": "^1.0.5",
     "@next/font": "13.1.2",
     "@prisma/client": "^4.9.0",

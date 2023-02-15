@@ -36,6 +36,11 @@
         @apply border-none;
     }
 
+    button.warning {
+        @apply bg-red-300;
+        @apply hover:bg-red-400;
+    }
+
     textarea {
         @apply resize-y;
     }

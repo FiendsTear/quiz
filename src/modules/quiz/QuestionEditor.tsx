@@ -5,10 +5,15 @@ import React from "react";
 import debounce from "lodash.debounce";
 import { useFieldArray, useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
 type QuestionWithAnswers = Question & { answers: Answer[] };
 
-export default function QuestionEditor(props: { question: Question }) {
+export default function QuestionEditor(props: {
+  question: Question;
+  refetchQuiz: { (): void };
+}) {
   // state
   const [question, setQuestion] = useState<QuestionWithAnswers>(
     Object.assign({}, props.question, { answers: [] })
@@ -36,7 +41,14 @@ export default function QuestionEditor(props: { question: Question }) {
   }
 
   function handleWeightChange(e: React.ChangeEvent<HTMLInputElement>) {
-    mutation.mutate({ ...question, ...{ answerWeight: Number(e.target.value) } });
+    mutation.mutate({
+      ...question,
+      ...{ answerWeight: Number(e.target.value) },
+    });
+  }
+
+  function reFetchQuestion() {
+    getQuestionQuery.refetch().catch((err) => console.error(err));
   }
 
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
@@ -45,16 +57,25 @@ export default function QuestionEditor(props: { question: Question }) {
       { questionID: question.id },
       {
         onSuccess: () => {
-          getQuestionQuery.refetch().catch((err) => console.error(err));
+          reFetchQuestion();
         },
       }
     );
   }
+  const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
+
+  function deleteQuestion() {
+    questionDeletion.mutate(question.id, {
+      onSuccess() {
+        props.refetchQuiz();
+      },
+    });
+  }
 
   if (getQuestionQuery.isLoading) return <div>Загрузка</div>;
   return (
-    <form className='border border-solid border-emerald-500 rounded-lg p-4'>
-      <div className="flex gap-4">
+    <form className="border border-solid border-emerald-500 rounded-lg p-4">
+      <div className="flex gap-4 items-start">
         <div className="w-3/4">
           <label htmlFor="question-body">Question text</label>
           <input
@@ -70,14 +91,27 @@ export default function QuestionEditor(props: { question: Question }) {
             id="answer-weight"
             type="number"
             className="mb-3"
-            {...register("answerWeight", { onChange: debounce(handleWeightChange, 500) })}
+            {...register("answerWeight", {
+              onChange: debounce(handleWeightChange, 500),
+            })}
           ></input>
         </div>
+        <button
+          type="button"
+          className="warning aspect-square"
+          onClick={deleteQuestion}
+        >
+          <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
+        </button>
       </div>
       <fieldset className="flex flex-col gap-2 mb-3">
         {fields.map((field, index) => {
           return (
-            <AnswerEditor key={field.fieldID} answer={field}></AnswerEditor>
+            <AnswerEditor
+              key={field.fieldID}
+              answer={field}
+              refetchQuestion={reFetchQuestion}
+            ></AnswerEditor>
           );
         })}
       </fieldset>

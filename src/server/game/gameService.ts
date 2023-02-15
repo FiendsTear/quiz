@@ -165,7 +165,7 @@ function finishQuestion(game: IActiveGame) {
   gameState.players.forEach((player) => {
     currentCorrectAnswers.forEach((answer) => {
       if (answer.id === player.currentAnswerID) {
-        player.score++;
+        player.score = player.score + currentQuestion.answerWeight;
       }
     });
   });

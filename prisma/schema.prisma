@@ -2,91 +2,91 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
 }
 
 model Quiz {
-  id        Int        @id @unique @default(autoincrement())
-  name      String
-  userId    String?
-  user      User?     @relation(fields: [userId], references: [id])
-  questions Question[]
-  Game      Game[]
+    id        Int        @id @unique @default(autoincrement())
+    name      String
+    userId    String?
+    user      User?      @relation(fields: [userId], references: [id])
+    questions Question[]
+    Game      Game[]
 }
 
 model Question {
-  id              Int       @id @unique @default(autoincrement())
-  body            String?
-  quiz            Quiz      @relation(fields: [quizID], references: [id])
-  quizID          Int
-  order           Int
-  answerWeight    Float     @default(1)
-  answers         Answer[]
+    id           Int      @id @unique @default(autoincrement())
+    body         String?
+    quiz         Quiz     @relation(fields: [quizID], references: [id])
+    quizID       Int
+    order        Int
+    answerWeight Float    @default(1)
+    answers      Answer[]
 }
 
 model Answer {
-  id         Int      @id @unique @default(autoincrement())
-  body       String?
-  isCorrect  Boolean
-  question   Question @relation(fields: [questionID], references: [id])
-  questionID Int
+    id         Int      @id @unique @default(autoincrement())
+    body       String?
+    isCorrect  Boolean
+    question   Question @relation(fields: [questionID], references: [id], onDelete: Cascade)
+    questionID Int
 }
 
 model Game {
-  id      Int        @id @unique @default(autoincrement())
-  quiz    Quiz       @relation(fields: [quizID], references: [id])
-  quizID  Int
-  players User[]
+    id      Int    @id @unique @default(autoincrement())
+    quiz    Quiz   @relation(fields: [quizID], references: [id])
+    quizID  Int
+    players User[]
 }
 
 model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
+    id                String  @id @default(cuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String? @db.Text
+    access_token      String? @db.Text
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String? @db.Text
+    session_state     String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+    @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id           String   @id @default(cuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-  quizzes        Quiz[]
-  games         Game[]
+    id            String    @id @default(cuid())
+    name          String?
+    email         String?   @unique
+    emailVerified DateTime?
+    image         String?
+    accounts      Account[]
+    sessions      Session[]
+    quizzes       Quiz[]
+    games         Game[]
 }
 
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+    identifier String
+    token      String   @unique
+    expires    DateTime
 
-  @@unique([identifier, token])
+    @@unique([identifier, token])
 }

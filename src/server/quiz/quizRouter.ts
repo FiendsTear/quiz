@@ -2,9 +2,13 @@ import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
 import { addOrUpdateQuiz, getQuiz, getQuizzes } from "./services/quizService";
 import { quizDTO } from "./dto/quizDTO";
 import { questionDTO } from "./dto/questionDTO";
-import { addOrUpdateQuestion, getQuestion } from "./services/questionService";
+import {
+  addOrUpdateQuestion,
+  deleteQuestion,
+  getQuestion,
+} from "./services/questionService";
 import { answerDTO } from "./dto/createAnswerDTO";
-import { addOrUpdateAnswer } from "./services/answerService";
+import { addOrUpdateAnswer, deleteAnswer } from "./services/answerService";
 import { z } from "zod";
 export const quizRouter = createTRPCRouter({
   // quizzes
@@ -26,8 +30,15 @@ export const quizRouter = createTRPCRouter({
   addOrUpdateQuestion: protectedProcedure
     .input(questionDTO)
     .mutation(({ input }) => addOrUpdateQuestion(input)),
+  deleteQuestion: protectedProcedure
+    .input(z.number())
+    .mutation(({ input }) => deleteQuestion(input)),
+
   addOrUpdateAnswer: protectedProcedure
     .input(answerDTO)
     .mutation(({ input }) => addOrUpdateAnswer(input)),
+  deleteAnswer: protectedProcedure
+    .input(z.number())
+    .mutation(({ input }) => deleteAnswer(input)),
 });
 // export type definition of API

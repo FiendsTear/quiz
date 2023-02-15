@@ -1,4 +1,4 @@
-import React, { SyntheticEvent, useState } from "react";
+import React, { useState } from "react";
 import { trpc } from "../../../utils/trpc";
 import { QuizDTO } from "../../../server/quiz/dto/quizDTO";
 import { useForm } from "react-hook-form";
@@ -28,12 +28,16 @@ export default function NewQuizPage() {
     quizMutation.mutate({ id: +quizID, name: e.target.value });
   }
 
+  function refetchQuiz() {
+    getQuizQuery.refetch().catch((err) => console.error(err));
+  }
+
   function handleNewQuestion() {
     questionMutation.mutate(
       { quizID: +quizID, order: questions.length },
       {
         onSuccess: (data) => {
-          setQuestions([...questions, data]);
+          refetchQuiz();
         },
       }
     );
@@ -58,6 +62,7 @@ export default function NewQuizPage() {
             <QuestionEditor
               key={question.id}
               question={question}
+              refetchQuiz={refetchQuiz}
             ></QuestionEditor>
           );
         })}

@@ -59,7 +59,7 @@ export const gameRouter = createWSRouter({
 
   nextQuestion: protectedWSProcedure.input(z.number()).mutation(({ input }) => {
     const game = getGame(input);
-    return nextQuestion(game);
+    nextQuestion(game);
   }),
 
   disconnect: protectedWSProcedure.mutation(() => {

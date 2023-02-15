@@ -4,8 +4,13 @@ import { useState } from "react";
 import React from "react";
 import debounce from "lodash.debounce";
 import { useForm } from "react-hook-form";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 
-export default function AnswerEditor(props: { answer: Answer }) {
+export default function AnswerEditor(props: {
+  answer: Answer;
+  refetchQuestion: { (): void };
+}) {
   // state
   const [answer, setAnswer] = useState<Answer>(props.answer);
 
@@ -15,6 +20,7 @@ export default function AnswerEditor(props: { answer: Answer }) {
   });
 
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
+  const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
 
   function handleAnswerChange(changedValue: Partial<Answer>) {
     answerMutation.mutate({ ...answer, ...changedValue });
@@ -22,6 +28,11 @@ export default function AnswerEditor(props: { answer: Answer }) {
 
   const bodyInputID = `answer-body-${answer.id}`;
   const isCorrectInputID = `answer-isCorrect-${answer.id}`;
+
+  function deleteAnswer() {
+    answerDeletion.mutate(answer.id);
+    props.refetchQuestion();
+  }
 
   return (
     <section>
@@ -34,18 +45,32 @@ export default function AnswerEditor(props: { answer: Answer }) {
           }, 500),
         })}
       />
-      <input
-        id={isCorrectInputID}
-        type="checkbox"
-        {...register(`isCorrect`, {
-          onChange: debounce(
-            (e: React.ChangeEvent<HTMLInputElement>) =>
-              handleAnswerChange({ isCorrect: e.target.checked }),
-            500
-          ),
-        })}
-      ></input>
-      <label htmlFor={isCorrectInputID}>Is this answer correct?</label>
+
+      <section className="flex justify-between">
+        <div>
+          <input
+            id={isCorrectInputID}
+            type="checkbox"
+            {...register(`isCorrect`, {
+              onChange: debounce(
+                (e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleAnswerChange({ isCorrect: e.target.checked }),
+                500
+              ),
+            })}
+          ></input>
+          <label htmlFor={isCorrectInputID}>Is this answer correct?</label>
+        </div>
+
+        <button
+          type="button"
+          className="warning"
+          onClick={deleteAnswer}
+          title="Delete answer"
+        >
+          <FontAwesomeIcon icon={faTrashCan} />
+        </button>
+      </section>
     </section>
   );
 }

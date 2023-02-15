@@ -17,3 +17,7 @@ export async function addOrUpdateAnswer(input: AnswerDTO) {
   });
   return answer;
 }
+
+export async function deleteAnswer(answerID: number) {
+  return await prisma.answer.delete({ where: { id: answerID } });
+}
