@@ -1,9 +1,7 @@
 import { GameStatus, trpc } from "@/utils/trpc";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
-import withSubscription from "../../../modules/game/useGameState";
 
 import { useRouter } from "next/router";
-import useGameState from "../../../modules/game/useGameState";
 import { RouterOutputs } from "../../../utils/trpc";
 import { useState } from "react";
 
@@ -22,22 +20,19 @@ export default function HostGamePage() {
     },
   });
 
-  const startMutation = trpc.game.start.useMutation({
-    onSuccess(data) {
-      console.log("start mut");
-      console.log(data);
-    },
-  });
-
-  function startGame() {
-    startMutation.mutate(gameID);
-  }
+  const startMutation = trpc.game.start.useMutation();
+  const nextQuestionMutation = trpc.game.nextQuestion.useMutation();
 
   if (gameState.status === GameStatus.Ongoing)
     return (
-      <CurrentQuestion
-        questionData={gameState.currentQuestion}
-      ></CurrentQuestion>
+      <article>
+        <CurrentQuestion
+          questionData={gameState.currentQuestion}
+        ></CurrentQuestion>
+        <button onClick={() => nextQuestionMutation.mutate(gameID)}>
+          Next question
+        </button>
+      </article>
     );
 
   return (
@@ -48,7 +43,7 @@ export default function HostGamePage() {
           return <li key={player.id}>{player.name}</li>;
         })}
       </ul>
-      <button type="button" onClick={startGame}>
+      <button type="button" onClick={() => startMutation.mutate(gameID)}>
         Start game
       </button>
     </section>

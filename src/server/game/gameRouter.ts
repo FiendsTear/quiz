@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { createWSRouter, protectedWSProcedure } from "../trpc";
 import { addPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
+import { nextQuestion, getGame } from "./gameService";
 import {
   addGame,
   addPlayerAnswer,
@@ -55,6 +56,11 @@ export const gameRouter = createWSRouter({
       console.log(ctx.session);
       return addPlayerAnswer(input, ctx.session.user.id);
     }),
+
+  nextQuestion: protectedWSProcedure.input(z.number()).mutation(({ input }) => {
+    const game = getGame(input);
+    return nextQuestion(game);
+  }),
 
   disconnect: protectedWSProcedure.mutation(() => {
     console.log("disconnect");

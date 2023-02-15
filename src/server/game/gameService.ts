@@ -38,6 +38,7 @@ type GameState = {
   players: Player[];
   playersAnsweredCount: number;
   currentCorrectAnswers: Answer[];
+  nextQuestionTimeout: NodeJS.Timeout | null;
 };
 
 interface IActiveGame {
@@ -63,14 +64,15 @@ export function getGameState(gameID: number) {
 
 export async function addGame(input: number) {
   const gameData = await createGame(input);
-  const gameState = {
+  const gameState: GameState = {
     status: GameStatus.Created,
     players: [],
     currentQuestion: gameData.quiz.questions[0],
     playersAnsweredCount: 0,
     currentCorrectAnswers: [],
+    nextQuestionTimeout: null,
   };
-  const activeGame = {
+  const activeGame: IActiveGame = {
     emitter: new EventEmitter(),
     gameData,
     gameState,
@@ -137,7 +139,7 @@ export function leaveGame(gameID: number, playerID: string) {
   players.splice(playerIndex, 1);
 }
 
-function getGame(gameID: number) {
+export function getGame(gameID: number) {
   const game = activeGames.get(gameID);
   if (!game)
     throw new TRPCError({ code: "BAD_REQUEST", message: "Game not found" });
@@ -153,9 +155,7 @@ function getPlayer(gameState: GameState, playerID: string) {
 
 function finishQuestion(game: IActiveGame) {
   const { gameState, gameData, emitter } = game;
-  const questionIndex = gameData.quiz.questions.findIndex(
-    (question) => question.id === gameState.currentQuestion.id
-  );
+  const questionIndex = gameState.currentQuestion.order;
   const currentQuestion = gameData.quiz.questions[questionIndex];
   const currentCorrectAnswers = currentQuestion.answers.filter(
     (answer) => answer.isCorrect === true
@@ -169,16 +169,28 @@ function finishQuestion(game: IActiveGame) {
       }
     });
   });
-  setTimeout(() => {
-    gameState.currentCorrectAnswers = [];
-    gameState.playersAnsweredCount = 0;
-    gameState.currentQuestion = gameData.quiz.questions[questionIndex + 1];
-    if (questionIndex + 1 === gameData.quiz.questions.length) {
-      gameState.status = GameStatus.Finished;
-      activeGames.delete(gameData.id);
-    } else {
-      gameState.currentQuestion = gameData.quiz.questions[questionIndex + 1];
-    }
-    emitter.emit(GameEvents.Changed, gameState);
+  gameState.nextQuestionTimeout = setTimeout(() => {
+    nextQuestion(game);
   }, 2000);
+}
+
+export function nextQuestion(game: IActiveGame) {
+  const { gameState, gameData, emitter } = game;
+  const currentQuestionIndex = gameState.currentQuestion.order;
+  if (gameState.nextQuestionTimeout) {
+    clearTimeout(gameState.nextQuestionTimeout);
+    gameState.nextQuestionTimeout = null;
+  }
+
+  gameState.currentCorrectAnswers = [];
+  gameState.playersAnsweredCount = 0;
+  gameState.currentQuestion = gameData.quiz.questions[currentQuestionIndex + 1];
+  if (currentQuestionIndex + 1 === gameData.quiz.questions.length) {
+    gameState.status = GameStatus.Finished;
+    activeGames.delete(gameData.id);
+  } else {
+    gameState.currentQuestion =
+      gameData.quiz.questions[currentQuestionIndex + 1];
+  }
+  emitter.emit(GameEvents.Changed, gameState);
 }
