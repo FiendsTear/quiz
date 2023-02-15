@@ -23,6 +23,7 @@
     }
 
     input[type=text],
+    input[type=number],
     textarea {
         @apply w-full;
         @apply outline-1;
