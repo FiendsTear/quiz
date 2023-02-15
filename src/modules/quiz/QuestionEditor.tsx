@@ -31,8 +31,12 @@ export default function QuestionEditor(props: { question: Question }) {
     },
   });
 
-  function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
+  function handleBodyChange(e: React.ChangeEvent<HTMLInputElement>) {
     mutation.mutate({ ...question, ...{ body: e.target.value } });
+  }
+
+  function handleWeightChange(e: React.ChangeEvent<HTMLInputElement>) {
+    mutation.mutate({ ...question, ...{ answerWeight: Number(e.target.value) } });
   }
 
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
@@ -50,13 +54,26 @@ export default function QuestionEditor(props: { question: Question }) {
   if (getQuestionQuery.isLoading) return <div>Загрузка</div>;
   return (
     <form className='border border-solid border-emerald-500 rounded-lg p-4'>
-      <label htmlFor="question-body">Question text</label>
-      <input
-        id="question-body"
-        type="text"
-        className="mb-3"
-        {...register("body", { onChange: debounce(handleChange, 500) })}
-      ></input>
+      <div className="flex gap-4">
+        <div className="w-3/4">
+          <label className='w-full' htmlFor="question-body">Question text</label>
+          <input
+            id="question-body"
+            type="text"
+            className="mb-3"
+            {...register("body", { onChange: debounce(handleBodyChange, 500) })}
+          ></input>
+        </div>
+        <div className="w-1/4">
+          <label className='w-full' htmlFor="answer-weight">Answer weight</label>
+          <input
+            id="answer-weight"
+            type="number"
+            className="mb-3"
+            {...register("answerWeight", { onChange: debounce(handleWeightChange, 500) })}
+          ></input>
+        </div>
+      </div>
       <fieldset className="flex flex-col gap-2 mb-3">
         {fields.map((field, index) => {
           return (

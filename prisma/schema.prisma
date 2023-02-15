@@ -20,12 +20,13 @@ model Quiz {
 }
 
 model Question {
-  id      Int      @id @unique @default(autoincrement())
-  body    String?
-  quiz    Quiz     @relation(fields: [quizID], references: [id])
-  quizID  Int
-  order   Int
-  answers Answer[]
+  id              Int       @id @unique @default(autoincrement())
+  body            String?
+  quiz            Quiz      @relation(fields: [quizID], references: [id])
+  quizID          Int
+  order           Int
+  answerWeight    Float     @default(1)
+  answers         Answer[]
 }
 
 model Answer {
