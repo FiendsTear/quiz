@@ -30,8 +30,11 @@ export default function AnswerEditor(props: {
   const isCorrectInputID = `answer-isCorrect-${answer.id}`;
 
   function deleteAnswer() {
-    answerDeletion.mutate(answer.id);
-    props.refetchQuestion();
+    answerDeletion.mutate(answer.id, {
+      onSuccess() {
+        props.refetchQuestion();
+      },
+    });
   }
 
   return (
