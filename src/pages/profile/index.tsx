@@ -4,7 +4,7 @@ import { trpc } from "../../utils/trpc";
 
 export default function ProfilePage() {
   const { push } = useRouter();
-  const query = trpc.quiz.getQuizzes.useQuery();
+  const query = trpc.quiz.getUserQuizzes.useQuery();
 
   const mutation = trpc.quiz.addOrUpdateQuiz.useMutation();
   function handleNewQuiz() {
