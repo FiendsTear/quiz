@@ -5,7 +5,7 @@ export default function Layout({ children }: any) {
   return (
     <>
       <Header />
-      <main className="grow px-5 py-3">{children}</main>
+      <main className="grid relative grow px-5 py-3">{children}</main>
       <Footer />
     </>
   );
