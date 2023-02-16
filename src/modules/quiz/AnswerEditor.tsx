@@ -23,7 +23,11 @@ export default function AnswerEditor(props: {
   const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
 
   function handleAnswerChange(changedValue: Partial<Answer>) {
-    answerMutation.mutate({ ...answer, ...changedValue });
+    answerMutation.mutate({ ...answer, ...changedValue }, {
+        onSuccess: (data) => {
+            setAnswer(data);
+        }
+    });
   }
 
   const bodyInputID = `answer-body-${answer.id}`;
