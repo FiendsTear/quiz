@@ -30,6 +30,7 @@ type Player = {
   currentAnswerID?: number;
   score: number;
   name: string;
+  image?: string | null;
 };
 
 type GameState = {
@@ -114,6 +115,7 @@ export function enterGame(gameID: number, player: Session["user"]) {
     id: player.id,
     score: 0,
     name: player.name as string,
+    image: player.image,
   });
   game.emitter.emit(GameEvents.Changed, game.gameState);
   return game.gameState;
