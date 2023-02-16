@@ -1,5 +1,6 @@
 import { useSession, signOut, signIn } from "next-auth/react";
 import Link from "next/link";
+import Userpic from "./Userpic";
 import { useTranslation } from "next-i18next";
 
 export default function Header() {
@@ -12,8 +13,13 @@ export default function Header() {
         <Link href="/">Home</Link>
         <Link href="/games">Games</Link>
       </section>
-      <section className="flex grow justify-end gap-2">
-        <Link href="/profile">{sessionData && <span>{sessionData.user?.name}</span>}</Link>
+      <section className="flex grow justify-end gap-4">
+        <Link className="flex items-center gap-2" href="/profile">{sessionData && 
+          <>
+            <Userpic src={sessionData.user?.image} size={32} />
+            <span>{sessionData.user?.name}</span>
+          </>}
+        </Link>
         <button
           onClick={sessionData ? () => void signOut() : () => void signIn()}
         >

@@ -1,6 +1,6 @@
 import { GameStatus, trpc } from "@/utils/trpc";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
-
+import Userpic from "@/modules/Userpic";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
 import { useState } from "react";
@@ -38,9 +38,12 @@ export default function HostGamePage() {
   return (
     <section>
       <div>Players:</div>
-      <ul>
+      <ul className="grid grid-cols-auto-200 gap-4">
         {gameState.players?.map((player) => {
-          return <li key={player.id}>{player.name}</li>;
+          return <li key={player.id} className="flex flex-col text-center items-center border border-solid border-emerald-500 rounded-lg gap-2 p-4">
+            <Userpic src={player.image} size={64} />
+            {player.name}
+          </li>;
         })}
       </ul>
       <button type="button" onClick={() => startMutation.mutate(gameID)}>
