@@ -74,7 +74,7 @@ export default function QuestionEditor(props: {
 
   if (getQuestionQuery.isLoading) return <div>Загрузка</div>;
   return (
-    <form className="border border-solid border-emerald-500 rounded-lg p-4">
+    <form className="bordered p-4">
       <div className="flex gap-4 items-start">
         <div className="w-3/4">
           <label htmlFor="question-body">Question text</label>

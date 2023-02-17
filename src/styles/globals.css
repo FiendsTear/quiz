@@ -70,6 +70,13 @@
         @apply list-none;
     }
 
+    li.bordered, form.bordered {
+        @apply border;
+        @apply border-solid;
+        @apply border-emerald-500;
+        @apply rounded-lg;
+    }
+
     h1 {
         @apply m-0;
     }

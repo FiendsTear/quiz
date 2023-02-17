@@ -40,7 +40,7 @@ export default function HostGamePage() {
       <div>Players:</div>
       <ul className="grid grid-cols-auto-200 gap-4">
         {gameState.players?.map((player) => {
-          return <li key={player.id} className="flex flex-col text-center items-center border border-solid border-emerald-500 rounded-lg gap-2 p-4">
+          return <li key={player.id} className="flex flex-col text-center items-center bordered gap-2 p-4">
             <Userpic src={player.image} size={64} />
             {player.name}
           </li>;
