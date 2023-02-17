@@ -1,16 +1,16 @@
 import React, { useState } from "react";
 import { trpc } from "../../../utils/trpc";
-import { QuizDTO } from "../../../server/quiz/dto/quizDTO";
+import type { QuizDTO } from "../../../server/quiz/dto/quizDTO";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
-import { Question, Quiz } from "@prisma/client";
+import type { Question } from "@prisma/client";
 import QuestionEditor from "../../../modules/quiz/QuestionEditor";
 
 export default function NewQuizPage() {
-  const { query, isReady } = useRouter();
+  const { query, isReady, push } = useRouter();
   const [questions, setQuestions] = useState<Question[]>([]);
-  const { register, handleSubmit } = useForm<QuizDTO>();
+  const { register } = useForm<QuizDTO>();
 
   const quizID = query.id as string;
 
@@ -24,8 +24,20 @@ export default function NewQuizPage() {
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
   if (!isReady) return <div>Загрузка</div>;
 
-  function handleNameChange(e: React.ChangeEvent<HTMLInputElement>) {
-    quizMutation.mutate({ id: +quizID, name: e.target.value });
+  function handleQuizChange(changedValue: Partial<QuizDTO>) {
+    quizMutation.mutate({ ...{ id: +quizID }, ...changedValue }, {
+      onSuccess: () => {
+        refetchQuiz();
+      }
+    });
+  }
+
+  function handlePublish() {
+    quizMutation.mutate({ id: +quizID, isPublished: true }, {
+      onSuccess: () => {
+        push(`/profile`).catch((err) => console.error(err));
+      }
+    });
   }
 
   function refetchQuiz() {
@@ -36,7 +48,7 @@ export default function NewQuizPage() {
     questionMutation.mutate(
       { quizID: +quizID, order: questions.length },
       {
-        onSuccess: (data) => {
+        onSuccess: () => {
           refetchQuiz();
         },
       }
@@ -54,7 +66,11 @@ export default function NewQuizPage() {
         type="text"
         defaultValue={getQuizQuery.data?.name}
         className="mb-3"
-        {...register("name", { onChange: debounce(handleNameChange, 700) })}
+        {...register("name", {
+          onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+            handleQuizChange({ name: e.target.value });
+          }, 700)
+        })}
       ></input>
       <ul className="flex flex-col gap-5">
         {questions.map((question) => {
@@ -67,9 +83,29 @@ export default function NewQuizPage() {
           );
         })}
       </ul>
-      <button type="button" onClick={handleNewQuestion}>
-        Add Question
-      </button>
+      <div className="flex justify-between">
+        <button type="button" onClick={handleNewQuestion}>
+          Add Question
+        </button>
+        <div className="flex items-center gap-2">
+          <input 
+            id="quiz-isPrivate"
+            type="checkbox"
+            defaultChecked={getQuizQuery.data?.isPrivate}
+            {...register(`isPrivate`, {
+              onChange: debounce(
+                (e: React.ChangeEvent<HTMLInputElement>) =>
+                  handleQuizChange({ isPrivate: e.target.checked }),
+                500
+              ),
+            })}
+          ></input>
+          <label htmlFor="quiz-isPrivate">Private Quiz</label>
+          <button type="button" onClick={handlePublish}>
+            Publish Quiz
+          </button>
+        </div>
+      </div>
     </article>
   );
 }

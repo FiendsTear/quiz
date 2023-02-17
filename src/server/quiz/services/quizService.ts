@@ -1,16 +1,36 @@
-import { PrismaClient, Prisma } from "@prisma/client";
-import { QuizDTO } from "../dto/quizDTO";
-import { Session } from "next-auth";
+import { PrismaClient } from "@prisma/client";
+import type { Prisma } from "@prisma/client";
+import type { QuizDTO } from "../dto/quizDTO";
+import type { Session } from "next-auth";
 
 const prisma = new PrismaClient();
 
 export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
-  const quiz = await prisma.quiz.upsert({
-    where: { id: input.id },
-    update: { name: input.name, userId: session.user.id },
-    create: { name: input.name, userId: session.user.id },
-  });
-  return quiz;
+  const { isPublished, isPrivate, name } = input;
+  if (name) {
+    const quiz = await prisma.quiz.upsert({
+      where: { id: input.id },
+      update: {
+        name,
+        isPrivate,
+        isPublished,
+        userId: session.user.id
+      },
+      create: { name, userId: session.user.id },
+    });
+    return quiz;
+  }
+  else {
+    const quiz = await prisma.quiz.update({
+      where: { id: input.id },
+      data: {
+        isPrivate,
+        isPublished,
+        userId: session.user.id
+      }
+    });
+    return quiz;
+  }
 }
 
 export async function getQuizzes(where?: Prisma.QuizWhereInput) {

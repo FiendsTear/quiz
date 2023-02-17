@@ -1,10 +1,12 @@
 import { trpc } from "@/utils/trpc";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { Quiz } from "@prisma/client";
+import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
 
 export default function GamesPage() {
+  const { data: sessionData } = useSession();
   const { push } = useRouter();
   enum GameTabs {
     Find = "FIND",
@@ -15,7 +17,7 @@ export default function GamesPage() {
   const [selectedQuiz, selectQuiz] = useState<Quiz | null>(null);
 
   const gamesQuery = trpc.game.getActiveGames.useQuery();
-  const quizQuery = trpc.quiz.getQuizzes.useQuery();
+  const quizQuery = trpc.quiz.getPublishedQuizzes.useQuery();
 
   function handleGameEnter(gameID: number) {
     push(`/games/${gameID}/player`).catch((err) => console.error(err));
@@ -43,9 +45,13 @@ export default function GamesPage() {
               <li
                 key={quiz.id}
                 onClick={() => selectQuiz(quiz)}
-                className="flex flex-col justify-between border border-solid border-emerald-500 rounded-lg gap-2 p-4"
+                className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
               >
-                {quiz.name}
+                <span className='block mb-1'>{quiz.name}</span>
+                <span
+                  className={quiz.isPrivate ? 'text-fuchsia-700' : 'text-emerald-700'}>
+                  {sessionData?.user.id === quiz.userId ? quiz.isPrivate ? 'Your private quiz' : 'Your public quiz' : 'Public quiz'}
+                </span>
               </li>
             ))}
           </ul>
