@@ -5,8 +5,7 @@ import { createGame, getGamesByID } from "./gameRepository";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import type { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
-import { DefaultSession, Session } from "next-auth";
-
+import { Session } from "next-auth";
 enum GameStatus {
   Created,
   Ongoing,
@@ -27,7 +26,7 @@ enum GameEvents {
 
 type Player = {
   id: string;
-  currentAnswerID?: number;
+  currentAnswerID?: number | null;
   score: number;
   name: string;
   image?: string | null;
@@ -35,11 +34,14 @@ type Player = {
 
 type GameState = {
   status: GameStatus;
-  currentQuestion: Question & { answers: Answer[] };
+  currentQuestion: Question & {
+    answers: Answer[];
+    timerValue: number;
+  };
   players: Player[];
   playersAnsweredCount: number;
   currentCorrectAnswers: Answer[];
-  nextQuestionTimeout: NodeJS.Timeout | null;
+  correctAnswerTimeout: NodeJS.Timeout | null;
 };
 
 interface IActiveGame {
@@ -68,10 +70,10 @@ export async function addGame(input: number) {
   const gameState: GameState = {
     status: GameStatus.Created,
     players: [],
-    currentQuestion: gameData.quiz.questions[0],
+    currentQuestion: { ...gameData.quiz.questions[0], ...{ timerValue: 2000 } },
     playersAnsweredCount: 0,
     currentCorrectAnswers: [],
-    nextQuestionTimeout: null,
+    correctAnswerTimeout: null,
   };
   const activeGame: IActiveGame = {
     emitter: new EventEmitter(),
@@ -85,7 +87,7 @@ export async function addGame(input: number) {
 export function startGame(gameID: number) {
   const game = getGame(gameID);
   game.gameState.status = GameStatus.Ongoing;
-  game.emitter.emit(GameEvents.Changed, game.gameState);
+  emitState(game);
   return game.gameState;
 }
 
@@ -117,7 +119,7 @@ export function enterGame(gameID: number, player: Session["user"]) {
     name: player.name as string,
     image: player.image,
   });
-  game.emitter.emit(GameEvents.Changed, game.gameState);
+  emitState(game);
   return game.gameState;
 }
 
@@ -126,7 +128,7 @@ export function addPlayerAnswer(dto: AddPlayerAnswerDTO, playerID: string) {
   const player = getPlayer(game?.gameState, playerID);
 
   player.currentAnswerID = dto.answerID;
-  game.emitter.emit(GameEvents.Changed, game.gameState);
+  emitState(game);
 
   game.gameState.playersAnsweredCount++;
   if (game.gameState.playersAnsweredCount === game.gameState.players.length) {
@@ -156,14 +158,14 @@ function getPlayer(gameState: GameState, playerID: string) {
 }
 
 function finishQuestion(game: IActiveGame) {
-  const { gameState, gameData, emitter } = game;
+  const { gameState, gameData } = game;
   const questionIndex = gameState.currentQuestion.order;
   const currentQuestion = gameData.quiz.questions[questionIndex];
   const currentCorrectAnswers = currentQuestion.answers.filter(
     (answer) => answer.isCorrect === true
   );
   gameState.currentCorrectAnswers = currentCorrectAnswers;
-  emitter.emit(GameEvents.Changed, game.gameState);
+
   gameState.players.forEach((player) => {
     currentCorrectAnswers.forEach((answer) => {
       if (answer.id === player.currentAnswerID) {
@@ -171,28 +173,40 @@ function finishQuestion(game: IActiveGame) {
       }
     });
   });
-  gameState.nextQuestionTimeout = setTimeout(() => {
+
+  emitState(game);
+
+  gameState.correctAnswerTimeout = setTimeout(() => {
     nextQuestion(game);
   }, 2000);
 }
 
 export function nextQuestion(game: IActiveGame) {
-  const { gameState, gameData, emitter } = game;
+  const { gameState, gameData } = game;
   const currentQuestionIndex = gameState.currentQuestion.order;
-  if (gameState.nextQuestionTimeout) {
-    clearTimeout(gameState.nextQuestionTimeout);
-    gameState.nextQuestionTimeout = null;
+  if (gameState.correctAnswerTimeout) {
+    clearTimeout(gameState.correctAnswerTimeout);
+    gameState.correctAnswerTimeout = null;
   }
 
   gameState.currentCorrectAnswers = [];
   gameState.playersAnsweredCount = 0;
-  gameState.currentQuestion = gameData.quiz.questions[currentQuestionIndex + 1];
-  if (currentQuestionIndex + 1 === gameData.quiz.questions.length) {
+  if (currentQuestionIndex + 1 >= gameData.quiz.questions.length) {
     gameState.status = GameStatus.Finished;
     activeGames.delete(gameData.id);
   } else {
-    gameState.currentQuestion =
-      gameData.quiz.questions[currentQuestionIndex + 1];
+    gameState.currentQuestion = {
+      ...gameData.quiz.questions[currentQuestionIndex + 1],
+      ...{ timerValue: 2000 },
+    };
   }
-  emitter.emit(GameEvents.Changed, gameState);
+  emitState(game);
+}
+
+function emitState(game: IActiveGame) {
+  const { emitter, gameState } = game;
+  const cloneGameState: Partial<GameState> = Object.assign({}, gameState);
+  delete cloneGameState.playersAnsweredCount;
+  delete cloneGameState.correctAnswerTimeout;
+  emitter.emit(GameEvents.Changed, cloneGameState);
 }

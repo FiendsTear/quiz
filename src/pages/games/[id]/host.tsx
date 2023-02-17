@@ -28,6 +28,7 @@ export default function HostGamePage() {
       <article>
         <CurrentQuestion
           questionData={gameState.currentQuestion}
+          isHost={true}
         ></CurrentQuestion>
         <button onClick={() => nextQuestionMutation.mutate(gameID)}>
           Next question
@@ -40,10 +41,15 @@ export default function HostGamePage() {
       <div>Players:</div>
       <ul className="grid grid-cols-auto-200 gap-4">
         {gameState.players?.map((player) => {
-          return <li key={player.id} className="flex flex-col text-center items-center bordered gap-2 p-4">
-            <Userpic src={player.image} size={64} />
-            {player.name}
-          </li>;
+          return (
+            <li
+              key={player.id}
+              className="flex flex-col text-center items-center bordered gap-2 p-4"
+            >
+              <Userpic src={player.image} size={64} />
+              {player.name}
+            </li>
+          );
         })}
       </ul>
       <button type="button" onClick={() => startMutation.mutate(gameID)}>

@@ -41,7 +41,10 @@ export const gameRouter = createWSRouter({
   enter: protectedWSProcedure.input(z.number()).mutation(({ ctx, input }) => {
     const player = ctx.session.user;
     const gameState = enterGame(input, player);
-    ctx.req?.socket.on("close", () => leaveGame(input, player.id));
+    ctx.req?.socket.on("close", () => {
+      leaveGame(input, player.id);
+      ctx.req?.socket.removeAllListeners();
+    });
     return gameState;
   }),
 
@@ -53,7 +56,6 @@ export const gameRouter = createWSRouter({
   answer: protectedWSProcedure
     .input(addPlayerAnswerDTO)
     .mutation(({ input, ctx }) => {
-      console.log(ctx.session);
       return addPlayerAnswer(input, ctx.session.user.id);
     }),
 
