@@ -1,9 +1,15 @@
-import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
+import { useState } from 'react';
 import { trpc } from "../../utils/trpc";
+import type { Quiz } from '@prisma/client';
+import GameSettings from "@/modules/game/GameSettings";
 
 export default function ProfilePage() {
+  const { data: sessionData } = useSession();
   const { push } = useRouter();
+  const [selectedQuiz, selectQuiz] = useState<Quiz | null>(null);
+
   const query = trpc.quiz.getUserQuizzes.useQuery();
 
   const mutation = trpc.quiz.addOrUpdateQuiz.useMutation();
@@ -21,22 +27,28 @@ export default function ProfilePage() {
 
   if (query.isLoading) return <div>Загрузка</div>;
   return (
-    <article>
+    <article className="relative h-full">
+      {selectedQuiz && (
+        <GameSettings
+          quiz={selectedQuiz}
+          cancelSelect={() => selectQuiz(null)}
+          userId={sessionData?.user.id}
+        />
+      )}
       <h1>Profile</h1>
       <ul className="grid grid-cols-auto-200 justify-center gap-4">
         {query.data?.map((quiz) => {
           return (
-            <li key={quiz.id} className="bordered hover:bg-emerald-200 gap-2">
-              <Link
-                href={`profile/quizzes/${quiz.id}`}
-                className="flex flex-col w-full h-full justify-between box-border p-4"
-              >
-                <span className='block mb-1'>{quiz.name}</span>
-                <span 
-                  className={quiz.isPublished ? quiz.isPrivate ? 'text-fuchsia-700' : 'text-emerald-700' : 'text-gray-600' }>
-                  {quiz.isPublished ? quiz.isPrivate ? 'Private' : 'Published' : 'Unpublished'}
-                </span>
-              </Link>
+            <li 
+              key={quiz.id}
+              onClick={() => selectQuiz(quiz)}
+              className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
+            >
+              <span className='block'>{quiz.name}</span>
+              <span 
+                className={quiz.isPublished ? quiz.isPrivate ? 'text-fuchsia-700' : 'text-emerald-700' : 'text-gray-600' }>
+                {quiz.isPublished ? quiz.isPrivate ? 'Private' : 'Published' : 'Unpublished'}
+              </span>
             </li>
           );
         })}

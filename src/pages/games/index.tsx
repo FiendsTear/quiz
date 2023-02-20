@@ -1,12 +1,10 @@
 import { trpc } from "@/utils/trpc";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
 
 export default function GamesPage() {
-  const { data: sessionData } = useSession();
   const { push } = useRouter();
   enum GameTabs {
     Find = "FIND",
@@ -47,11 +45,7 @@ export default function GamesPage() {
                 onClick={() => selectQuiz(quiz)}
                 className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
               >
-                <span className='block mb-1'>{quiz.name}</span>
-                <span
-                  className={quiz.isPrivate ? 'text-fuchsia-700' : 'text-emerald-700'}>
-                  {sessionData?.user.id === quiz.userId ? quiz.isPrivate ? 'Your private quiz' : 'Your public quiz' : 'Public quiz'}
-                </span>
+                {quiz.name}
               </li>
             ))}
           </ul>
