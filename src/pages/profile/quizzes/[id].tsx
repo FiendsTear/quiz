@@ -101,7 +101,7 @@ export default function NewQuizPage() {
             })}
           ></input>
           <label htmlFor="quiz-isPrivate">Private Quiz</label>
-          <button type="button" onClick={handlePublish}>
+          <button disabled={getQuizQuery.data?.isPublished} type="button" onClick={handlePublish}>
             Publish Quiz
           </button>
         </div>

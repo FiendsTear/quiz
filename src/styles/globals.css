@@ -61,6 +61,11 @@
         @apply cursor-pointer;
     }
 
+    button:disabled {
+        @apply bg-gray-200;
+        @apply text-gray-400;
+    }
+
     a {
         @apply no-underline;
         @apply text-inherit;
