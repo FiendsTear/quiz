@@ -6,10 +6,12 @@ import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 import type { Question } from "@prisma/client";
 import QuestionEditor from "../../../modules/quiz/QuestionEditor";
+import Message from '@/modules/Message';
 
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [message, setMessage] = useState<boolean>(false);
   const { register } = useForm<QuizDTO>();
 
   const quizID = query.id as string;
@@ -34,10 +36,13 @@ export default function NewQuizPage() {
 
   function handlePublish() {
     quizMutation.mutate({ id: +quizID, isPublished: true }, {
-      onSuccess: () => {
-        push(`/profile`).catch((err) => console.error(err));
-      }
+      onSuccess: () => { setMessage(true); }
     });
+  }
+
+  function toProfilePage() {
+    setMessage(false);
+    push(`/profile`).catch((err) => console.error(err));
   }
 
   function refetchQuiz() {
@@ -58,7 +63,13 @@ export default function NewQuizPage() {
   if (getQuizQuery.isLoading) return <div>Загрузка</div>;
 
   return (
-    <article>
+    <article className="relative h-full">
+      {message && (
+        <Message
+          messageString='Quiz published successfully'
+          confirmSelect={() => toProfilePage()}
+        />
+      )}
       <h1>Edit Quiz</h1>
       <label htmlFor="quiz-name">Quiz name</label>
       <input
