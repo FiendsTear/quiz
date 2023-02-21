@@ -68,6 +68,7 @@
 
     ul {
         @apply list-none;
+        @apply p-0;
     }
 
     h1 {
