@@ -14,20 +14,19 @@ export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
         name,
         isPrivate,
         isPublished,
-        userId: session.user.id
+        userId: session.user.id,
       },
       create: { name, userId: session.user.id },
     });
     return quiz;
-  }
-  else {
+  } else {
     const quiz = await prisma.quiz.update({
       where: { id: input.id },
       data: {
         isPrivate,
         isPublished,
-        userId: session.user.id
-      }
+        userId: session.user.id,
+      },
     });
     return quiz;
   }
@@ -44,6 +43,7 @@ export async function unpuplishQuiz(quizID: number) {
 export async function getQuizzes(where?: Prisma.QuizWhereInput) {
   const quizzes = await prisma.quiz.findMany({
     where,
+    orderBy: { id: "asc" },
   });
   await prisma.$disconnect();
   return quizzes;
