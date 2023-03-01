@@ -31,17 +31,11 @@ export default function AnswerEditor(props: {
       { ...answer, ...changedValue },
       {
         onSuccess: (data) => {
-<<<<<<< HEAD
-            setAnswer(data);
-            props.refetchQuiz();
-        }
-    });
-=======
           setAnswer(data);
+          props.refetchQuiz();
         },
       }
     );
->>>>>>> origin
   }
 
   const bodyInputID = `answer-body-${answer.id}`;
