@@ -4,6 +4,7 @@ import Userpic from "@/modules/Userpic";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
 import { useState } from "react";
+import { getTranslations } from "@/common/getTranslations";
 
 export default function HostGamePage() {
   const { query, isReady } = useRouter();
@@ -23,18 +24,29 @@ export default function HostGamePage() {
   const startMutation = trpc.game.start.useMutation();
   const nextQuestionMutation = trpc.game.nextQuestion.useMutation();
 
-  if (gameState.status === GameStatus.Ongoing)
-    return (
-      <article>
-        <CurrentQuestion
-          questionData={gameState.currentQuestion}
-          isHost={true}
-        ></CurrentQuestion>
-        <button onClick={() => nextQuestionMutation.mutate(gameID)}>
-          Next question
-        </button>
-      </article>
-    );
+  if (gameState.status === GameStatus.Ongoing) {
+    if (gameState.currentCorrectAnswers?.length) {
+      return (
+        <div>
+          {gameState.currentCorrectAnswers.map((answer) => (
+            <div key={answer.id}>{answer.body}</div>
+          ))}
+        </div>
+      );
+    } else {
+      return (
+        <article>
+          <CurrentQuestion
+            questionData={gameState.currentQuestion}
+            isHost={true}
+          ></CurrentQuestion>
+          <button onClick={() => nextQuestionMutation.mutate(gameID)}>
+            Next question
+          </button>
+        </article>
+      );
+    }
+  }
 
   return (
     <section>
@@ -58,3 +70,5 @@ export default function HostGamePage() {
     </section>
   );
 }
+
+export const getServerSideProps = getTranslations;

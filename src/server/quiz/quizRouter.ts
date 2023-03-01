@@ -16,12 +16,12 @@ export const quizRouter = createTRPCRouter({
   getUserQuizzes: protectedProcedure.query(({ ctx }) =>
     getQuizzes({ userId: ctx.session.user.id })
   ),
-  getPublishedQuizzes: protectedProcedure.query(() =>
-    getQuizzes({
+  getPublishedQuizzes: protectedProcedure.query(async () => {
+    return await getQuizzes({
       isPublished: true,
       isPrivate: false,
-    })
-  ),
+    });
+  }),
   getQuiz: protectedProcedure
     .input(z.string())
     .query(({ input }) => getQuiz(input)),

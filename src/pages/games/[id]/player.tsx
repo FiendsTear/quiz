@@ -3,11 +3,15 @@ import { useState, useEffect } from "react";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
+import { getTranslations } from "@/common/getTranslations";
+import { useTranslation } from "next-i18next";
+import Loading from "../../../common/components/Loading";
 
 export default function PlayerGamePage() {
   const { query, isReady } = useRouter();
   const gameID = Number(query.id?.toString());
   //   const gameState = useGameState(gameID);
+  const { t } = useTranslation("common");
 
   const [gameState, setGameState] = useState<
     RouterOutputs["game"]["getGameState"]
@@ -30,7 +34,7 @@ export default function PlayerGamePage() {
     if (!connected) enterMutation.mutate(gameID);
   });
 
-  if (!gameState) return <div>Загрузка</div>;
+  if (!gameState) return <Loading />;
   if (gameState.currentCorrectAnswers?.length) {
     return (
       <div>
@@ -61,4 +65,8 @@ export default function PlayerGamePage() {
   }
 
   return <section>Waiting for start</section>;
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return getTranslations({ locale });
 }

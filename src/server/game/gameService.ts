@@ -70,7 +70,7 @@ export async function addGame(input: number) {
   const gameState: GameState = {
     status: GameStatus.Created,
     players: [],
-    currentQuestion: { ...gameData.quiz.questions[0], ...{ timerValue: 2000 } },
+    currentQuestion: { ...gameData.quiz.questions[0], ...{ timerValue: 15 } },
     playersAnsweredCount: 0,
     currentCorrectAnswers: [],
     correctAnswerTimeout: null,
@@ -197,7 +197,7 @@ export function nextQuestion(game: IActiveGame) {
   } else {
     gameState.currentQuestion = {
       ...gameData.quiz.questions[currentQuestionIndex + 1],
-      ...{ timerValue: 2000 },
+      ...{ timerValue: 15 },
     };
   }
   emitState(game);
