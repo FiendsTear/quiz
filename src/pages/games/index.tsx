@@ -3,6 +3,8 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
+import { getTranslations } from "@/common/getTranslations";
+import { useTranslation } from "next-i18next";
 
 export default function GamesPage() {
   const { push } = useRouter();
@@ -13,6 +15,8 @@ export default function GamesPage() {
   const [currentTab, setTab] = useState<GameTabs>(GameTabs.Find);
 
   const [selectedQuiz, selectQuiz] = useState<Quiz | null>(null);
+
+  const { t } = useTranslation("common");
 
   const gamesQuery = trpc.game.getActiveGames.useQuery();
   const quizQuery = trpc.quiz.getPublishedQuizzes.useQuery();
@@ -30,14 +34,14 @@ export default function GamesPage() {
         />
       )}
       <section>
-        <button onClick={() => setTab(GameTabs.Find)}>Find</button>
-        <button onClick={() => setTab(GameTabs.Create)}>Create</button>
+        <button onClick={() => setTab(GameTabs.Find)}>{t("Find")}</button>
+        <button onClick={() => setTab(GameTabs.Create)}>{t("Create")}</button>
       </section>
       {currentTab === GameTabs.Create && (
         <section>
-          <h2>New Game</h2>
+          <h2>{t("New game")}</h2>
           {!quizQuery.data ||
-            (!quizQuery.data.length && <div>Quizzes not found</div>)}
+            (!quizQuery.data.length && <div>{t("Quizzes not found")}</div>)}
           <ul className="grid grid-cols-auto-200 gap-4 justify-center">
             {quizQuery.data?.map((quiz) => (
               <li
@@ -54,14 +58,14 @@ export default function GamesPage() {
 
       {currentTab === GameTabs.Find && (
         <section>
-          <h2>Enter Game</h2>
+          <h2>{t("Enter Game")}</h2>
           {!gamesQuery.data ||
-            (!gamesQuery.data.length && <div>Games not found</div>)}
+            (!gamesQuery.data.length && <div>{t("Games not found")}</div>)}
           <ul className="grid grid-cols-auto-200 gap-4 justify-center">
             {gamesQuery.data?.map((game) => (
               <li key={game.id}>
                 <button onClick={() => handleGameEnter(game.id)}>
-                  Enter Game {game.id}
+                  {t("Enter Game")} {game.id}
                 </button>
               </li>
             ))}
@@ -70,4 +74,8 @@ export default function GamesPage() {
       )}
     </article>
   );
+}
+
+export async function getStaticProps({ locale }: { locale: string }) {
+  return getTranslations({ locale });
 }

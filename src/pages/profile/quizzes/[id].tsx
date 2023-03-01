@@ -6,7 +6,10 @@ import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 import type { Question } from "@prisma/client";
 import QuestionEditor from "../../../modules/quiz/QuestionEditor";
-import Message from '@/modules/Message';
+import Message from "@/modules/Message";
+import { getTranslations } from "@/common/getTranslations";
+import { useTranslation } from "next-i18next";
+import { getPaths } from "../../../common/getPaths";
 
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
@@ -14,6 +17,7 @@ export default function NewQuizPage() {
   const [message, setMessage] = useState<boolean>(false);
   const { register } = useForm<QuizDTO>();
 
+  const { t } = useTranslation("common");
   const quizID = query.id as string;
 
   const getQuizQuery = trpc.quiz.getQuiz.useQuery(quizID, {
@@ -27,17 +31,25 @@ export default function NewQuizPage() {
   if (!isReady) return <div>Загрузка</div>;
 
   function handleQuizChange(changedValue: Partial<QuizDTO>) {
-    quizMutation.mutate({ ...{ id: +quizID }, ...changedValue }, {
-      onSuccess: () => {
-        refetchQuiz();
+    quizMutation.mutate(
+      { ...{ id: +quizID }, ...changedValue },
+      {
+        onSuccess: () => {
+          refetchQuiz();
+        },
       }
-    });
+    );
   }
 
   function handlePublish() {
-    quizMutation.mutate({ id: +quizID, isPublished: true }, {
-      onSuccess: () => { setMessage(true); }
-    });
+    quizMutation.mutate(
+      { id: +quizID, isPublished: true },
+      {
+        onSuccess: () => {
+          setMessage(true);
+        },
+      }
+    );
   }
 
   function toProfilePage() {
@@ -60,18 +72,18 @@ export default function NewQuizPage() {
     );
   }
 
-  if (getQuizQuery.isLoading) return <div>Загрузка</div>;
+  if (getQuizQuery.isLoading) return <div>{t("Loading")}</div>;
 
   return (
     <article className="relative h-full">
       {message && (
         <Message
-          messageString='Quiz published successfully'
+          messageString="Quiz published successfully"
           confirmSelect={() => toProfilePage()}
         />
       )}
       <h1>Edit Quiz</h1>
-      <label htmlFor="quiz-name">Quiz name</label>
+      <label htmlFor="quiz-name">{t("Quiz name")}</label>
       <input
         id="quiz-name"
         type="text"
@@ -80,7 +92,7 @@ export default function NewQuizPage() {
         {...register("name", {
           onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
             handleQuizChange({ name: e.target.value });
-          }, 700)
+          }, 700),
         })}
       ></input>
       <ul className="flex flex-col gap-5">
@@ -96,10 +108,10 @@ export default function NewQuizPage() {
       </ul>
       <div className="flex justify-between">
         <button type="button" onClick={handleNewQuestion}>
-          Add Question
+          {t("Add Question")}
         </button>
         <div className="flex items-center gap-2">
-          <input 
+          <input
             id="quiz-isPrivate"
             type="checkbox"
             defaultChecked={getQuizQuery.data?.isPrivate}
@@ -111,12 +123,19 @@ export default function NewQuizPage() {
               ),
             })}
           ></input>
-          <label htmlFor="quiz-isPrivate">Private Quiz</label>
-          <button disabled={getQuizQuery.data?.isPublished} type="button" onClick={handlePublish}>
-            Publish Quiz
+          <label htmlFor="quiz-isPrivate">{t("Private quiz")}</label>
+          <button
+            disabled={getQuizQuery.data?.isPublished}
+            type="button"
+            onClick={handlePublish}
+          >
+            {t("Publish quiz")}
           </button>
         </div>
       </div>
     </article>
   );
 }
+
+export const getStaticProps = getTranslations;
+export const getStaticPaths = getPaths;

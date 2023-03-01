@@ -4,6 +4,7 @@ import Userpic from "@/modules/Userpic";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
 import { useState } from "react";
+import { getTranslations } from "@/common/getTranslations";
 
 export default function HostGamePage() {
   const { query, isReady } = useRouter();
@@ -69,3 +70,8 @@ export default function HostGamePage() {
     </section>
   );
 }
+
+export async function getStaticProps({ locale }: { locale: string }) {
+    return getTranslations({ locale });
+  }
+  

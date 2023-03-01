@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
+import { getTranslations } from "@/common/getTranslations";
 
 export default function PlayerGamePage() {
   const { query, isReady } = useRouter();
@@ -62,3 +63,8 @@ export default function PlayerGamePage() {
 
   return <section>Waiting for start</section>;
 }
+
+export async function getStaticProps({ locale }: { locale: string }) {
+    return getTranslations({ locale });
+  }
+  
