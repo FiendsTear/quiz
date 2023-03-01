@@ -33,6 +33,14 @@ export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
   }
 }
 
+export async function unpuplishQuiz(quizID: number) {
+  const quiz = await prisma.quiz.update({
+    where: { id: quizID },
+    data: { isPublished: false },
+  });
+  return quiz;
+}
+
 export async function getQuizzes(where?: Prisma.QuizWhereInput) {
   const quizzes = await prisma.quiz.findMany({
     where,

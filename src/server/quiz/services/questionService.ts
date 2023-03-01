@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { QuestionDTO } from "../dto/questionDTO";
+import type { QuestionDTO } from "../dto/questionDTO";
+import { unpuplishQuiz } from './quizService';
 
 const prisma = new PrismaClient();
 
@@ -20,11 +21,23 @@ export async function addOrUpdateQuestion(input: QuestionDTO) {
       answerWeight: input.answerWeight,
       quiz: { connect: { id: input.quizID } },
     },
-    update: { body: input.body, answerWeight: input.answerWeight },
+    update: { 
+      body: input.body, 
+      answerWeight: input.answerWeight,
+    },
+    include: { quiz: true },
   });
+  if (question.quiz.isPublished)
+    await unpuplishQuiz(question.quiz.id);
   return question;
 }
 
 export async function deleteQuestion(questionID: number) {
-  return await prisma.question.delete({ where: { id: questionID } });
+  const question = await prisma.question.delete({
+    where: { id: questionID },
+    include: { quiz: true },
+  });
+  if (question.quiz.isPublished)
+    await unpuplishQuiz(question.quiz.id);
+  return question;
 }

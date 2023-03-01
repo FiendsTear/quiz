@@ -27,7 +27,7 @@ export default function NewQuizPage() {
   if (!isReady) return <div>Загрузка</div>;
 
   function handleQuizChange(changedValue: Partial<QuizDTO>) {
-    quizMutation.mutate({ ...{ id: +quizID }, ...changedValue }, {
+    quizMutation.mutate({ ...{ id: +quizID, isPublished: false }, ...changedValue }, {
       onSuccess: () => {
         refetchQuiz();
       }

@@ -5,6 +5,7 @@ import React from "react";
 import debounce from "lodash.debounce";
 import { useFieldArray, useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
+import type { QuestionDTO } from "@/server/quiz/dto/questionDTO";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 
@@ -36,14 +37,11 @@ export default function QuestionEditor(props: {
     },
   });
 
-  function handleBodyChange(e: React.ChangeEvent<HTMLInputElement>) {
-    mutation.mutate({ ...question, ...{ body: e.target.value } });
-  }
-
-  function handleWeightChange(e: React.ChangeEvent<HTMLInputElement>) {
-    mutation.mutate({
-      ...question,
-      ...{ answerWeight: Number(e.target.value) },
+  function handleQuestionChange(changedValue: Partial<QuestionDTO>) {
+    mutation.mutate({ ...question, ...changedValue }, {
+      onSuccess: () => {
+        props.refetchQuiz();
+      }
     });
   }
 
@@ -58,6 +56,7 @@ export default function QuestionEditor(props: {
       {
         onSuccess: () => {
           reFetchQuestion();
+          props.refetchQuiz();
         },
       }
     );
@@ -82,7 +81,11 @@ export default function QuestionEditor(props: {
             id="question-body"
             type="text"
             className="mb-3"
-            {...register("body", { onChange: debounce(handleBodyChange, 500) })}
+            {...register("body", {
+              onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+                handleQuestionChange({ body: e.target.value });
+              }, 700)
+            })}
           ></input>
         </div>
         <div className="w-1/4">
@@ -92,7 +95,9 @@ export default function QuestionEditor(props: {
             type="number"
             className="mb-3"
             {...register("answerWeight", {
-              onChange: debounce(handleWeightChange, 500),
+              onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+                handleQuestionChange({ answerWeight: Number(e.target.value) });
+              }, 700)
             })}
           ></input>
         </div>
@@ -111,6 +116,7 @@ export default function QuestionEditor(props: {
               key={field.fieldID}
               answer={field}
               refetchQuestion={reFetchQuestion}
+              refetchQuiz={props.refetchQuiz}
             ></AnswerEditor>
           );
         })}

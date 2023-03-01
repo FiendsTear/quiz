@@ -10,6 +10,7 @@ import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 export default function AnswerEditor(props: {
   answer: Answer;
   refetchQuestion: { (): void };
+  refetchQuiz: { (): void };
 }) {
   // state
   const [answer, setAnswer] = useState<Answer>(props.answer);
@@ -26,6 +27,7 @@ export default function AnswerEditor(props: {
     answerMutation.mutate({ ...answer, ...changedValue }, {
         onSuccess: (data) => {
             setAnswer(data);
+            props.refetchQuiz();
         }
     });
   }
@@ -37,6 +39,7 @@ export default function AnswerEditor(props: {
     answerDeletion.mutate(answer.id, {
       onSuccess() {
         props.refetchQuestion();
+        props.refetchQuiz();
       },
     });
   }
