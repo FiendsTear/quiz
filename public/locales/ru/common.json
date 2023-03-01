@@ -13,5 +13,20 @@
     "Create": "Создать",
     "Quizzes not found": "Квизы не найдены",
     "Enter Game": "Присоединиться к игре",
-    "Games not found": "Игры не найдены"
+    "Games not found": "Игры не найдены",
+    "Sign out": "Выйти",
+    "Sign in": "Войти",
+    "Home": "Главная",
+    "Games": "Игры",
+    "Unpublished": "Неопубликован",
+    "Private": "Приватный",
+    "Published": "Опубликован",
+    "Add answer variant": "Добавить вариант ответа",
+    "Answer weight": "Вес вопроса",
+    "Question text": "Текст вопроса",
+    "Answer text": "Текст ответа",
+    "Is this answer correct?": "Верный ответ",
+    "Waiting for others": "Ожидаем других",
+    "Edit Quiz": "Редактировать квиз",
+    "Create game": "Создать игру"
 }

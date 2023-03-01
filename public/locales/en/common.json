@@ -13,5 +13,20 @@
     "Create": "Create",
     "Quizzes not found": "Quizzes not found",
     "Enter Game": "Enter Game",
-    "Games not found": "Games not found"
+    "Games not found": "Games not found",
+    "Sign out": "Sign out",
+    "Sign in": "Sign in",
+    "Home": "Home",
+    "Games": "Games",
+    "Unpublished": "Unpublished",
+    "Private": "Private",
+    "Published": "Published",
+    "Add answer variant": "Add answer variant",
+    "Answer weight": "Answer weight",
+    "Question text": "Question text",
+    "Answer text": "Answer text",
+    "Is this answer correct?": "Is this answer correct?",
+    "Waiting for others": "Waiting for others",
+    "Edit Quiz": "Edit Quiz",
+    "Create game": "Create game"
 }

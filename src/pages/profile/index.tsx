@@ -6,6 +6,7 @@ import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
+import Loading from "../../common/components/Loading";
 
 export default function ProfilePage() {
   const { data: sessionData } = useSession();
@@ -28,7 +29,7 @@ export default function ProfilePage() {
     );
   }
 
-  if (query.isLoading) return <div>{t("Loading")}</div>;
+  if (query.isLoading) return <Loading />;
   return (
     <article className="relative h-full">
       {selectedQuiz && (
@@ -59,9 +60,9 @@ export default function ProfilePage() {
               >
                 {quiz.isPublished
                   ? quiz.isPrivate
-                    ? "Private"
-                    : "Published"
-                  : "Unpublished"}
+                    ? t("Private")
+                    : t("Published")
+                  : t("Unpublished")}
               </span>
             </li>
           );
@@ -76,6 +77,4 @@ export default function ProfilePage() {
   );
 }
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return getTranslations({ locale });
-}
+export const getServerSideProps = getTranslations;

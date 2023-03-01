@@ -7,6 +7,8 @@ import { useFieldArray, useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import Loading from "../../common/components/Loading";
+import { useTranslation } from "next-i18next";
 
 type QuestionWithAnswers = Question & { answers: Answer[] };
 
@@ -28,6 +30,8 @@ export default function QuestionEditor(props: {
     control,
     keyName: "fieldID",
   });
+
+  const { t } = useTranslation("common");
 
   const mutation = trpc.quiz.addOrUpdateQuestion.useMutation();
   const getQuestionQuery = trpc.quiz.getQuestion.useQuery(question.id, {
@@ -72,12 +76,12 @@ export default function QuestionEditor(props: {
     });
   }
 
-  if (getQuestionQuery.isLoading) return <div>Загрузка</div>;
+  if (getQuestionQuery.isLoading) return <Loading />;
   return (
     <form className="bordered p-4">
       <div className="flex gap-4 items-start">
         <div className="w-3/4">
-          <label htmlFor="question-body">Question text</label>
+          <label htmlFor="question-body">{t("Question text")}</label>
           <input
             id="question-body"
             type="text"
@@ -86,7 +90,7 @@ export default function QuestionEditor(props: {
           ></input>
         </div>
         <div className="w-1/4">
-          <label htmlFor="answer-weight">Answer weight</label>
+          <label htmlFor="answer-weight">{t("Answer weight")}</label>
           <input
             id="answer-weight"
             type="number"
@@ -116,7 +120,7 @@ export default function QuestionEditor(props: {
         })}
       </fieldset>
       <button type="button" onClick={createAnswer}>
-        Add answer variant
+        {t("Add answer variant")}
       </button>
     </form>
   );

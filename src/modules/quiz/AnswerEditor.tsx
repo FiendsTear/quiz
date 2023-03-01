@@ -6,6 +6,7 @@ import debounce from "lodash.debounce";
 import { useForm } from "react-hook-form";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { useTranslation } from "next-i18next";
 
 export default function AnswerEditor(props: {
   answer: Answer;
@@ -19,15 +20,20 @@ export default function AnswerEditor(props: {
     values: answer,
   });
 
+  const { t } = useTranslation();
+
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
   const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
 
   function handleAnswerChange(changedValue: Partial<Answer>) {
-    answerMutation.mutate({ ...answer, ...changedValue }, {
+    answerMutation.mutate(
+      { ...answer, ...changedValue },
+      {
         onSuccess: (data) => {
-            setAnswer(data);
-        }
-    });
+          setAnswer(data);
+        },
+      }
+    );
   }
 
   const bodyInputID = `answer-body-${answer.id}`;
@@ -43,7 +49,7 @@ export default function AnswerEditor(props: {
 
   return (
     <section>
-      <label htmlFor={bodyInputID}>Answer text</label>
+      <label htmlFor={bodyInputID}>{t("Answer text")}</label>
       <textarea
         id={bodyInputID}
         {...register(`body`, {
@@ -66,7 +72,7 @@ export default function AnswerEditor(props: {
               ),
             })}
           ></input>
-          <label htmlFor={isCorrectInputID}>Is this answer correct?</label>
+          <label htmlFor={isCorrectInputID}>{t("Is this answer correct?")}</label>
         </div>
 
         <button

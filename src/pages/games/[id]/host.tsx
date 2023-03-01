@@ -71,7 +71,4 @@ export default function HostGamePage() {
   );
 }
 
-export async function getStaticProps({ locale }: { locale: string }) {
-    return getTranslations({ locale });
-  }
-  
+export const getServerSideProps = getTranslations;

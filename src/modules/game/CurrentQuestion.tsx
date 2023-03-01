@@ -3,7 +3,7 @@ import { Question, Answer } from "@prisma/client";
 import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useTimer } from "react-timer-hook";
-import { setTimeout } from "timers";
+import { useTranslation } from "next-i18next";
 
 type QuestionData = Question & {
   answers: Answer[];
@@ -17,6 +17,7 @@ export default function CurrentQuestion(props: {
   const { questionData } = props;
   const { query } = useRouter();
   const [answerSent, setAnswerSent] = useState<boolean>(false);
+  const { t } = useTranslation();
   //   const [questionTimer, setTimer] = useState<ReturnType<
   //     typeof setTimeout
   //   > | null>(null);
@@ -51,7 +52,7 @@ export default function CurrentQuestion(props: {
     }
   }, [questionData.timerValue, restart, isRunning]);
 
-  if (answerSent && !props.isHost) return <div>Waiting for others</div>;
+  if (answerSent && !props.isHost) return <div>{t("Waiting for others")}</div>;
   return (
     <div className="flex flex-col">
       <div className="text-center">{questionData.body}</div>

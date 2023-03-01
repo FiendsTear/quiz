@@ -6,10 +6,10 @@ import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 import type { Question } from "@prisma/client";
 import QuestionEditor from "../../../modules/quiz/QuestionEditor";
-import Message from "@/modules/Message";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
-import { getPaths } from "../../../common/getPaths";
+import Loading from '../../../common/components/Loading';
+import Message from '../../../common/components/Message';
 
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
@@ -28,7 +28,7 @@ export default function NewQuizPage() {
   const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
 
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
-  if (!isReady) return <div>Загрузка</div>;
+  
 
   function handleQuizChange(changedValue: Partial<QuizDTO>) {
     quizMutation.mutate(
@@ -72,7 +72,7 @@ export default function NewQuizPage() {
     );
   }
 
-  if (getQuizQuery.isLoading) return <div>{t("Loading")}</div>;
+  if (!isReady) return <Loading />;
 
   return (
     <article className="relative h-full">
@@ -137,5 +137,4 @@ export default function NewQuizPage() {
   );
 }
 
-export const getStaticProps = getTranslations;
-export const getStaticPaths = getPaths;
+export const getServerSideProps = getTranslations;
