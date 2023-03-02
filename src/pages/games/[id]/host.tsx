@@ -1,10 +1,10 @@
 import { GameStatus, trpc } from "@/utils/trpc";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
-import Userpic from "@/modules/Userpic";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
 import { useState } from "react";
 import { getTranslations } from "@/common/getTranslations";
+import Userpic from '../../../common/components/Userpic';
 
 export default function HostGamePage() {
   const { query, isReady } = useRouter();

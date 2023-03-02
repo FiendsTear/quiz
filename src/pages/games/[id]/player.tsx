@@ -67,6 +67,4 @@ export default function PlayerGamePage() {
   return <section>Waiting for start</section>;
 }
 
-export async function getStaticProps({ locale }: { locale: string }) {
-  return getTranslations({ locale });
-}
+export const getServerSideProps = getTranslations;
