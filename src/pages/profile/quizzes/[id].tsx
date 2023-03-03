@@ -82,7 +82,7 @@ export default function NewQuizPage() {
           confirmSelect={() => toProfilePage()}
         />
       )}
-      <h1>Edit Quiz</h1>
+      <h1>{t("Edit Quiz")}</h1>
       <label htmlFor="quiz-name">{t("Quiz name")}</label>
       <input
         id="quiz-name"

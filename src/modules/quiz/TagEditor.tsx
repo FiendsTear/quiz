@@ -4,9 +4,10 @@ import { useForm } from "react-hook-form";
 import debounce from "lodash.debounce";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
-import type { CreateTagDTO } from '@/server/quiz/dto/createTagDTO';
-import type { Tag } from '@prisma/client';
-import Loading from '@/common/components/Loading';
+import type { CreateTagDTO } from "@/server/quiz/dto/createTagDTO";
+import type { Tag } from "@prisma/client";
+import Loading from "@/common/components/Loading";
+import { useTranslation } from "next-i18next";
 
 export default function TagEditor(props: {
   tags: Tag[] | undefined;
@@ -19,6 +20,8 @@ export default function TagEditor(props: {
   const { register } = useForm<CreateTagDTO>({
     values: newTag,
   });
+
+  const { t } = useTranslation("common");
 
   const getSimilarTags = trpc.quiz.getSimilarTags.useQuery(newTag);
 
@@ -71,9 +74,9 @@ export default function TagEditor(props: {
   }
 
   return (
-    <div className="bordered p-4">
+    <div>
       <ul className="flex items-center gap-2 m-0">
-        <li>Tags:</li>
+        <li>{t("Tags")}:</li>
         {props.tags?.map((tag) => {
           return (
             <li className="bg-emerald-300 rounded-md pl-1" key={tag.id}>
@@ -102,7 +105,7 @@ export default function TagEditor(props: {
       </ul>
       {isTagAdding && (
         <div className="mt-3">
-          <label htmlFor="quiz-tag">Tag name</label>
+          <label htmlFor="quiz-tag">{t("Tag name")}</label>
           <input
             type="text"
             id="quiz-tag"
@@ -116,7 +119,7 @@ export default function TagEditor(props: {
           {!getSimilarTags.data && <Loading />}
           {getSimilarTags.data && getSimilarTags.data.length > 0 && newTag.name.length > 1 && (
             <ul className="flex items-center gap-2">
-              <li>Similar Tags:</li>
+              <li>{t("Similar Tags")}:</li>
               {getSimilarTags.data.map((tag) => {
                 return (
                   <li key={tag.id}>
@@ -133,10 +136,10 @@ export default function TagEditor(props: {
               type="button"
               disabled={newTag.name.length < 3}
               onClick={createNewTag}>
-                Create New Tag
+              {t("Create New Tag")}
             </button>
             <button type="button" onClick={() => setTagAdding(false)}>
-              Cancel
+              {t("Cancel")}
             </button>
           </div>
         </div>
