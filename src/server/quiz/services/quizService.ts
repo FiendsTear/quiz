@@ -52,7 +52,10 @@ export async function getQuizzes(where?: Prisma.QuizWhereInput) {
 export async function getQuiz(quizID: string) {
   const quiz = await prisma.quiz.findFirstOrThrow({
     where: { id: +quizID },
-    include: { questions: { orderBy: { order: "asc" } } },
+    include: {
+      questions: { orderBy: { order: "asc" } },
+      tags: true,
+    },
   });
   return quiz;
 }

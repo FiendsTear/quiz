@@ -6,10 +6,11 @@ import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
 import type { Question } from "@prisma/client";
 import QuestionEditor from "../../../modules/quiz/QuestionEditor";
+import TagEditor from '@/modules/quiz/TagEditor';
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
-import Loading from '../../../common/components/Loading';
-import Message from '../../../common/components/Message';
+import Loading from "../../../common/components/Loading";
+import Message from "../../../common/components/Message";
 
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
@@ -28,7 +29,6 @@ export default function NewQuizPage() {
   const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
 
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
-  
 
   function handleQuizChange(changedValue: Partial<QuizDTO>) {
     quizMutation.mutate(
@@ -95,6 +95,11 @@ export default function NewQuizPage() {
           }, 700),
         })}
       ></input>
+      <TagEditor 
+        tags={getQuizQuery.data?.tags}
+        quizID={+quizID} 
+        refetchQuiz={refetchQuiz}
+      ></TagEditor>
       <ul className="flex flex-col gap-5">
         {questions.map((question) => {
           return (
