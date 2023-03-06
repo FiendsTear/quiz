@@ -4,9 +4,8 @@ import type { QuizDTO } from "../../../server/quiz/dto/quizDTO";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
-import type { Question } from "@prisma/client";
 import QuestionEditor from "../../../modules/quiz/QuestionEditor";
-import TagEditor from '@/modules/quiz/TagEditor';
+import TagEditor from "@/modules/quiz/TagEditor";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
@@ -14,21 +13,22 @@ import Message from "../../../common/components/Message";
 
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [message, setMessage] = useState<boolean>(false);
   const { register } = useForm<QuizDTO>();
+  const ctx = trpc.useContext();
 
   const { t } = useTranslation("common");
   const quizID = query.id as string;
 
   const getQuizQuery = trpc.quiz.getQuiz.useQuery(quizID, {
     enabled: isReady,
-    onSuccess: (data) => setQuestions(data.questions),
   });
 
   const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
 
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
+
+  if (!isReady || !getQuizQuery.data) return <Loading />;
 
   function handleQuizChange(changedValue: Partial<QuizDTO>) {
     quizMutation.mutate(
@@ -61,9 +61,9 @@ export default function NewQuizPage() {
     getQuizQuery.refetch().catch((err) => console.error(err));
   }
 
-  function handleNewQuestion() {
+  function handleNewQuestion(order: number) {
     questionMutation.mutate(
-      { quizID: +quizID, order: questions.length },
+      { quizID: +quizID, order },
       {
         onSuccess: () => {
           refetchQuiz();
@@ -72,7 +72,7 @@ export default function NewQuizPage() {
     );
   }
 
-  if (!isReady) return <Loading />;
+  const { data } = getQuizQuery;
 
   return (
     <article className="relative h-full">
@@ -87,7 +87,7 @@ export default function NewQuizPage() {
       <input
         id="quiz-name"
         type="text"
-        defaultValue={getQuizQuery.data?.name}
+        defaultValue={data.name}
         className="mb-3"
         {...register("name", {
           onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,13 +95,13 @@ export default function NewQuizPage() {
           }, 700),
         })}
       ></input>
-      <TagEditor 
-        tags={getQuizQuery.data?.tags}
-        quizID={+quizID} 
+      <TagEditor
+        tags={data.tags}
+        quizID={+quizID}
         refetchQuiz={refetchQuiz}
       ></TagEditor>
       <ul className="flex flex-col gap-5">
-        {questions.map((question) => {
+        {data.questions.map((question) => {
           return (
             <QuestionEditor
               key={question.id}
@@ -112,14 +112,17 @@ export default function NewQuizPage() {
         })}
       </ul>
       <div className="flex justify-between">
-        <button type="button" onClick={handleNewQuestion}>
+        <button
+          type="button"
+          onClick={() => handleNewQuestion(data.questions.length)}
+        >
           {t("Add Question")}
         </button>
         <div className="flex items-center gap-2">
           <input
             id="quiz-isPrivate"
             type="checkbox"
-            defaultChecked={getQuizQuery.data?.isPrivate}
+            defaultChecked={data.isPrivate}
             {...register(`isPrivate`, {
               onChange: debounce(
                 (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -130,7 +133,7 @@ export default function NewQuizPage() {
           ></input>
           <label htmlFor="quiz-isPrivate">{t("Private quiz")}</label>
           <button
-            disabled={getQuizQuery.data?.isPublished}
+            disabled={data.isPublished}
             type="button"
             onClick={handlePublish}
           >

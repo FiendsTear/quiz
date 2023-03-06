@@ -1,9 +1,7 @@
 import { trpc } from "../../utils/trpc";
-import type { Answer, Question } from "@prisma/client";
-import { useState } from "react";
 import React from "react";
 import debounce from "lodash.debounce";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
 import type { QuestionDTO } from "@/server/quiz/dto/questionDTO";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -11,42 +9,19 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import Loading from "../../common/components/Loading";
 import { useTranslation } from "next-i18next";
 
-type QuestionWithAnswers = Question & { answers: Answer[] };
-
-export default function QuestionEditor(props: {
-  question: Question;
-  refetchQuiz: { (): void };
-}) {
-  // state
-  const [question, setQuestion] = useState<QuestionWithAnswers>(
-    Object.assign({}, props.question, { answers: [] })
-  );
-
+export default function QuestionEditor(props: { questionID: number }) {
   // form state
-  const { register, control } = useForm<QuestionWithAnswers>({
-    values: question,
-  });
-  const { fields } = useFieldArray({
-    name: "answers",
-    control,
-    keyName: "fieldID",
-  });
+  const { register, getValues } = useForm();
 
   const { t } = useTranslation("common");
 
   const mutation = trpc.quiz.addOrUpdateQuestion.useMutation();
-  const getQuestionQuery = trpc.quiz.getQuestion.useQuery(question.id, {
-    onSuccess: (data) => {
-      setQuestion({ ...question, ...data });
-    },
-  });
+  const getQuestionQuery = trpc.quiz.getQuestion.useQuery(props.questionID);
+
+  if (!getQuestionQuery.data) return <Loading />;
 
   function handleQuestionChange(changedValue: Partial<QuestionDTO>) {
-    mutation.mutate({ ...question, ...changedValue }, {
-      onSuccess: () => {
-        props.refetchQuiz();
-      }
-    });
+    mutation.mutate({ ...getQuestionQuery.data, ...changedValue });
   }
 
   function reFetchQuestion() {
@@ -55,27 +30,15 @@ export default function QuestionEditor(props: {
 
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
   function createAnswer() {
-    answerMutation.mutate(
-      { questionID: question.id },
-      {
-        onSuccess: () => {
-          reFetchQuestion();
-          props.refetchQuiz();
-        },
-      }
-    );
+    answerMutation.mutate({ questionID: props.questionID });
   }
+  
   const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
 
   function deleteQuestion() {
-    questionDeletion.mutate(question.id, {
-      onSuccess() {
-        props.refetchQuiz();
-      },
-    });
+    questionDeletion.mutate(props.questionID);
   }
 
-  if (getQuestionQuery.isLoading) return <Loading />;
   return (
     <form className="bordered p-4">
       <div className="flex gap-4 items-start">
@@ -88,7 +51,7 @@ export default function QuestionEditor(props: {
             {...register("body", {
               onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ body: e.target.value });
-              }, 700)
+              }, 700),
             })}
           ></input>
         </div>
@@ -101,7 +64,7 @@ export default function QuestionEditor(props: {
             {...register("answerWeight", {
               onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ answerWeight: Number(e.target.value) });
-              }, 700)
+              }, 700),
             })}
           ></input>
         </div>
