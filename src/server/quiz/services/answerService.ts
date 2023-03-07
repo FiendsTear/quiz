@@ -5,7 +5,7 @@ import { unpuplishQuiz } from "./quizService";
 const prisma = new PrismaClient();
 
 export async function getAnswer(answerID: number) {
-  const answer = await prisma.answer.findUnique({
+  const answer = await prisma.answer.findUniqueOrThrow({
     where: { id: answerID },
   });
   return answer;

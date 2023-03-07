@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import type { QuestionDTO } from "../dto/questionDTO";
-import { unpuplishQuiz } from "./quizService";
+import { unpuplishQuiz as unpublishQuiz } from "./quizService";
 
 const prisma = new PrismaClient();
 
 export async function getQuestion(questionID: number) {
-  const question = await prisma.question.findFirstOrThrow({
+  const question = await prisma.question.findUniqueOrThrow({
     where: { id: questionID },
     include: { answers: { select: { id: true } } },
   });
@@ -27,7 +27,7 @@ export async function addOrUpdateQuestion(input: QuestionDTO) {
     },
     include: { quiz: true },
   });
-  if (question.quiz.isPublished) await unpuplishQuiz(question.quiz.id);
+  if (question.quiz.isPublished) await unpublishQuiz(question.quiz.id);
   return question;
 }
 
@@ -36,6 +36,6 @@ export async function deleteQuestion(questionID: number) {
     where: { id: questionID },
     include: { quiz: true },
   });
-  if (question.quiz.isPublished) await unpuplishQuiz(question.quiz.id);
+  if (question.quiz.isPublished) await unpublishQuiz(question.quiz.id);
   return question;
 }

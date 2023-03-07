@@ -1,42 +1,73 @@
-import { trpc } from "../../utils/trpc";
+import { RouterInputs, trpc } from "../../utils/trpc";
 import React from "react";
 import debounce from "lodash.debounce";
 import { useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
 import type { QuestionDTO } from "@/server/quiz/dto/questionDTO";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+
 import Loading from "../../common/components/Loading";
 import { useTranslation } from "next-i18next";
 
-export default function QuestionEditor(props: { questionID: number }) {
-  // form state
-  const { register, getValues } = useForm();
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { getQueryKey } from "@trpc/react-query";
 
+type QuestionInput = RouterInputs["quiz"]["addOrUpdateQuestion"];
+
+export default function QuestionEditor(props: { questionID: number }) {
   const { t } = useTranslation("common");
 
   const mutation = trpc.quiz.addOrUpdateQuestion.useMutation();
   const getQuestionQuery = trpc.quiz.getQuestion.useQuery(props.questionID);
+  const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
+  const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
+  const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
 
+  // form state
+  const { register, getValues, setValue } = useForm<QuestionInput>({
+    values: getQuestionQuery.data,
+  });
+  
   if (!getQuestionQuery.data) return <Loading />;
+  const data = getQuestionQuery.data;
 
   function handleQuestionChange(changedValue: Partial<QuestionDTO>) {
-    mutation.mutate({ ...getQuestionQuery.data, ...changedValue });
+    mutation.mutate(
+      { ...data, ...changedValue },
+      {
+        onSuccess: () => {
+          refetchQuestion();
+        },
+      }
+    );
   }
 
-  function reFetchQuestion() {
+  function refetchQuestion() {
     getQuestionQuery.refetch().catch((err) => console.error(err));
   }
 
-  const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
   function createAnswer() {
-    answerMutation.mutate({ questionID: props.questionID });
+    answerMutation.mutate(
+      { questionID: props.questionID },
+      {
+        onSuccess: () => {
+          refetchQuestion();
+        },
+      }
+    );
   }
-  
-  const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
 
   function deleteQuestion() {
     questionDeletion.mutate(props.questionID);
+  }
+
+  function deleteAnswer(answerID: number) {
+    answerDeletion.mutate(answerID, {
+      onSuccess: () => {
+        refetchQuestion();
+      },
+    });
   }
 
   return (
@@ -76,18 +107,30 @@ export default function QuestionEditor(props: { questionID: number }) {
           <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
         </button>
       </div>
-      <fieldset className="flex flex-col gap-2 mb-3">
-        {fields.map((field, index) => {
+      <ul className="flex flex-col gap-2 mb-3">
+        {data.answers.map((answer) => {
           return (
-            <AnswerEditor
-              key={field.fieldID}
-              answer={field}
-              refetchQuestion={reFetchQuestion}
-              refetchQuiz={props.refetchQuiz}
-            ></AnswerEditor>
+            <li
+              key={answer.id}
+              className="flex items-end gap-x-5 gap-y-1 flex-wrap"
+            >
+              <AnswerEditor
+                answerID={answer.id}
+                className="grow"
+              ></AnswerEditor>
+              <button
+                type="button"
+                className="warning"
+                onClick={() => deleteAnswer(answer.id)}
+                title="Delete answer"
+              >
+                <FontAwesomeIcon icon={faTrashCan} />
+              </button>
+              <div className="w-full h-px bg-stone-300"></div>
+            </li>
           );
         })}
-      </fieldset>
+      </ul>
       <button type="button" onClick={createAnswer}>
         {t("Add answer variant")}
       </button>

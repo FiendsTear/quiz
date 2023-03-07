@@ -1,6 +1,6 @@
 import React, { useState } from "react";
+import type { RouterInputs } from "../../../utils/trpc";
 import { trpc } from "../../../utils/trpc";
-import type { QuizDTO } from "../../../server/quiz/dto/quizDTO";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
@@ -10,12 +10,13 @@ import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 import Message from "../../../common/components/Message";
+import { useQueries } from "@tanstack/react-query";
 
+type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
   const [message, setMessage] = useState<boolean>(false);
-  const { register } = useForm<QuizDTO>();
-  const ctx = trpc.useContext();
+  const { register } = useForm<QuizInput>();
 
   const { t } = useTranslation("common");
   const quizID = query.id as string;
@@ -24,13 +25,22 @@ export default function NewQuizPage() {
     enabled: isReady,
   });
 
-  const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
+  const questionQueries = trpc.useQueries((t) => {
+    if (getQuizQuery.data) {
+      return getQuizQuery.data.questions.map((question) => {
+        console.log(question.id);
+        return t.quiz.getQuestion(question.id);
+      });
+    }
+    return [];
+  });
 
+  const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
 
   if (!isReady || !getQuizQuery.data) return <Loading />;
 
-  function handleQuizChange(changedValue: Partial<QuizDTO>) {
+  function handleQuizChange(changedValue: QuizInput) {
     quizMutation.mutate(
       { ...{ id: +quizID }, isPublished: false, ...changedValue },
       {
@@ -105,8 +115,7 @@ export default function NewQuizPage() {
           return (
             <QuestionEditor
               key={question.id}
-              question={question}
-              refetchQuiz={refetchQuiz}
+              questionID={question.id}
             ></QuestionEditor>
           );
         })}
