@@ -49,6 +49,7 @@ export default function ProfilePage() {
               className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
             >
               <span className="block">{quiz.name}</span>
+              <span className="opacity-60">{quiz.tags.map((tag) => tag.name).join(", ")}</span>
               <span
                 className={
                   quiz.isPublished

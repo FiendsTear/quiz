@@ -26,7 +26,7 @@ export async function createTag(input: CreateTagDTO) {
       id: true,
     },
     data: {
-      name: input.name,
+      name: input.name.toLowerCase(),
       quizzes: {
         connect: { id: input.quizID },
       },

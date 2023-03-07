@@ -49,7 +49,8 @@ export default function GamesPage() {
                 onClick={() => selectQuiz(quiz)}
                 className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
               >
-                {quiz.name}
+                <span>{quiz.name}</span>
+                <span className="opacity-60">{quiz.tags.map((tag) => tag.name).join(", ")}</span>
               </li>
             ))}
           </ul>

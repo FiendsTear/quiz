@@ -1,12 +1,12 @@
-import { trpc } from '@/utils/trpc';
+import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import debounce from "lodash.debounce";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faXmark, faPlus, faMinus, faCheck } from "@fortawesome/free-solid-svg-icons";
 import type { CreateTagDTO } from "@/server/quiz/dto/createTagDTO";
 import type { Tag } from "@prisma/client";
-import Loading from "@/common/components/Loading";
+import Dropdown from "@/common/components/Dropdown";
 import { useTranslation } from "next-i18next";
 
 export default function TagEditor(props: {
@@ -15,7 +15,8 @@ export default function TagEditor(props: {
   refetchQuiz: { (): void };
 }) {
   const [isTagAdding, setTagAdding] = useState<boolean>(false);
-  const [tagName, setTagName] = useState<string>('');
+  const [isError, setError] = useState<boolean>(false);
+  const [tagName, setTagName] = useState<string>("");
   const newTag: CreateTagDTO = { quizID: props.quizID, name: tagName };
   const { register } = useForm<CreateTagDTO>({
     values: newTag,
@@ -39,11 +40,8 @@ export default function TagEditor(props: {
     attachTag.mutate(
       { quizID: props.quizID, tagID },
       {
-        onSuccess: () => {
-          refetchTags();
-          props.refetchQuiz();
-          setTagName('');
-        },
+        onSuccess: () => resetOnSuccess(),
+        onError: () => setError(true)
       }
     );
   }
@@ -52,34 +50,44 @@ export default function TagEditor(props: {
     removeTag.mutate(
       { quizID: props.quizID, tagID },
       {
-        onSuccess: () => {
-          refetchTags();
-          props.refetchQuiz();
-        },
+        onSuccess: () => resetOnSuccess(),
       }
     );
+  }
+
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    if (getSimilarTags.data?.length === 1)
+      attachTagToQuiz(getSimilarTags.data[0].id);
+    else
+      createNewTag();
   }
 
   function createNewTag() {
     createTag.mutate(
       { ...newTag },
       {
-        onSuccess: () => {
-          refetchTags();
-          props.refetchQuiz();
-          setTagName('');
-        },
+        onSuccess: () => resetOnSuccess(),
+        onError: () => setError(true)
       }
     );
   }
 
+  function resetOnSuccess() {
+    refetchTags();
+    props.refetchQuiz();
+    setTagName("");
+    setTagAdding(false);
+    setError(false);
+  }
+
   return (
-    <div>
+    <form onSubmit={(e) => onSubmit(e)}>
       <ul className="flex items-center gap-2 m-0">
         <li>{t("Tags")}:</li>
         {props.tags?.map((tag) => {
           return (
-            <li className="bg-emerald-300 rounded-md pl-1" key={tag.id}>
+            <li className="flex items-center flex-nowrap	bg-emerald-300 rounded-md pl-1" key={tag.id}>
               {tag.name}
               <button
                 type="button"
@@ -95,55 +103,35 @@ export default function TagEditor(props: {
           <li>
             <button
               type="button"
-              className="aspect-square"
               onClick={() => setTagAdding(true)}
             >
               <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
             </button>
           </li>
         )}
-      </ul>
-      {isTagAdding && (
-        <div className="mt-3">
-          <label htmlFor="quiz-tag">{t("Tag name")}</label>
-          <input
-            type="text"
-            id="quiz-tag"
-            {...register("name", {
-              onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-                setTagName(e.target.value);
-                refetchTags();
-              }, 700),
-            })}
-          />
-          {!getSimilarTags.data && <Loading />}
-          {getSimilarTags.data && getSimilarTags.data.length > 0 && newTag.name.length > 1 && (
-            <ul className="flex items-center gap-2">
-              <li>{t("Similar Tags")}:</li>
-              {getSimilarTags.data.map((tag) => {
-                return (
-                  <li key={tag.id}>
-                    <button type="button" onClick={() => attachTagToQuiz(tag.id)}>
-                      {tag.name}
-                    </button>
-                  </li>
-                );
+        {isTagAdding && (
+          <li className="flex items-center gap-1 h-full">
+            <Dropdown
+              className="h-full lowercase"
+              options={getSimilarTags.data}
+              handleClick={attachTagToQuiz}
+              {...register("name", {
+                onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+                  setTagName(e.target.value);
+                  refetchTags();
+                }, 700),
               })}
-            </ul>
-          )}
-          <div className="flex gap-2 mt-3">
-            <button
-              type="button"
-              disabled={newTag.name.length < 3}
-              onClick={createNewTag}>
-              {t("Create New Tag")}
+            ></Dropdown>
+            <button className="ml-1" type="submit" disabled={newTag.name.length < 3}>
+              <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
             </button>
-            <button type="button" onClick={() => setTagAdding(false)}>
-              {t("Cancel")}
+            <button type="reset" onClick={() => resetOnSuccess()}>
+              <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
             </button>
-          </div>
-        </div>
-      )}
-    </div>
+            {isError && <span className="text-red-500">{t("This tag is already attached")}</span>}
+          </li>
+        )}
+      </ul>
+    </form>
   );
 }

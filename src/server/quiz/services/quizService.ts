@@ -44,6 +44,7 @@ export async function getQuizzes(where?: Prisma.QuizWhereInput) {
   const quizzes = await prisma.quiz.findMany({
     where,
     orderBy: { id: "asc" },
+    include: { tags: true },
   });
   await prisma.$disconnect();
   return quizzes;
