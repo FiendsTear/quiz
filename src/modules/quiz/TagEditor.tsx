@@ -57,20 +57,30 @@ export default function TagEditor(props: {
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (getSimilarTags.data?.length === 1)
-      attachTagToQuiz(getSimilarTags.data[0].id);
+    const similarTags = getSimilarTags.data;
+    if (similarTags?.length) {
+      for (let i = 0; i < similarTags.length; i++) 
+        if (tagName === similarTags[i].name.toLowerCase()) {
+          attachTagToQuiz(similarTags[i].id);
+          break;
+        } 
+        else 
+          if (i === similarTags.length-1)
+            createNewTag();
+    }
     else
       createNewTag();
   }
 
   function createNewTag() {
-    createTag.mutate(
-      { ...newTag },
-      {
-        onSuccess: () => resetOnSuccess(),
-        onError: () => setError(true)
-      }
-    );
+    if (tagName.length > 2)
+      createTag.mutate(
+        { ...newTag },
+        {
+          onSuccess: () => resetOnSuccess(),
+          onError: () => setError(true)
+        }
+      );
   }
 
   function resetOnSuccess() {
@@ -113,7 +123,7 @@ export default function TagEditor(props: {
           <li className="flex items-center gap-1 h-full">
             <Dropdown
               className="h-full lowercase"
-              options={getSimilarTags.data}
+              options={(tagName.length > 2) ? getSimilarTags.data : []}
               handleClick={attachTagToQuiz}
               {...register("name", {
                 onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
