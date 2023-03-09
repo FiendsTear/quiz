@@ -1,5 +1,5 @@
 import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
-import { addOrUpdateQuiz, getQuiz, getQuizzes } from "./services/quizService";
+import { addOrUpdateQuiz, getQuiz, getQuizzes, filterQuizzes } from "./services/quizService";
 import { quizDTO } from "./dto/quizDTO";
 import { questionDTO } from "./dto/questionDTO";
 import {
@@ -9,9 +9,10 @@ import {
 } from "./services/questionService";
 import { answerDTO } from "./dto/createAnswerDTO";
 import { addOrUpdateAnswer, deleteAnswer } from "./services/answerService";
+import { filterQuizDTO } from './dto/filterQuizDTO';
 import { createTagDTO } from './dto/createTagDTO';
 import { tagDTO } from './dto/tagDTO';
-import { getSimilarTags, createTag, attachTag, removeTag } from './services/tagService';
+import { getSimilarTags, createTag, attachTag, removeTag, getTags } from './services/tagService';
 import { z } from "zod";
 export const quizRouter = createTRPCRouter({
   // quizzes
@@ -19,8 +20,10 @@ export const quizRouter = createTRPCRouter({
   getUserQuizzes: protectedProcedure.query(({ ctx }) =>
     getQuizzes({ userId: ctx.session.user.id })
   ),
-  getPublishedQuizzes: protectedProcedure.query(async () => {
-    return await getQuizzes({
+  getPublishedQuizzes: protectedProcedure
+    .input(filterQuizDTO)
+    .query(async ({ input }) => {
+      return await filterQuizzes(input, {
       isPublished: true,
       isPrivate: false,
     });
@@ -54,6 +57,9 @@ export const quizRouter = createTRPCRouter({
   getSimilarTags: protectedProcedure
     .input(createTagDTO)
     .query(({ input }) => getSimilarTags(input)),
+  getTags: protectedProcedure
+    .input(z.string())
+    .query(({ input }) => getTags(input)),
   createTag: protectedProcedure
     .input(createTagDTO)
     .mutation(({ input }) => createTag(input)),

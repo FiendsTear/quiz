@@ -20,6 +20,19 @@ export async function getSimilarTags(input: CreateTagDTO) {
   return tags;
 }
 
+export async function getTags(name: string) {
+  const tags = await prisma.tag.findMany({
+    where: {
+      name: {
+        contains: name,
+        mode: 'insensitive'
+      },
+    }
+  });
+  await prisma.$disconnect();
+  return tags;
+}
+
 export async function createTag(input: CreateTagDTO) {
   const tag = await prisma.tag.create({
     select: {
