@@ -1,49 +1,55 @@
-import type { ReactNode} from "react";
-import { useState, forwardRef } from "react";
+import type { ReactNode } from "react";
+import { forwardRef } from "react";
 import type { Tag } from "@prisma/client";
-import debounce from "lodash.debounce";
 import Loading from "./Loading";
+import { useComponentVisible } from '../useComponentVisible';
 
 interface Props {
+  id?: string,
   name: string,
-  handleClick: { (id: number): void };
+  handleClick: { (tag: Tag): void };
   options?: Tag[],
   className?: string,
   children?: ReactNode;
 }
 type Ref = HTMLInputElement;
 
-const Dropdown = forwardRef<Ref, Props>(({ name, options, handleClick, ...rest }, ref) => {
+const Dropdown = forwardRef<Ref, Props>(({ id, name, options, handleClick, ...rest }, refInput) => {
 
-  const [isFocused, setFocused] = useState(false);
+  const { refDiv, isComponentVisible, setIsComponentVisible } = useComponentVisible(false);
 
   return (
-    <div className="relative">
+    <div className="w-full h-full relative" ref={refDiv}>
       <input
         type="text"
         autoComplete="off"
         name={name}
+        id={id}
         {...rest}
-        ref={ref}
-        onFocus={() => setFocused(true)}
-        onBlur={debounce(() => setFocused(false), 500)}
+        ref={refInput}
+        onFocus={() => setIsComponentVisible(true)}
       />
-      <div className={isFocused ? "absolute bg-white w-full shadow-md" : "hidden"}>
-        <ul className="divide-y divide-gray-200 overflow-y-auto max-h-32">
-          {!options && <Loading />}
-          {options?.map((option) => {
-            return (
-              <li
-                className="cursor-pointer p-1 border-solid border-0 hover:bg-emerald-200"
-                key={option.id}
-                onClick={() => handleClick(option.id)}
-              >
-                {option.name}
-              </li>
-            );
-          })}
-        </ul>
-      </div>
+      {isComponentVisible && (
+        <div className="absolute bg-white w-full shadow-md z-10">
+          <ul className="divide-y divide-gray-200 overflow-y-auto max-h-32">
+            {!options && <Loading />}
+            {options?.map((option) => {
+              return (
+                <li
+                  className="cursor-pointer p-1 border-solid border-0 hover:bg-emerald-200"
+                  key={option.id}
+                  onClick={() => {
+                    handleClick(option);
+                    setIsComponentVisible(false);
+                  }}
+                >
+                  {option.name}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 });
