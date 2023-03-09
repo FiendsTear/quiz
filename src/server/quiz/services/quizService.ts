@@ -3,32 +3,42 @@ import type { QuizDTO } from "../dto/quizDTO";
 import type { FilterQuizDTO } from "../dto/filterQuizDTO";
 import type { Session } from "next-auth";
 import { prisma } from "../../db";
+import { TRPCError } from "@trpc/server";
+
+export async function createQuiz(session: Session) {
+  const userQuizzesCount = await prisma.quiz.count({
+    where: { userId: session.user.id },
+  });
+  if (userQuizzesCount >= 10)
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: "You can't have more than 10 quizzes",
+    });
+  const quiz = await prisma.quiz.create({
+    data: { name: "my new quiz", userId: session.user.id },
+  });
+  return quiz;
+}
 
 export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
+  const quiz = await prisma.quiz.findFirst({
+    where: { id: input.id, AND: { userId: session.user.id } },
+  });
+  if (!quiz)
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "This quiz is not yours",
+    });
   const { isPublished, isPrivate, name } = input;
-  if (name) {
-    const quiz = await prisma.quiz.upsert({
-      where: { id: input.id },
-      update: {
-        name,
-        isPrivate,
-        isPublished,
-        userId: session.user.id,
-      },
-      create: { name, userId: session.user.id },
-    });
-    return quiz;
-  } else {
-    const quiz = await prisma.quiz.update({
-      where: { id: input.id },
-      data: {
-        isPrivate,
-        isPublished,
-        userId: session.user.id,
-      },
-    });
-    return quiz;
-  }
+  const updatedQuiz = await prisma.quiz.update({
+    where: { id: input.id },
+    data: {
+      name,
+      isPrivate,
+      isPublished,
+    },
+  });
+  return updatedQuiz;
 }
 
 export async function unpuplishQuiz(quizID: number) {

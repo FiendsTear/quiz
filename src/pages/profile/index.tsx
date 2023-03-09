@@ -16,17 +16,15 @@ export default function ProfilePage() {
 
   const query = trpc.quiz.getUserQuizzes.useQuery();
 
-  const mutation = trpc.quiz.addOrUpdateQuiz.useMutation();
+  const mutation = trpc.quiz.createQuiz.useMutation();
+
   function handleNewQuiz() {
-    mutation.mutate(
-      { name: "new quiz" },
-      {
-        onSuccess: (data) => {
-          push(`profile/quizzes/${data.id}`).catch((err) => console.error(err));
-          //   query.refetch();
-        },
-      }
-    );
+    mutation.mutate(undefined, {
+      onSuccess: (data) => {
+        push(`profile/quizzes/${data.id}`).catch((err) => console.error(err));
+        //   query.refetch();
+      },
+    });
   }
 
   if (query.isLoading) return <Loading />;
@@ -49,7 +47,9 @@ export default function ProfilePage() {
               className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
             >
               <span className="block">{quiz.name}</span>
-              <span className="opacity-60">{quiz.tags.map((tag) => tag.name).join(", ")}</span>
+              <span className="opacity-60">
+                {quiz.tags.map((tag) => tag.name).join(", ")}
+              </span>
               <span
                 className={
                   quiz.isPublished
