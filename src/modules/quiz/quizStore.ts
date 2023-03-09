@@ -2,18 +2,22 @@ import { ZodError } from "zod";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import produce from "immer";
+import { Answer, Question, Quiz } from "@prisma/client";
 
 type Issues = ZodError["issues"];
-interface PropIssue {
-  [propName: string]: string;
-}
-interface ErrorsByID {
-  [id: number]: PropIssue;
-}
+export type QuizIssues = {
+  [key in keyof Partial<Quiz>]: string;
+};
+export type AnswerIssues = {
+  [key in keyof Partial<Answer>]: string;
+};
+export type QuestionIssues = {
+  [key in keyof Partial<Question>]: string;
+};
 interface QuizFormState {
-  quizErrors: PropIssue;
-  questionsErrors: ErrorsByID;
-  answersErrors: ErrorsByID;
+  quizErrors: QuizIssues;
+  questionsErrors: { [id: number]: QuestionIssues };
+  answersErrors: { [id: number]: AnswerIssues };
   setAnswerError: { (answerID: number, errors: Issues): void };
   setQuestionError: { (questionID: number, errors: Issues): void };
   setQuizError: { (errors: Issues): void };
@@ -30,7 +34,7 @@ export const useQuizStore = create<QuizFormState>()(
     setAnswerError: (answerID, issues) => {
       set(
         produce<QuizFormState>((draft) => {
-          const answerIssues: PropIssue = {};
+          const answerIssues: AnswerIssues = {};
           issues.forEach((issue) => {
             answerIssues[issue.path[issue.path.length - 1]] = issue.message;
           });
@@ -41,7 +45,7 @@ export const useQuizStore = create<QuizFormState>()(
     setQuestionError: (questionID, issues) => {
       set(
         produce<QuizFormState>((draft) => {
-          const questionIssues: PropIssue = {};
+          const questionIssues: QuestionIssues = {};
           issues.forEach((issue) => {
             questionIssues[issue.path[issue.path.length - 1]] = issue.message;
           });
@@ -52,7 +56,7 @@ export const useQuizStore = create<QuizFormState>()(
     setQuizError: (issues) => {
       set(
         produce<QuizFormState>((draft) => {
-          const quizIssues: PropIssue = {};
+          const quizIssues: QuizIssues = {};
           issues.forEach((issue) => {
             quizIssues[issue.path[issue.path.length - 1]] = issue.message;
           });

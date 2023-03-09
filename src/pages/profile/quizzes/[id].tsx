@@ -157,6 +157,7 @@ export default function NewQuizPage() {
           }, 700),
         })}
       ></input>
+      <span>{issues ? issues["name"] : ""}</span>
       <TagEditor
         tags={data.tags}
         quizID={+quizID}
