@@ -1,36 +1,54 @@
 import React, { useState } from "react";
+import type { RouterInputs } from "../../../utils/trpc";
 import { trpc } from "../../../utils/trpc";
-import type { QuizDTO } from "../../../server/quiz/dto/quizDTO";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
-import type { Question } from "@prisma/client";
-import QuestionEditor from "../../../modules/quiz/QuestionEditor";
-import TagEditor from '@/modules/quiz/TagEditor';
+import QuestionEditor, {
+  QuestionInput,
+} from "../../../modules/quiz/QuestionEditor";
+import TagEditor from "@/modules/quiz/TagEditor";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 import Message from "../../../common/components/Message";
+import { QuizSchema, validQuizSchema } from "../../../modules/quiz/quizSchema";
+import {
+  validQuestionSchema,
+  validAnswerSchema,
+} from "../../../modules/quiz/quizSchema";
+import { useQuizStore } from "@/modules/quiz/quizStore";
+import { Answer } from "@prisma/client";
+
+type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
 
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [message, setMessage] = useState<boolean>(false);
-  const { register } = useForm<QuizDTO>();
+  const { register } = useForm<QuizInput>();
 
   const { t } = useTranslation("common");
   const quizID = query.id as string;
 
   const getQuizQuery = trpc.quiz.getQuiz.useQuery(quizID, {
     enabled: isReady,
-    onSuccess: (data) => setQuestions(data.questions),
+    staleTime: 60,
   });
 
-  const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
+  const setAnswerError = useQuizStore((state) => state.setAnswerError);
+  const setQuestionError = useQuizStore((state) => state.setQuestionError);
+  const setQuizError = useQuizStore((state) => state.setQuizError);
+  const issues = useQuizStore((state) => state.quizErrors);
 
+  const ctx = trpc.useContext();
+  //   const setError = useQuizStore(state => state.set);
+
+  const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
 
-  function handleQuizChange(changedValue: Partial<QuizDTO>) {
+  if (!isReady || !getQuizQuery.data) return <Loading />;
+
+  function handleQuizChange(changedValue: QuizInput) {
     quizMutation.mutate(
       { ...{ id: +quizID }, isPublished: false, ...changedValue },
       {
@@ -42,14 +60,47 @@ export default function NewQuizPage() {
   }
 
   function handlePublish() {
-    quizMutation.mutate(
-      { id: +quizID, isPublished: true },
-      {
-        onSuccess: () => {
-          setMessage(true);
-        },
+    if (!getQuizQuery.data) return;
+    const quizData = getQuizQuery.data;
+    let quizValidForPublication = true;
+    quizData.questions.map((question) => {
+      const questionData = ctx.quiz.getQuestion.getData(question.id);
+      if (!questionData) return;
+      const answers: Answer[] | undefined = [];
+      // validate and consolidate question answers
+      questionData.answers.map((answer) => {
+        const answerData = ctx.quiz.getAnswer.getData(answer.id);
+        if (!answerData) return;
+        answers.push(answerData);
+        const answerParseRes = validAnswerSchema.safeParse(answerData);
+        if (!answerParseRes.success) {
+          quizValidForPublication = false;
+          setAnswerError(answer.id, answerParseRes.error.issues);
+        }
+      });
+      questionData.answers = answers;
+      const parseRes = validQuestionSchema.safeParse(questionData);
+      if (!parseRes.success) {
+        quizValidForPublication = false;
+        setQuestionError(question.id, parseRes.error.issues);
       }
-    );
+    });
+
+    const quizParseRes = validQuizSchema.safeParse(quizData);
+    if (!quizParseRes.success) {
+      setQuizError(quizParseRes.error.issues);
+      quizValidForPublication = false;
+    }
+    if (quizValidForPublication) {
+      quizMutation.mutate(
+        { id: +quizID, isPublished: true },
+        {
+          onSuccess: () => {
+            setMessage(true);
+          },
+        }
+      );
+    }
   }
 
   function toProfilePage() {
@@ -58,12 +109,23 @@ export default function NewQuizPage() {
   }
 
   function refetchQuiz() {
-    getQuizQuery.refetch().catch((err) => console.error(err));
+    getQuizQuery
+      .refetch()
+      .then((res) => {
+        if (res.data) {
+          const parseRes = validQuizSchema.safeParse(res.data);
+          if (!parseRes.success) setQuizError(parseRes.error.issues);
+          else {
+            setQuizError([]);
+          }
+        }
+      })
+      .catch((err) => console.error(err));
   }
 
-  function handleNewQuestion() {
+  function handleNewQuestion(order: number) {
     questionMutation.mutate(
-      { quizID: +quizID, order: questions.length },
+      { quizID: +quizID, order },
       {
         onSuccess: () => {
           refetchQuiz();
@@ -72,7 +134,7 @@ export default function NewQuizPage() {
     );
   }
 
-  if (!isReady) return <Loading />;
+  const { data } = getQuizQuery;
 
   return (
     <article className="relative h-full">
@@ -87,7 +149,7 @@ export default function NewQuizPage() {
       <input
         id="quiz-name"
         type="text"
-        defaultValue={getQuizQuery.data?.name}
+        defaultValue={data.name}
         className="mb-3"
         {...register("name", {
           onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,31 +157,33 @@ export default function NewQuizPage() {
           }, 700),
         })}
       ></input>
-      <TagEditor 
-        tags={getQuizQuery.data?.tags}
-        quizID={+quizID} 
+      <TagEditor
+        tags={data.tags}
+        quizID={+quizID}
         refetchQuiz={refetchQuiz}
       ></TagEditor>
       <ul className="flex flex-col gap-5">
-        {questions.map((question) => {
+        {data.questions.map((question) => {
           return (
             <QuestionEditor
               key={question.id}
-              question={question}
-              refetchQuiz={refetchQuiz}
+              questionID={question.id}
             ></QuestionEditor>
           );
         })}
       </ul>
       <div className="flex justify-between">
-        <button type="button" onClick={handleNewQuestion}>
+        <button
+          type="button"
+          onClick={() => handleNewQuestion(data.questions.length)}
+        >
           {t("Add Question")}
         </button>
         <div className="flex items-center gap-2">
           <input
             id="quiz-isPrivate"
             type="checkbox"
-            defaultChecked={getQuizQuery.data?.isPrivate}
+            defaultChecked={data.isPrivate}
             {...register(`isPrivate`, {
               onChange: debounce(
                 (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -130,7 +194,7 @@ export default function NewQuizPage() {
           ></input>
           <label htmlFor="quiz-isPrivate">{t("Private quiz")}</label>
           <button
-            disabled={getQuizQuery.data?.isPublished}
+            disabled={data.isPublished}
             type="button"
             onClick={handlePublish}
           >

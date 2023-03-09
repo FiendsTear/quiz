@@ -1,81 +1,94 @@
-import { trpc } from "../../utils/trpc";
-import type { Answer, Question } from "@prisma/client";
-import { useState } from "react";
+import { RouterInputs, trpc } from "../../utils/trpc";
 import React from "react";
 import debounce from "lodash.debounce";
-import { useFieldArray, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
 import type { QuestionDTO } from "@/server/quiz/dto/questionDTO";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
+
 import Loading from "../../common/components/Loading";
 import { useTranslation } from "next-i18next";
 
-type QuestionWithAnswers = Question & { answers: Answer[] };
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
+import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useQuizStore } from "./quizStore";
+import { validQuestionSchema } from "./quizSchema";
 
-export default function QuestionEditor(props: {
-  question: Question;
-  refetchQuiz: { (): void };
-}) {
-  // state
-  const [question, setQuestion] = useState<QuestionWithAnswers>(
-    Object.assign({}, props.question, { answers: [] })
-  );
+export type QuestionInput = RouterInputs["quiz"]["addOrUpdateQuestion"];
 
-  // form state
-  const { register, control } = useForm<QuestionWithAnswers>({
-    values: question,
-  });
-  const { fields } = useFieldArray({
-    name: "answers",
-    control,
-    keyName: "fieldID",
-  });
-
+export default function QuestionEditor(props: { questionID: number }) {
   const { t } = useTranslation("common");
 
   const mutation = trpc.quiz.addOrUpdateQuestion.useMutation();
-  const getQuestionQuery = trpc.quiz.getQuestion.useQuery(question.id, {
-    onSuccess: (data) => {
-      setQuestion({ ...question, ...data });
-    },
+  const getQuestionQuery = trpc.quiz.getQuestion.useQuery(props.questionID, {});
+  const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
+  const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
+  const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
+
+  const issues = useQuizStore(
+    (state) => state.questionsErrors[props.questionID]
+  );
+  const setQuestionError = useQuizStore((state) => state.setQuestionError);
+  const questionSchema = validQuestionSchema.omit({ answers: true });
+
+  // form state
+  const { register, getValues, setValue } = useForm<QuestionInput>({
+    values: getQuestionQuery.data,
   });
 
+  if (!getQuestionQuery.data) return <Loading />;
+  const data = getQuestionQuery.data;
+
   function handleQuestionChange(changedValue: Partial<QuestionDTO>) {
-    mutation.mutate({ ...question, ...changedValue }, {
-      onSuccess: () => {
-        props.refetchQuiz();
-      }
-    });
-  }
-
-  function reFetchQuestion() {
-    getQuestionQuery.refetch().catch((err) => console.error(err));
-  }
-
-  const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
-  function createAnswer() {
-    answerMutation.mutate(
-      { questionID: question.id },
+    mutation.mutate(
+      { ...data, ...changedValue },
       {
         onSuccess: () => {
-          reFetchQuestion();
-          props.refetchQuiz();
+          refetchQuestion();
         },
       }
     );
   }
-  const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
+
+  function refetchQuestion() {
+    getQuestionQuery
+      .refetch()
+      .then((res) => {
+        if (res.data) {
+          const parseRes = questionSchema.safeParse(res.data);
+          if (!parseRes.success)
+            setQuestionError(res.data.id, parseRes.error.issues);
+          else {
+            setQuestionError(res.data.id, []);
+          }
+        }
+      })
+      .catch((err) => console.error(err));
+  }
+
+  function createAnswer() {
+    answerMutation.mutate(
+      { questionID: props.questionID },
+      {
+        onSuccess: () => {
+          refetchQuestion();
+        },
+      }
+    );
+  }
 
   function deleteQuestion() {
-    questionDeletion.mutate(question.id, {
-      onSuccess() {
-        props.refetchQuiz();
+    questionDeletion.mutate(props.questionID);
+  }
+
+  function deleteAnswer(answerID: number) {
+    answerDeletion.mutate(answerID, {
+      onSuccess: () => {
+        refetchQuestion();
       },
     });
   }
 
-  if (getQuestionQuery.isLoading) return <Loading />;
   return (
     <form className="bordered p-4">
       <div className="flex gap-4 items-start">
@@ -84,13 +97,13 @@ export default function QuestionEditor(props: {
           <input
             id="question-body"
             type="text"
-            className="mb-3"
             {...register("body", {
               onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ body: e.target.value });
-              }, 700)
+              }, 700),
             })}
           ></input>
+          <span className="issue">{issues ? issues["body"] : ""}</span>
         </div>
         <div className="w-1/4">
           <label htmlFor="answer-weight">{t("Answer weight")}</label>
@@ -101,7 +114,7 @@ export default function QuestionEditor(props: {
             {...register("answerWeight", {
               onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ answerWeight: Number(e.target.value) });
-              }, 700)
+              }, 700),
             })}
           ></input>
         </div>
@@ -113,18 +126,31 @@ export default function QuestionEditor(props: {
           <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
         </button>
       </div>
-      <fieldset className="flex flex-col gap-2 mb-3">
-        {fields.map((field, index) => {
+      <ul className="flex flex-col gap-2 mb-3">
+        {data.answers.map((answer) => {
           return (
-            <AnswerEditor
-              key={field.fieldID}
-              answer={field}
-              refetchQuestion={reFetchQuestion}
-              refetchQuiz={props.refetchQuiz}
-            ></AnswerEditor>
+            <li
+              key={answer.id}
+              className="flex items-end gap-x-5 gap-y-1 flex-wrap"
+            >
+              <AnswerEditor
+                answerID={answer.id}
+                className="grow"
+              ></AnswerEditor>
+              <button
+                type="button"
+                className="warning"
+                onClick={() => deleteAnswer(answer.id)}
+                title="Delete answer"
+              >
+                <FontAwesomeIcon icon={faTrashCan} />
+              </button>
+              <div className="w-full h-px bg-stone-300"></div>
+            </li>
           );
         })}
-      </fieldset>
+        <span className="issue">{issues ? issues["answers"] : ""}</span>
+      </ul>
       <button type="button" onClick={createAnswer}>
         {t("Add answer variant")}
       </button>

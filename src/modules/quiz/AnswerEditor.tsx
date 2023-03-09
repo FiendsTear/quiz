@@ -1,57 +1,69 @@
+import type { RouterInputs } from "../../utils/trpc";
 import { trpc } from "../../utils/trpc";
 import type { Answer } from "@prisma/client";
-import { useState } from "react";
 import React from "react";
 import debounce from "lodash.debounce";
 import { useForm } from "react-hook-form";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { useTranslation } from "next-i18next";
+import Loading from "../../common/components/Loading";
+import { useQuizStore } from "./quizStore";
+import { validAnswerSchema } from "./quizSchema";
+
+export type AnswerInput = RouterInputs["quiz"]["addOrUpdateAnswer"];
 
 export default function AnswerEditor(props: {
-  answer: Answer;
-  refetchQuestion: { (): void };
-  refetchQuiz: { (): void };
+  answerID: number;
+  className: string;
 }) {
-  // state
-  const [answer, setAnswer] = useState<Answer>(props.answer);
-
-  // form state
-  const { register } = useForm<Answer>({
-    values: answer,
-  });
+  const answerID = props.answerID;
 
   const { t } = useTranslation();
 
+  // server state
+  const answerQuery = trpc.quiz.getAnswer.useQuery(answerID);
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
-  const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
+
+  const setAnswerError = useQuizStore((state) => state.setAnswerError);
+  const issues = useQuizStore((state) => state.answersErrors[answerID]);
+
+  // form state
+  const { register } = useForm<AnswerInput>({ values: answerQuery.data });
+
+  if (!answerQuery.data) return <Loading />;
+  const data = answerQuery.data;
 
   function handleAnswerChange(changedValue: Partial<Answer>) {
     answerMutation.mutate(
-      { ...answer, ...changedValue },
+      { ...data, ...changedValue },
       {
-        onSuccess: (data) => {
-          setAnswer(data);
-          props.refetchQuiz();
+        onSuccess: () => {
+          refetchAnswer();
         },
       }
     );
   }
 
-  const bodyInputID = `answer-body-${answer.id}`;
-  const isCorrectInputID = `answer-isCorrect-${answer.id}`;
-
-  function deleteAnswer() {
-    answerDeletion.mutate(answer.id, {
-      onSuccess() {
-        props.refetchQuestion();
-        props.refetchQuiz();
-      },
-    });
+  function refetchAnswer() {
+    answerQuery
+      .refetch()
+      .then((res) => {
+        if (res.data) {
+          const parseRes = validAnswerSchema.safeParse(res.data);
+          if (!parseRes.success)
+            setAnswerError(answerID, parseRes.error.issues);
+          else {
+            setAnswerError(answerID, []);
+          }
+        }
+      })
+      .catch((err) => console.error(err));
   }
 
+  const bodyInputID = `answer-body-${answerID}`;
+  const isCorrectInputID = `answer-isCorrect-${answerID}`;
+
   return (
-    <section>
+    <section className={props.className}>
       <label htmlFor={bodyInputID}>{t("Answer text")}</label>
       <textarea
         id={bodyInputID}
@@ -61,7 +73,7 @@ export default function AnswerEditor(props: {
           }, 500),
         })}
       />
-
+      <span className="issue">{issues ? issues["body"] : ""}</span>
       <section className="flex justify-between">
         <div>
           <input
@@ -75,17 +87,10 @@ export default function AnswerEditor(props: {
               ),
             })}
           ></input>
-          <label htmlFor={isCorrectInputID}>{t("Is this answer correct?")}</label>
+          <label htmlFor={isCorrectInputID}>
+            {t("Is this answer correct?")}
+          </label>
         </div>
-
-        <button
-          type="button"
-          className="warning"
-          onClick={deleteAnswer}
-          title="Delete answer"
-        >
-          <FontAwesomeIcon icon={faTrashCan} />
-        </button>
       </section>
     </section>
   );

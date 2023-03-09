@@ -8,10 +8,19 @@ import {
   getQuestion,
 } from "./services/questionService";
 import { answerDTO } from "./dto/createAnswerDTO";
-import { addOrUpdateAnswer, deleteAnswer } from "./services/answerService";
-import { createTagDTO } from './dto/createTagDTO';
-import { tagDTO } from './dto/tagDTO';
-import { getSimilarTags, createTag, attachTag, removeTag } from './services/tagService';
+import {
+  addOrUpdateAnswer,
+  deleteAnswer,
+  getAnswer,
+} from "./services/answerService";
+import { createTagDTO } from "./dto/createTagDTO";
+import { tagDTO } from "./dto/tagDTO";
+import {
+  getSimilarTags,
+  createTag,
+  attachTag,
+  removeTag,
+} from "./services/tagService";
 import { z } from "zod";
 export const quizRouter = createTRPCRouter({
   // quizzes
@@ -43,6 +52,10 @@ export const quizRouter = createTRPCRouter({
     .input(z.number())
     .mutation(({ input }) => deleteQuestion(input)),
 
+  //answers
+  getAnswer: protectedProcedure
+    .input(z.number())
+    .query(({ input }) => getAnswer(input)),
   addOrUpdateAnswer: protectedProcedure
     .input(answerDTO)
     .mutation(({ input }) => addOrUpdateAnswer(input)),
@@ -64,4 +77,3 @@ export const quizRouter = createTRPCRouter({
     .input(tagDTO)
     .mutation(({ input }) => removeTag(input)),
 });
-// export type definition of API
