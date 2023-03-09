@@ -1,14 +1,13 @@
-import { PrismaClient } from "@prisma/client";
 import type { QuestionDTO } from "../dto/questionDTO";
 import { unpuplishQuiz as unpublishQuiz } from "./quizService";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../db";
 
 export async function getQuestion(questionID: number) {
-  const question = await prisma.question.findUniqueOrThrow({
+  const question = await prisma.question.findUnique({
     where: { id: questionID },
     include: { answers: { select: { id: true } } },
   });
+  if (!question) return undefined;
   return question;
 }
 

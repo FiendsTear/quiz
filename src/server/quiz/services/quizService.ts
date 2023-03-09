@@ -1,10 +1,8 @@
-import { PrismaClient } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import type { QuizDTO } from "../dto/quizDTO";
-import type { FilterQuizDTO } from '../dto/filterQuizDTO';
+import type { FilterQuizDTO } from "../dto/filterQuizDTO";
 import type { Session } from "next-auth";
-
-const prisma = new PrismaClient();
+import { prisma } from "../../db";
 
 export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
   const { isPublished, isPrivate, name } = input;
@@ -52,41 +50,49 @@ export async function getQuizzes(where?: Prisma.QuizWhereInput) {
 }
 
 export async function getQuiz(quizID: string) {
-  const quiz = await prisma.quiz.findFirstOrThrow({
+  const quiz = await prisma.quiz.findUnique({
     where: { id: +quizID },
     include: {
       questions: { select: { id: true }, orderBy: { order: "asc" } },
       tags: true,
     },
   });
+  if (!quiz) return undefined;
   return quiz;
 }
 
-export async function filterQuizzes(input: FilterQuizDTO, where?: Prisma.QuizWhereInput) {
+export async function filterQuizzes(
+  input: FilterQuizDTO,
+  where?: Prisma.QuizWhereInput
+) {
   const { tags, quizName } = input;
-  const filterTags: Prisma.QuizWhereInput = (tags.length) ? {
-    tags: {
-      some: {
-        id: { in: tags.map(tag => tag.id) }
+  const filterTags: Prisma.QuizWhereInput = tags.length
+    ? {
+        tags: {
+          some: {
+            id: { in: tags.map((tag) => tag.id) },
+          },
+        },
       }
-    }
-  } : {};
+    : {};
 
-  const filterName: Prisma.QuizWhereInput = (quizName.length) ? {
-    name: {
-      contains: quizName,
-      mode: 'insensitive'
-    }
-  } : {};
+  const filterName: Prisma.QuizWhereInput = quizName.length
+    ? {
+        name: {
+          contains: quizName,
+          mode: "insensitive",
+        },
+      }
+    : {};
 
   const quizzes = await prisma.quiz.findMany({
-    where: { 
+    where: {
       ...where,
-      ...filterTags, 
+      ...filterTags,
       ...filterName,
     },
     orderBy: { id: "asc" },
-    include: { tags: true }
+    include: { tags: true },
   });
   await prisma.$disconnect();
   return quizzes;
