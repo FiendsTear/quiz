@@ -4,15 +4,23 @@ import { trpc } from "../../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import debounce from "lodash.debounce";
-import QuestionEditor from "../../../modules/quiz/QuestionEditor";
+import QuestionEditor, {
+  QuestionInput,
+} from "../../../modules/quiz/QuestionEditor";
 import TagEditor from "@/modules/quiz/TagEditor";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 import Message from "../../../common/components/Message";
-import { useQueries } from "@tanstack/react-query";
+import { QuizSchema, validQuizSchema } from "../../../modules/quiz/quizSchema";
+import {
+  validQuestionSchema,
+  validAnswerSchema,
+} from "../../../modules/quiz/quizSchema";
+import { useQuizStore } from "@/modules/quiz/quizStore";
 
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
+
 export default function NewQuizPage() {
   const { query, isReady, push } = useRouter();
   const [message, setMessage] = useState<boolean>(false);
@@ -23,17 +31,11 @@ export default function NewQuizPage() {
 
   const getQuizQuery = trpc.quiz.getQuiz.useQuery(quizID, {
     enabled: isReady,
+    staleTime: 60,
   });
 
-  const questionQueries = trpc.useQueries((t) => {
-    if (getQuizQuery.data) {
-      return getQuizQuery.data.questions.map((question) => {
-        console.log(question.id);
-        return t.quiz.getQuestion(question.id);
-      });
-    }
-    return [];
-  });
+  const ctx = trpc.useContext();
+  //   const setError = useQuizStore(state => state.set);
 
   const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
@@ -52,14 +54,39 @@ export default function NewQuizPage() {
   }
 
   function handlePublish() {
-    quizMutation.mutate(
-      { id: +quizID, isPublished: true },
-      {
-        onSuccess: () => {
-          setMessage(true);
-        },
+    if (!getQuizQuery.data) return;
+    const quizData: any = getQuizQuery.data;
+
+    const questions: QuestionInput[] = [];
+    data.questions.map((question) => {
+      const questionData = ctx.quiz.getQuestion.getData(question.id);
+      const answersData: any[] = [];
+      if (questionData) {
+        questionData?.answers.map((answer) => {
+          const answerData = ctx.quiz.getAnswer.getData(answer.id);
+          answersData.push(answerData);
+        });
+        questionData.answers = answersData;
+        questions.push(questionData);
       }
-    );
+    });
+    quizData.questions = questions;
+
+    const quizParseRes = validQuizSchema.safeParse(quizData);
+    console.log(quizParseRes);
+    if (quizParseRes.success) {
+      quizMutation.mutate(
+        { id: +quizID, isPublished: true },
+        {
+          onSuccess: () => {
+            setMessage(true);
+          },
+        }
+      );
+    } else {
+      const error = quizParseRes.error;
+      // error.issues.forEach();
+    }
   }
 
   function toProfilePage() {

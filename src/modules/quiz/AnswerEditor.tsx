@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
 
-type AnswerInput = RouterInputs["quiz"]["addOrUpdateAnswer"];
+export type AnswerInput = RouterInputs["quiz"]["addOrUpdateAnswer"];
 
 export default function AnswerEditor(props: {
   answerID: number;

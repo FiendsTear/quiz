@@ -11,9 +11,8 @@ import { useTranslation } from "next-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { getQueryKey } from "@trpc/react-query";
 
-type QuestionInput = RouterInputs["quiz"]["addOrUpdateQuestion"];
+export type QuestionInput = RouterInputs["quiz"]["addOrUpdateQuestion"];
 
 export default function QuestionEditor(props: { questionID: number }) {
   const { t } = useTranslation("common");
