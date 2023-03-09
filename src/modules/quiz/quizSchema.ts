@@ -19,5 +19,6 @@ export const validQuestionSchema = z.object({
 export const validQuizSchema = z.object({
   name: z.string().min(3),
   questions: z.array(z.any()).min(1),
+  tags: z.array(z.any()).max(10),
 });
 export type QuizSchema = z.infer<typeof validQuizSchema>;

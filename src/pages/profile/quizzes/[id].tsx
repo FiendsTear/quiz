@@ -162,6 +162,7 @@ export default function NewQuizPage() {
         quizID={+quizID}
         refetchQuiz={refetchQuiz}
       ></TagEditor>
+      <span className="issue">{issues ? issues["tags"] : ""}</span>
       <ul className="flex flex-col gap-5">
         {data.questions.map((question) => {
           return (
