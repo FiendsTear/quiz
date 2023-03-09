@@ -27,7 +27,7 @@ export default function GameSettings(props: {
   }
 
   return (
-    <section className="absolute w-full h-full flex items-center justify-center isolate bg-stone-800/60">
+    <section className="absolute w-full h-full flex items-center justify-center isolate bg-stone-800/60 z-10">
       <form className="w-1/2 h-1/2 grid gap-4">
         <button onClick={() => cancelSelect()}>{t("Cancel")}</button>
         {userId && userId === quiz.userId && (

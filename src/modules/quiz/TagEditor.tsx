@@ -36,9 +36,9 @@ export default function TagEditor(props: {
     getSimilarTags.refetch().catch((err) => console.error(err));
   }
 
-  function attachTagToQuiz(tagID: number) {
+  function attachTagToQuiz(tag: Tag) {
     attachTag.mutate(
-      { quizID: props.quizID, tagID },
+      { quizID: props.quizID, tagID: tag.id },
       {
         onSuccess: () => resetOnSuccess(),
         onError: () => setError(true)
@@ -61,7 +61,7 @@ export default function TagEditor(props: {
     if (similarTags?.length) {
       for (let i = 0; i < similarTags.length; i++) 
         if (tagName === similarTags[i].name.toLowerCase()) {
-          attachTagToQuiz(similarTags[i].id);
+          attachTagToQuiz(similarTags[i]);
           break;
         } 
         else 
@@ -97,7 +97,7 @@ export default function TagEditor(props: {
         <li>{t("Tags")}:</li>
         {props.tags?.map((tag) => {
           return (
-            <li className="flex items-center flex-nowrap	bg-emerald-300 rounded-md pl-1" key={tag.id}>
+            <li className="flex-none	bg-emerald-300 rounded-md pl-1" key={tag.id}>
               {tag.name}
               <button
                 type="button"

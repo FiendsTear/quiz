@@ -1,6 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import type { QuizDTO } from "../dto/quizDTO";
+import type { FilterQuizDTO } from '../dto/filterQuizDTO';
 import type { Session } from "next-auth";
 
 const prisma = new PrismaClient();
@@ -59,4 +60,34 @@ export async function getQuiz(quizID: string) {
     },
   });
   return quiz;
+}
+
+export async function filterQuizzes(input: FilterQuizDTO, where?: Prisma.QuizWhereInput) {
+  const { tags, quizName } = input;
+  const filterTags: Prisma.QuizWhereInput = (tags.length) ? {
+    tags: {
+      some: {
+        id: { in: tags.map(tag => tag.id) }
+      }
+    }
+  } : {};
+
+  const filterName: Prisma.QuizWhereInput = (quizName.length) ? {
+    name: {
+      contains: quizName,
+      mode: 'insensitive'
+    }
+  } : {};
+
+  const quizzes = await prisma.quiz.findMany({
+    where: { 
+      ...where,
+      ...filterTags, 
+      ...filterName,
+    },
+    orderBy: { id: "asc" },
+    include: { tags: true }
+  });
+  await prisma.$disconnect();
+  return quizzes;
 }
