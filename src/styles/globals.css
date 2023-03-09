@@ -11,6 +11,7 @@
         @apply h-full;
         @apply m-0;
         @apply p-0;
+        font-zize: 16px;
     }
 
     #__next {
@@ -85,5 +86,10 @@
 
     h1 {
         @apply m-0;
+    }
+
+    .issue {
+        @apply text-red-600;
+        @apply text-xs;
     }
 }

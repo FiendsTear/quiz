@@ -18,6 +18,7 @@ import {
   validAnswerSchema,
 } from "../../../modules/quiz/quizSchema";
 import { useQuizStore } from "@/modules/quiz/quizStore";
+import { Answer } from "@prisma/client";
 
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
 
@@ -33,6 +34,11 @@ export default function NewQuizPage() {
     enabled: isReady,
     staleTime: 60,
   });
+
+  const setAnswerError = useQuizStore((state) => state.setAnswerError);
+  const setQuestionError = useQuizStore((state) => state.setQuestionError);
+  const setQuizError = useQuizStore((state) => state.setQuizError);
+  const issues = useQuizStore((state) => state.quizErrors);
 
   const ctx = trpc.useContext();
   //   const setError = useQuizStore(state => state.set);
@@ -55,26 +61,37 @@ export default function NewQuizPage() {
 
   function handlePublish() {
     if (!getQuizQuery.data) return;
-    const quizData: any = getQuizQuery.data;
-
-    const questions: QuestionInput[] = [];
-    data.questions.map((question) => {
+    const quizData = getQuizQuery.data;
+    let quizValidForPublication = true;
+    quizData.questions.map((question) => {
       const questionData = ctx.quiz.getQuestion.getData(question.id);
-      const answersData: any[] = [];
-      if (questionData) {
-        questionData?.answers.map((answer) => {
-          const answerData = ctx.quiz.getAnswer.getData(answer.id);
-          answersData.push(answerData);
-        });
-        questionData.answers = answersData;
-        questions.push(questionData);
+      if (!questionData) return;
+      const answers: Answer[] | undefined = [];
+      // validate and consolidate question answers
+      questionData.answers.map((answer) => {
+        const answerData = ctx.quiz.getAnswer.getData(answer.id);
+        if (!answerData) return;
+        answers.push(answerData);
+        const answerParseRes = validAnswerSchema.safeParse(answerData);
+        if (!answerParseRes.success) {
+          quizValidForPublication = false;
+          setAnswerError(answer.id, answerParseRes.error.issues);
+        }
+      });
+      questionData.answers = answers;
+      const parseRes = validQuestionSchema.safeParse(questionData);
+      if (!parseRes.success) {
+        quizValidForPublication = false;
+        setQuestionError(question.id, parseRes.error.issues);
       }
     });
-    quizData.questions = questions;
 
     const quizParseRes = validQuizSchema.safeParse(quizData);
-    console.log(quizParseRes);
-    if (quizParseRes.success) {
+    if (!quizParseRes.success) {
+      setQuizError(quizParseRes.error.issues);
+      quizValidForPublication = false;
+    }
+    if (quizValidForPublication) {
       quizMutation.mutate(
         { id: +quizID, isPublished: true },
         {
@@ -83,9 +100,6 @@ export default function NewQuizPage() {
           },
         }
       );
-    } else {
-      const error = quizParseRes.error;
-      // error.issues.forEach();
     }
   }
 
@@ -95,7 +109,18 @@ export default function NewQuizPage() {
   }
 
   function refetchQuiz() {
-    getQuizQuery.refetch().catch((err) => console.error(err));
+    getQuizQuery
+      .refetch()
+      .then((res) => {
+        if (res.data) {
+          const parseRes = validQuizSchema.safeParse(res.data);
+          if (!parseRes.success) setQuizError(parseRes.error.issues);
+          else {
+            setQuizError([]);
+          }
+        }
+      })
+      .catch((err) => console.error(err));
   }
 
   function handleNewQuestion(order: number) {

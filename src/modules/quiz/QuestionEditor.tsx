@@ -11,6 +11,8 @@ import { useTranslation } from "next-i18next";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
+import { useQuizStore } from "./quizStore";
+import { validQuestionSchema } from "./quizSchema";
 
 export type QuestionInput = RouterInputs["quiz"]["addOrUpdateQuestion"];
 
@@ -18,16 +20,22 @@ export default function QuestionEditor(props: { questionID: number }) {
   const { t } = useTranslation("common");
 
   const mutation = trpc.quiz.addOrUpdateQuestion.useMutation();
-  const getQuestionQuery = trpc.quiz.getQuestion.useQuery(props.questionID);
+  const getQuestionQuery = trpc.quiz.getQuestion.useQuery(props.questionID, {});
   const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
   const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
+
+  const issues = useQuizStore(
+    (state) => state.questionsErrors[props.questionID]
+  );
+  const setQuestionError = useQuizStore((state) => state.setQuestionError);
+  const questionSchema = validQuestionSchema.omit({ answers: true });
 
   // form state
   const { register, getValues, setValue } = useForm<QuestionInput>({
     values: getQuestionQuery.data,
   });
-  
+
   if (!getQuestionQuery.data) return <Loading />;
   const data = getQuestionQuery.data;
 
@@ -43,7 +51,19 @@ export default function QuestionEditor(props: { questionID: number }) {
   }
 
   function refetchQuestion() {
-    getQuestionQuery.refetch().catch((err) => console.error(err));
+    getQuestionQuery
+      .refetch()
+      .then((res) => {
+        if (res.data) {
+          const parseRes = questionSchema.safeParse(res.data);
+          if (!parseRes.success)
+            setQuestionError(res.data.id, parseRes.error.issues);
+          else {
+            setQuestionError(res.data.id, []);
+          }
+        }
+      })
+      .catch((err) => console.error(err));
   }
 
   function createAnswer() {
@@ -77,13 +97,13 @@ export default function QuestionEditor(props: { questionID: number }) {
           <input
             id="question-body"
             type="text"
-            className="mb-3"
             {...register("body", {
               onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ body: e.target.value });
               }, 700),
             })}
           ></input>
+          <span className="issue">{issues ? issues["body"] : ""}</span>
         </div>
         <div className="w-1/4">
           <label htmlFor="answer-weight">{t("Answer weight")}</label>
@@ -129,6 +149,7 @@ export default function QuestionEditor(props: { questionID: number }) {
             </li>
           );
         })}
+        <span className="issue">{issues ? issues["answers"] : ""}</span>
       </ul>
       <button type="button" onClick={createAnswer}>
         {t("Add answer variant")}

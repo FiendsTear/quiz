@@ -6,6 +6,8 @@ import debounce from "lodash.debounce";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
+import { useQuizStore } from "./quizStore";
+import { validAnswerSchema } from "./quizSchema";
 
 export type AnswerInput = RouterInputs["quiz"]["addOrUpdateAnswer"];
 
@@ -21,6 +23,9 @@ export default function AnswerEditor(props: {
   const answerQuery = trpc.quiz.getAnswer.useQuery(answerID);
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
 
+  const setAnswerError = useQuizStore((state) => state.setAnswerError);
+  const issues = useQuizStore((state) => state.answersErrors[answerID]);
+
   // form state
   const { register } = useForm<AnswerInput>({ values: answerQuery.data });
 
@@ -28,7 +33,30 @@ export default function AnswerEditor(props: {
   const data = answerQuery.data;
 
   function handleAnswerChange(changedValue: Partial<Answer>) {
-    answerMutation.mutate({ ...data, ...changedValue });
+    answerMutation.mutate(
+      { ...data, ...changedValue },
+      {
+        onSuccess: () => {
+          refetchAnswer();
+        },
+      }
+    );
+  }
+
+  function refetchAnswer() {
+    answerQuery
+      .refetch()
+      .then((res) => {
+        if (res.data) {
+          const parseRes = validAnswerSchema.safeParse(res.data);
+          if (!parseRes.success)
+            setAnswerError(answerID, parseRes.error.issues);
+          else {
+            setAnswerError(answerID, []);
+          }
+        }
+      })
+      .catch((err) => console.error(err));
   }
 
   const bodyInputID = `answer-body-${answerID}`;
@@ -45,7 +73,7 @@ export default function AnswerEditor(props: {
           }, 500),
         })}
       />
-
+      <span className="issue">{issues ? issues["body"] : ""}</span>
       <section className="flex justify-between">
         <div>
           <input
