@@ -157,13 +157,14 @@ export default function NewQuizPage() {
           }, 700),
         })}
       ></input>
-      <span>{issues ? issues["name"] : ""}</span>
+      <span className="issue">{issues ? issues["name"] : ""}</span>
       <TagEditor
         tags={data.tags}
         quizID={+quizID}
         refetchQuiz={refetchQuiz}
       ></TagEditor>
       <span className="issue">{issues ? issues["tags"] : ""}</span>
+      <span className="issue">{issues ? issues["questions"] : ""}</span>
       <ul className="flex flex-col gap-5">
         {data.questions.map((question) => {
           return (

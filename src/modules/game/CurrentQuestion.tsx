@@ -97,8 +97,8 @@ export default function CurrentQuestion(props: {
         <text
           x="50"
           y="50"
-          alignment-baseline="central"
-          text-anchor="middle"
+          alignmentBaseline="central"
+          textAnchor="middle"
           className="fill-stone-600"
         >
           {seconds}

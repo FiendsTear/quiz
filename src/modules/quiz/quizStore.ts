@@ -3,10 +3,11 @@ import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import produce from "immer";
 import { Answer, Question, Quiz } from "@prisma/client";
+import { RouterOutputs } from "../../utils/trpc";
 
 type Issues = ZodError["issues"];
 export type QuizIssues = {
-  [key in keyof Partial<Quiz>]: string;
+  [key in keyof Partial<RouterOutputs["quiz"]["getQuiz"]>]: string;
 };
 export type AnswerIssues = {
   [key in keyof Partial<Answer>]: string;
