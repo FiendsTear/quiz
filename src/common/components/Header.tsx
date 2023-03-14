@@ -3,12 +3,17 @@ import Link from "next/link";
 import Userpic from "./Userpic";
 import { useTranslation } from "next-i18next";
 
+import { Rubik } from "@next/font/google";
+const rubik = Rubik({ subsets: ["cyrillic", "latin"] });
+
 export default function Header() {
   const { data: sessionData } = useSession();
   const { t } = useTranslation("common");
 
   return (
-    <header className="flex bg-emerald-400 items-center p-2">
+    <header
+      className={`flex bg-emerald-400 items-center p-2 ${rubik.className}`}
+    >
       <section className="flex gap-2">
         <Link href="/">{t("Home")}</Link>
         <Link href="/games">{t("Games")}</Link>
