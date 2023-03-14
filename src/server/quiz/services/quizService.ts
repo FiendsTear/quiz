@@ -9,10 +9,11 @@ export async function createQuiz(session: Session) {
   const userQuizzesCount = await prisma.quiz.count({
     where: { userId: session.user.id },
   });
-  if (userQuizzesCount >= 10)
+  const maxQuizzes = 3;
+  if (userQuizzesCount >= maxQuizzes)
     throw new TRPCError({
       code: "BAD_REQUEST",
-      message: "You can't have more than 10 quizzes",
+      message: `You can't have more than ${maxQuizzes} quizzes`,
     });
   const quiz = await prisma.quiz.create({
     data: { name: "my new quiz", userId: session.user.id },
