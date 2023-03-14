@@ -2,6 +2,8 @@ import { z } from "zod";
 import { createWSRouter, protectedWSProcedure } from "../trpc";
 import { addPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
 import { nextQuestion, getGame } from "./gameService";
+import { createGameDTO } from "./dto.ts/createGameDTO";
+import { enterGameDTO } from "./dto.ts/enterGameDTO";
 import {
   addGame,
   addPlayerAnswer,
@@ -25,7 +27,7 @@ export const gameRouter = createWSRouter({
 
   // host created a game
   create: protectedWSProcedure
-    .input(z.number())
+    .input(createGameDTO)
     .mutation(async ({ input, ctx }) => {
       const game = await addGame(input);
       return game.gameData.id;
@@ -38,11 +40,11 @@ export const gameRouter = createWSRouter({
     }),
 
   // player entered a game
-  enter: protectedWSProcedure.input(z.number()).mutation(({ ctx, input }) => {
+  enter: protectedWSProcedure.input(enterGameDTO).mutation(({ ctx, input }) => {
     const player = ctx.session.user;
     const gameState = enterGame(input, player);
     ctx.req?.socket.on("close", () => {
-      leaveGame(input, player.id);
+      leaveGame(input.gameID, player.id);
       ctx.req?.socket.removeAllListeners();
     });
     return gameState;

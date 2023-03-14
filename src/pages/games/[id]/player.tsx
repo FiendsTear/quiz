@@ -8,8 +8,9 @@ import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 
 export default function PlayerGamePage() {
-  const { query, isReady } = useRouter();
+  const { query, isReady, push } = useRouter();
   const gameID = Number(query.id?.toString());
+  const accessCode = query.accessCode?.toString();
   //   const gameState = useGameState(gameID);
   const { t } = useTranslation("common");
 
@@ -29,10 +30,14 @@ export default function PlayerGamePage() {
       setGameState({ ...gameState, ...data });
       setConnected(true);
     },
+    onError: async (err) => {
+      await push("/games");
+    },
   });
+  enterMutation.reset;
   useEffect(() => {
-    if (!connected) enterMutation.mutate(gameID);
-  });
+    if (!connected) enterMutation.mutate({ gameID, accessCode });
+  }, [isReady]);
 
   if (!gameState) return <Loading />;
   if (gameState.currentCorrectAnswers?.length) {

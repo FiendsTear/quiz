@@ -3,11 +3,15 @@ module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      margin: {
+        "neg-5": "-1.25rem",
+        "neg-3": "-0.75rem",
+      },
       gridTemplateColumns: {
         "auto-200": "repeat(auto-fill, 200px)",
       },
       animation: {
-        countdown: "countdown 15s ease forwards"
+        countdown: "countdown 15s ease forwards",
       },
       keyframes: {
         countdown: {

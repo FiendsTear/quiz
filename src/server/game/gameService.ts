@@ -6,6 +6,9 @@ import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import type { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
 import { Session } from "next-auth";
+import { CreateGameDTO } from "./dto.ts/createGameDTO";
+import { customAlphabet } from "nanoid";
+import { EnterGameDTO } from "./dto.ts/enterGameDTO";
 enum GameStatus {
   Created,
   Ongoing,
@@ -42,6 +45,8 @@ type GameState = {
   playersAnsweredCount: number;
   currentCorrectAnswers: Answer[];
   correctAnswerTimeout: NodeJS.Timeout | null;
+  isPrivate: boolean;
+  accessCode: string | null;
 };
 
 interface IActiveGame {
@@ -55,7 +60,11 @@ const activeGames: Map<number, IActiveGame> = new Map();
 export async function getActiveGames() {
   const availableGamesID: number[] = [];
   activeGames.forEach((game, id) => {
-    if (game.gameState.status === GameStatus.Created) availableGamesID.push(id);
+    if (
+      game.gameState.status === GameStatus.Created &&
+      !game.gameState.isPrivate
+    )
+      availableGamesID.push(id);
   });
   return await getGamesByID(availableGamesID);
 }
@@ -65,8 +74,13 @@ export function getGameState(gameID: number) {
   return game.gameState;
 }
 
-export async function addGame(input: number) {
-  const gameData = await createGame(input);
+export async function addGame(input: CreateGameDTO) {
+  const gameData = await createGame(input.quizID);
+  let accessCode = null;
+  if (input.isPrivate) {
+    const nanoid = customAlphabet("0123456789ABCDEFGHJKLMNPQRSTUVWXYZ", 5);
+    accessCode = nanoid();
+  }
   const gameState: GameState = {
     status: GameStatus.Created,
     players: [],
@@ -74,6 +88,8 @@ export async function addGame(input: number) {
     playersAnsweredCount: 0,
     currentCorrectAnswers: [],
     correctAnswerTimeout: null,
+    isPrivate: input.isPrivate,
+    accessCode,
   };
   const activeGame: IActiveGame = {
     emitter: new EventEmitter(),
@@ -106,8 +122,15 @@ export function subscribeToGame(gameID: number) {
   return gameObservable;
 }
 
-export function enterGame(gameID: number, player: Session["user"]) {
-  const game = getGame(gameID);
+export function enterGame(input: EnterGameDTO, player: Session["user"]) {
+  const game = getGame(input.gameID);
+  if (game.gameState.isPrivate) {
+    if (input.accessCode != game.gameState.accessCode)
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Wrong acccess code",
+      });
+  }
   const playerRegistered = game.gameState.players.find(
     (registeredPlayer) => registeredPlayer.id === player.id
   );

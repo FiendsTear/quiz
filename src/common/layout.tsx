@@ -5,7 +5,7 @@ export default function Layout({ children }: any) {
   return (
     <>
       <Header />
-      <main className="grid relative grow px-5 py-3 overflow-y-scroll">
+      <main className="grid relative grow px-5 py-3 overflow-y-auto">
         {children}
       </main>
       <Footer />

@@ -2,19 +2,36 @@ import { GameStatus, trpc } from "@/utils/trpc";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getTranslations } from "@/common/getTranslations";
-import Userpic from '../../../common/components/Userpic';
+import Userpic from "../../../common/components/Userpic";
+import { useTranslation } from "next-i18next";
+import QRCode from "qrcode";
 
 export default function HostGamePage() {
-  const { query, isReady } = useRouter();
+  const { query, isReady, asPath } = useRouter();
   const gameID = Number(query.id?.toString());
-  //   const gameState = useGameState(gameID);
+  const { t } = useTranslation("common");
 
   const [gameState, setGameState] = useState<
     RouterOutputs["game"]["getGameState"]
   >({} as RouterOutputs["game"]["getGameState"]);
 
+  const QRCanvas = useRef<HTMLCanvasElement>(null);
+
+  const getGameStateQuery = trpc.game.getGameState.useQuery(gameID, {
+    // enabled if there's nothing in game state yet
+    enabled: isReady && !gameState.status,
+    onSuccess: (data) => {
+      setGameState(data);
+    },
+  });
+
+  useEffect(() => {
+    QRCode.toCanvas(QRCanvas.current, getURLForPlayer()).catch((err) =>
+      console.error(err)
+    );
+  }, [isReady, gameState]);
   trpc.game.subcribeToGame.useSubscription(gameID, {
     onData(message) {
       setGameState({ ...gameState, ...message });
@@ -23,6 +40,16 @@ export default function HostGamePage() {
 
   const startMutation = trpc.game.start.useMutation();
   const nextQuestionMutation = trpc.game.nextQuestion.useMutation();
+
+  function getURLForPlayer() {
+    let url = `${window.location.origin}/games/${gameID}/player`;
+    if (gameState.accessCode) url = `${url}?accessCode=${gameState.accessCode}`;
+    return url;
+  }
+
+  async function copyLink() {
+    await navigator.clipboard.writeText(getURLForPlayer());
+  }
 
   if (gameState.status === GameStatus.Ongoing) {
     if (gameState.currentCorrectAnswers?.length) {
@@ -50,6 +77,10 @@ export default function HostGamePage() {
 
   return (
     <section>
+      <canvas ref={QRCanvas} />
+      <button type="button" onClick={copyLink}>
+        {t("Copy link")}
+      </button>
       <div>Players:</div>
       <ul className="grid grid-cols-auto-200 gap-4">
         {gameState.players?.map((player) => {

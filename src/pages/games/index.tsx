@@ -1,16 +1,17 @@
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Quiz, Tag } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
-import type { FilterQuizDTO } from '@/server/quiz/dto/filterQuizDTO';
-import { useForm } from 'react-hook-form';
-import Dropdown from '@/common/components/Dropdown';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faXmark } from '@fortawesome/free-solid-svg-icons';
-import debounce from 'lodash.debounce';
+import type { FilterQuizDTO } from "@/server/quiz/dto/filterQuizDTO";
+import { useForm } from "react-hook-form";
+import Dropdown from "@/common/components/Dropdown";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
+import debounce from "lodash.debounce";
+
 
 export default function GamesPage() {
   const { push } = useRouter();
@@ -24,14 +25,14 @@ export default function GamesPage() {
 
   const [isFilterVisible, setFilterVisible] = useState<boolean>(false);
   const [tags, setTags] = useState<Tag[]>([]);
-  const [tagName, setTagName] = useState<string>('');
-  const [quizName, setQuizName] = useState<string>('');
-  const filter: FilterQuizDTO = ({ tags, quizName });
-  
+  const [tagName, setTagName] = useState<string>("");
+  const [quizName, setQuizName] = useState<string>("");
+
+  const filter: FilterQuizDTO = { tags, quizName };
+
   const { register } = useForm<FilterQuizDTO & { tagName: string }>({
-    values: { ...filter, tagName }
-  }
-  );
+    values: { ...filter, tagName },
+  });
 
   const { t } = useTranslation("common");
 
@@ -43,25 +44,26 @@ export default function GamesPage() {
   function filterAddTag(newTag: Tag) {
     let isTagRepeated = false;
     tags.forEach((tag) => {
-      if (tag.id === newTag.id)
-        isTagRepeated = true;
-    })
+      if (tag.id === newTag.id) isTagRepeated = true;
+    });
     if (!isTagRepeated) {
       setTags([...tags, newTag]);
-      setTagName('');
+      setTagName("");
     }
   }
 
   function filterRemoveTag(removeTag: Tag) {
-    setTags(tags.filter(tag => tag.id !== removeTag.id));
+    setTags(tags.filter((tag) => tag.id !== removeTag.id));
   }
 
-  function handleGameEnter(gameID: number) {
+  function handleGameEnter(gameID: number, accessCode?: string) {
+    let url = `/games/${gameID}/player`;
+    if (accessCode) url = `/games/${gameID}/player?accessCode=${accessCode}`;
     push(`/games/${gameID}/player`).catch((err) => console.error(err));
   }
 
   return (
-    <article className="relative h-full">
+    <article className="h-full">
       {selectedQuiz && (
         <GameSettings
           quiz={selectedQuiz}
@@ -76,7 +78,7 @@ export default function GamesPage() {
         <section>
           <div className="flex items-center gap-2">
             <h2>{t("New game")}</h2>
-            <button 
+            <button
               type="button"
               className=""
               onClick={() => setFilterVisible(!isFilterVisible)}
@@ -91,7 +93,10 @@ export default function GamesPage() {
               <ul className="flex items-center gap-2 m-0 mb-3">
                 {tags.map((tag) => {
                   return (
-                    <li className="flex-none	bg-emerald-300 rounded-md pl-1" key={tag.id}>
+                    <li
+                      className="flex-none	bg-emerald-300 rounded-md pl-1"
+                      key={tag.id}
+                    >
                       {tag.name}
                       <button
                         type="button"
@@ -110,8 +115,11 @@ export default function GamesPage() {
                     options={tagName.length ? tagsQuery.data : []}
                     handleClick={filterAddTag}
                     {...register("tagName", {
-                      onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) =>
-                        setTagName(e.target.value), 700)
+                      onChange: debounce(
+                        (e: React.ChangeEvent<HTMLInputElement>) =>
+                          setTagName(e.target.value),
+                        700
+                      ),
                     })}
                   ></Dropdown>
                 </li>
@@ -121,8 +129,11 @@ export default function GamesPage() {
                 id="filter-quiz"
                 type="text"
                 {...register("quizName", {
-                  onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) =>
-                    setQuizName(e.target.value), 700)
+                  onChange: debounce(
+                    (e: React.ChangeEvent<HTMLInputElement>) =>
+                      setQuizName(e.target.value),
+                    700
+                  ),
                 })}
               />
             </div>
@@ -138,7 +149,9 @@ export default function GamesPage() {
                 className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
               >
                 <span>{quiz.name}</span>
-                <span className="opacity-60">{quiz.tags.map((tag) => tag.name).join(", ")}</span>
+                <span className="opacity-60">
+                  {quiz.tags.map((tag) => tag.name).join(", ")}
+                </span>
               </li>
             ))}
           </ul>
@@ -148,6 +161,18 @@ export default function GamesPage() {
       {currentTab === GameTabs.Find && (
         <section>
           <h2>{t("Enter Game")}</h2>
+          {/* <div>
+            <label htmlFor="room_code">{t("Room code")}</label>
+            <input
+              id="room_code"
+              type="text"
+              onChange={(e) => setAccessCode(e.target.value)}
+            />
+            <canvas id="qr_code"></canvas>
+            <button type="button" onClick={handleGameEnter()}>
+              {t("Enter")}
+            </button>
+          </div> */}
           {!gamesQuery.data ||
             (!gamesQuery.data.length && <div>{t("Games not found")}</div>)}
           <ul className="grid grid-cols-auto-200 gap-4 justify-center">

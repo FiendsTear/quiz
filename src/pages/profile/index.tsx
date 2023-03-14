@@ -29,7 +29,7 @@ export default function ProfilePage() {
 
   if (query.isLoading) return <Loading />;
   return (
-    <article className="relative h-full">
+    <article className="h-full">
       {selectedQuiz && (
         <GameSettings
           quiz={selectedQuiz}
