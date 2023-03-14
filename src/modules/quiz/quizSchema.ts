@@ -1,7 +1,17 @@
 import { z } from "zod";
 
+export const validAnswerParameters = {
+  body: {
+    minLength: 1,
+    maxLength: 300,
+  },
+};
+
 export const validAnswerSchema = z.object({
-  body: z.string().min(1).max(300),
+  body: z
+    .string()
+    .min(validAnswerParameters.body.minLength)
+    .max(validAnswerParameters.body.maxLength),
 });
 
 export const validQuestionSchema = z.object({

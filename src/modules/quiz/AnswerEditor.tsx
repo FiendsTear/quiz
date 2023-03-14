@@ -7,7 +7,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
 import { useQuizStore } from "./quizStore";
-import { validAnswerSchema } from "./quizSchema";
+import { validAnswerSchema, validAnswerParameters } from "./quizSchema";
 
 export type AnswerInput = RouterInputs["quiz"]["addOrUpdateAnswer"];
 
@@ -67,6 +67,7 @@ export default function AnswerEditor(props: {
       <label htmlFor={bodyInputID}>{t("Answer text")}</label>
       <textarea
         id={bodyInputID}
+        maxLength={validAnswerParameters.body.maxLength}
         {...register(`body`, {
           onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
             handleAnswerChange({ body: e.target.value });
