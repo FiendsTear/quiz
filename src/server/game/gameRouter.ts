@@ -45,7 +45,6 @@ export const gameRouter = createWSRouter({
     const gameState = enterGame(input, player);
     ctx.req?.socket.on("close", () => {
       leaveGame(input.gameID, player.id);
-      ctx.req?.socket.removeAllListeners();
     });
     return gameState;
   }),

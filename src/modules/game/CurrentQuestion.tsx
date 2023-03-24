@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import { useState, useEffect } from "react";
 import { useTimer } from "react-timer-hook";
 import { useTranslation } from "next-i18next";
+import Timer from "./Timer";
 
 type QuestionData = Question & {
   answers: Answer[];
@@ -27,30 +28,12 @@ export default function CurrentQuestion(props: {
       setAnswerSent(true);
     },
   });
-  const { seconds, restart, pause, isRunning } = useTimer({
-    expiryTimestamp: new Date(),
-    autoStart: false,
-    onExpire: () => {
-      sendAnswer(null);
-    },
-  });
 
   function sendAnswer(answerID: number | null) {
     if (!answerSent) {
       answerMutation.mutate({ gameID: Number(query.id), answerID });
-      pause();
     }
   }
-
-  useEffect(() => {
-    if (questionData.timerValue && !isRunning) {
-      console.log("start timer", questionData.timerValue, isRunning);
-      const time = new Date();
-      time.setSeconds(time.getSeconds() + questionData.timerValue);
-      restart(time, true);
-      setAnswerSent(false);
-    }
-  }, [questionData.timerValue, restart, isRunning]);
 
   if (answerSent && !props.isHost) return <div>{t("Waiting for others")}</div>;
   return (
@@ -72,38 +55,10 @@ export default function CurrentQuestion(props: {
           </li>
         ))}
       </ul>
-      <svg
-        viewBox="0 0 100 100"
-        className="max-h-40"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <circle
-          className="stroke-amber-400"
-          cx="50"
-          cy="50"
-          r="48"
-          fill="none"
-          pathLength="360"
-          strokeDasharray="370"
-          strokeWidth={3}
-          transform="rotate(-90,50,50)"
-        >
-          <animate
-            attributeName="stroke-dashoffset"
-            dur={questionData.timerValue}
-            values="0;-370"
-          ></animate>
-        </circle>
-        <text
-          x="50"
-          y="50"
-          alignmentBaseline="central"
-          textAnchor="middle"
-          className="fill-stone-600"
-        >
-          {seconds}
-        </text>
-      </svg>
+      <Timer
+        secondsToExpire={questionData.timerValue}
+        onExpire={() => sendAnswer(null)}
+      />
     </div>
   );
 }
