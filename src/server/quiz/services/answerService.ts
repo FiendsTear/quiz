@@ -1,5 +1,5 @@
 import type { AnswerDTO } from "../dto/createAnswerDTO";
-import { unpuplishQuiz } from "./quizService";
+import { unpublishQuiz } from "./quizService";
 import { prisma } from "../../db";
 
 export async function getAnswer(answerID: number) {
@@ -25,7 +25,7 @@ export async function addOrUpdateAnswer(input: AnswerDTO) {
     },
   });
   if (answer.question.quiz.isPublished)
-    await unpuplishQuiz(answer.question.quiz.id);
+    await unpublishQuiz(answer.question.quiz.id);
   return answer;
 }
 
@@ -37,6 +37,6 @@ export async function deleteAnswer(answerID: number) {
     },
   });
   if (answer.question.quiz.isPublished)
-    await unpuplishQuiz(answer.question.quiz.id);
+    await unpublishQuiz(answer.question.quiz.id);
   return answer;
 }

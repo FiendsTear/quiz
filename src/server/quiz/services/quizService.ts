@@ -42,7 +42,7 @@ export async function addOrUpdateQuiz(input: QuizDTO, session: Session) {
   return updatedQuiz;
 }
 
-export async function unpuplishQuiz(quizID: number) {
+export async function unpublishQuiz(quizID: number) {
   const quiz = await prisma.quiz.update({
     where: { id: quizID },
     data: { isPublished: false },

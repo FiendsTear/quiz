@@ -1,5 +1,5 @@
 import type { QuestionDTO } from "../dto/questionDTO";
-import { unpuplishQuiz as unpublishQuiz } from "./quizService";
+import { unpublishQuiz } from "./quizService";
 import { prisma } from "../../db";
 
 export async function getQuestion(questionID: number) {
