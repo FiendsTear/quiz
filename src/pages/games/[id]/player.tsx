@@ -6,6 +6,7 @@ import { RouterOutputs } from "../../../utils/trpc";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
+import ErrorComponent from "../../../common/components/Errror";
 
 export default function PlayerGamePage() {
   const { query, isReady, push } = useRouter();
@@ -22,6 +23,9 @@ export default function PlayerGamePage() {
     onData(message) {
       setGameState({ ...gameState, ...message });
     },
+    onError(err) {
+      setErrored(err.message);
+    },
   });
 
   const [connected, setConnected] = useState(false);
@@ -34,10 +38,13 @@ export default function PlayerGamePage() {
       await push("/games");
     },
   });
-  enterMutation.reset;
+
   useEffect(() => {
     if (!connected) enterMutation.mutate({ gameID, accessCode });
   }, [isReady]);
+
+  const [errored, setErrored] = useState<string>("");
+  if (errored) return <ErrorComponent message={errored}></ErrorComponent>;
 
   if (!gameState) return <Loading />;
   if (gameState.currentCorrectAnswers?.length) {

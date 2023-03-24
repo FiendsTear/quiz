@@ -7,6 +7,7 @@ import { getTranslations } from "@/common/getTranslations";
 import Userpic from "../../../common/components/Userpic";
 import { useTranslation } from "next-i18next";
 import QRCode from "qrcode";
+import ErrorComponent from "../../../common/components/Errror";
 
 export default function HostGamePage() {
   const { query, isReady, asPath } = useRouter();
@@ -28,15 +29,11 @@ export default function HostGamePage() {
   });
 
   useEffect(() => {
-    QRCode.toCanvas(QRCanvas.current, getURLForPlayer()).catch((err) =>
-      console.error(err)
-    );
+    if (gameState.status === GameStatus.Created)
+      QRCode.toCanvas(QRCanvas.current, getURLForPlayer()).catch((err) =>
+        console.error(err)
+      );
   }, [isReady, gameState]);
-  trpc.game.subcribeToGame.useSubscription(gameID, {
-    onData(message) {
-      setGameState({ ...gameState, ...message });
-    },
-  });
 
   const startMutation = trpc.game.start.useMutation();
   const nextQuestionMutation = trpc.game.nextQuestion.useMutation();
@@ -50,6 +47,18 @@ export default function HostGamePage() {
   async function copyLink() {
     await navigator.clipboard.writeText(getURLForPlayer());
   }
+
+  trpc.game.subcribeToGame.useSubscription(gameID, {
+    onData(message) {
+      setGameState({ ...gameState, ...message });
+    },
+    onError(err) {
+      setErrored(err.message);
+    },
+  });
+  
+  const [errored, setErrored] = useState<string>("");
+  if (errored) return <ErrorComponent message={errored}></ErrorComponent>;
 
   if (gameState.status === GameStatus.Ongoing) {
     if (gameState.currentCorrectAnswers?.length) {
