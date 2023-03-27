@@ -4,21 +4,19 @@ import { trpc } from "../../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { debounce } from "lodash";
-import QuestionEditor, {
-  QuestionInput,
-} from "../../../modules/quiz/QuestionEditor";
+import QuestionEditor from "../../../modules/quiz/QuestionEditor";
 import TagEditor from "@/modules/quiz/TagEditor";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 import Message from "../../../common/components/Message";
-import { QuizSchema, validQuizSchema } from "../../../modules/quiz/quizSchema";
+import { validQuizSchema } from "../../../modules/quiz/quizSchema";
 import {
   validQuestionSchema,
   validAnswerSchema,
 } from "../../../modules/quiz/quizSchema";
 import { useQuizStore } from "@/modules/quiz/quizStore";
-import { Answer } from "@prisma/client";
+import type { Answer } from "@prisma/client";
 
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
 

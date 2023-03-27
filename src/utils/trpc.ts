@@ -1,4 +1,4 @@
-import { AppRouter } from "@/server/mainRouter";
+import type { AppRouter } from "@/server/mainRouter";
 import {
   createWSClient,
   httpBatchLink,
@@ -7,8 +7,8 @@ import {
   wsLink,
 } from "@trpc/client";
 import { createTRPCNext } from "@trpc/next";
-import { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
-import { NextPageContext } from "next";
+import type { inferRouterInputs, inferRouterOutputs } from "@trpc/server";
+import type { NextPageContext } from "next";
 import getConfig from "next/config";
 import SuperJSON from "superjson";
 

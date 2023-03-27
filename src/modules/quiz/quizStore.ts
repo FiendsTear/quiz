@@ -1,8 +1,8 @@
-import { ZodError } from "zod";
+import type { ZodError } from "zod";
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 import produce from "immer";
-import { RouterOutputs } from "../../utils/trpc";
+import type { RouterOutputs } from "../../utils/trpc";
 
 type Issues = ZodError["issues"];
 export type QuizIssues = {

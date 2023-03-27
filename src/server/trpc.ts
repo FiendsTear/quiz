@@ -16,15 +16,15 @@
  * database, the session, etc.
  */
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
-import { getServerSession, type Session } from "next-auth";
+import { type Session } from "next-auth";
 
-import { getServerAuthSession, authOptions } from "./auth";
+import { getServerAuthSession } from "./auth";
 import { prisma } from "./db";
 
-import { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
-import { IncomingMessage } from "http";
+import type { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
+import type { IncomingMessage } from "http";
 import { getSession } from "next-auth/react";
-import ws from "ws";
+import type ws from "ws";
 
 type CreateContextOptions = {
   session: Session | null;
@@ -45,7 +45,7 @@ const createInnerTRPCContext = (opts: CreateContextOptions) => {
   return {
     session: opts.session,
     prisma,
-    req: opts.req
+    req: opts.req,
   };
 };
 
@@ -62,7 +62,7 @@ export const createTRPCContext = async (opts: CreateNextContextOptions) => {
   const session = await getServerAuthSession({ req, res });
 
   return createInnerTRPCContext({
-    session
+    session,
   });
 };
 
@@ -94,7 +94,7 @@ const wsT = initTRPC.context<typeof createWSContext>().create({
   errorFormatter({ shape }) {
     return shape;
   },
-})
+});
 /**
  * 3. ROUTER & PROCEDURE (THE IMPORTANT BIT)
  *

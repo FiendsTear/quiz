@@ -1,7 +1,7 @@
 import { GameStatus, trpc } from "@/utils/trpc";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
-import { RouterOutputs } from "../../../utils/trpc";
+import type { RouterOutputs } from "../../../utils/trpc";
 import { useState, useEffect, useRef } from "react";
 import { getTranslations } from "@/common/getTranslations";
 import Userpic from "../../../common/components/Userpic";
@@ -10,7 +10,7 @@ import QRCode from "qrcode";
 import ErrorComponent from "../../../common/components/Errror";
 
 export default function HostGamePage() {
-  const { query, isReady, asPath } = useRouter();
+  const { query, isReady } = useRouter();
   const gameID = Number(query.id?.toString());
   const { t } = useTranslation("common");
 
@@ -20,7 +20,7 @@ export default function HostGamePage() {
 
   const QRCanvas = useRef<HTMLCanvasElement>(null);
 
-  const getGameStateQuery = trpc.game.getGameState.useQuery(gameID, {
+  trpc.game.getGameState.useQuery(gameID, {
     // enabled if there's nothing in game state yet
     enabled: isReady && !gameState.status,
     onSuccess: (data) => {
@@ -56,7 +56,7 @@ export default function HostGamePage() {
       setErrored(err.message);
     },
   });
-  
+
   const [errored, setErrored] = useState<string>("");
   if (errored) return <ErrorComponent message={errored}></ErrorComponent>;
 

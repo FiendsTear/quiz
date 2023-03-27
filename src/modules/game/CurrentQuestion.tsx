@@ -1,8 +1,7 @@
 import { trpc } from "@/utils/trpc";
-import { Question, Answer } from "@prisma/client";
+import type { Question, Answer } from "@prisma/client";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import { useTimer } from "react-timer-hook";
+import { useState } from "react";
 import { useTranslation } from "next-i18next";
 import Timer from "./Timer";
 

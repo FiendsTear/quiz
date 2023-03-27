@@ -16,7 +16,7 @@ import {
 } from "./gameService";
 
 export const gameRouter = createWSRouter({
-  getActiveGames: protectedWSProcedure.query(async ({ ctx }) => {
+  getActiveGames: protectedWSProcedure.query(async ({}) => {
     return await getActiveGames();
   }),
 
@@ -28,7 +28,7 @@ export const gameRouter = createWSRouter({
   // host created a game
   create: protectedWSProcedure
     .input(createGameDTO)
-    .mutation(async ({ input, ctx }) => {
+    .mutation(async ({ input }) => {
       const game = await addGame(input);
       return game.gameData.id;
     }),
