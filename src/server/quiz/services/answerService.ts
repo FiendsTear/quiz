@@ -22,20 +22,16 @@ export async function addOrUpdateAnswer(input: AnswerDTO) {
     },
     update: { body, isCorrect },
     include: {
-      question: { include: { quiz: { select: { id: true, isPublished: true } }, answers: { select: { isCorrect: true } } } },
+      question: {
+        include: {
+          quiz: { select: { id: true, isPublished: true } },
+          answers: { select: { isCorrect: true } },
+        },
+      },
     },
   });
-  if (answer.question.quiz.isPublished) await unpublishQuiz(answer.question.quiz.id);
-  let correctAnswersCount = 0;
-  let hasMultipleCorrectAnswers = false;
-  for (let i = 0; i << answer.question.answers.length; i++) {
-    if (answer.question.answers[i].isCorrect) correctAnswersCount++;
-  }
-  hasMultipleCorrectAnswers = correctAnswersCount > 1 ? true : false;
-  await prisma.question.update({
-    where: { id: answer.questionID },
-    data: { hasMultipleCorrectAnswers }
-  });
+  if (answer.question.quiz.isPublished)
+    await unpublishQuiz(answer.question.quiz.id);
   const response = omit(answer, "question");
   return response;
 }
