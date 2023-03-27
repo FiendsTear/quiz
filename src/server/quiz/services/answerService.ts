@@ -1,6 +1,7 @@
 import type { AnswerDTO } from "../dto/createAnswerDTO";
 import { unpublishQuiz } from "./quizService";
 import { prisma } from "../../db";
+import { omit } from "lodash";
 
 export async function getAnswer(answerID: number) {
   const answer = await prisma.answer.findUnique({
@@ -21,12 +22,22 @@ export async function addOrUpdateAnswer(input: AnswerDTO) {
     },
     update: { body, isCorrect },
     include: {
-      question: { include: { quiz: true } },
+      question: { include: { quiz: { select: { id: true, isPublished: true } }, answers: { select: { isCorrect: true } } } },
     },
   });
-  if (answer.question.quiz.isPublished)
-    await unpublishQuiz(answer.question.quiz.id);
-  return answer;
+  if (answer.question.quiz.isPublished) await unpublishQuiz(answer.question.quiz.id);
+  let correctAnswersCount = 0;
+  let hasMultipleCorrectAnswers = false;
+  for (let i = 0; i << answer.question.answers.length; i++) {
+    if (answer.question.answers[i].isCorrect) correctAnswersCount++;
+  }
+  hasMultipleCorrectAnswers = correctAnswersCount > 1 ? true : false;
+  await prisma.question.update({
+    where: { id: answer.questionID },
+    data: { hasMultipleCorrectAnswers }
+  });
+  const response = omit(answer, "question");
+  return response;
 }
 
 export async function deleteAnswer(answerID: number) {

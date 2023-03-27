@@ -1,6 +1,6 @@
 import { RouterInputs, trpc } from "../../utils/trpc";
 import React from "react";
-import debounce from "lodash.debounce";
+import { debounce } from "lodash";
 import { useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
 import type { QuestionDTO } from "@/server/quiz/dto/questionDTO";

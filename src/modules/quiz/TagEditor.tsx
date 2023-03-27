@@ -1,7 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import debounce from "lodash.debounce";
+import { debounce } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark, faPlus, faMinus, faCheck } from "@fortawesome/free-solid-svg-icons";
 import type { CreateTagDTO } from "@/server/quiz/dto/createTagDTO";

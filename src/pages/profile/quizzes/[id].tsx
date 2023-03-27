@@ -3,7 +3,7 @@ import type { RouterInputs } from "../../../utils/trpc";
 import { trpc } from "../../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import debounce from "lodash.debounce";
+import { debounce } from "lodash";
 import QuestionEditor, {
   QuestionInput,
 } from "../../../modules/quiz/QuestionEditor";

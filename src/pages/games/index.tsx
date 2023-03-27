@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import Dropdown from "@/common/components/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
-import debounce from "lodash.debounce";
+import { debounce } from "lodash";
 
 
 export default function GamesPage() {

@@ -2,7 +2,7 @@ import type { RouterInputs } from "../../utils/trpc";
 import { trpc } from "../../utils/trpc";
 import type { Answer } from "@prisma/client";
 import React from "react";
-import debounce from "lodash.debounce";
+import { debounce } from "lodash";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";

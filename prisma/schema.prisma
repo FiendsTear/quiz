@@ -11,25 +11,26 @@ datasource db {
 }
 
 model Quiz {
-    id              Int         @id @unique @default(autoincrement())
-    name            String
-    userId          String?
-    user            User?       @relation(fields: [userId], references: [id])
-    isPublished     Boolean     @default(false)
-    isPrivate       Boolean     @default(false)
-    tags            Tag[]
-    questions       Question[]
-    Game            Game[]
+    id          Int        @id @unique @default(autoincrement())
+    name        String
+    userId      String?
+    user        User?      @relation(fields: [userId], references: [id])
+    isPublished Boolean    @default(false)
+    isPrivate   Boolean    @default(false)
+    tags        Tag[]
+    questions   Question[]
+    Game        Game[]
 }
 
 model Question {
-    id           Int      @id @unique @default(autoincrement())
-    body         String?
-    quiz         Quiz     @relation(fields: [quizID], references: [id])
-    quizID       Int
-    order        Int
-    answerWeight Float    @default(1)
-    answers      Answer[]
+    id                        Int      @id @unique @default(autoincrement())
+    body                      String?
+    quiz                      Quiz     @relation(fields: [quizID], references: [id])
+    quizID                    Int
+    order                     Int
+    answerWeight              Float    @default(1)
+    answers                   Answer[]
+    hasMultipleCorrectAnswers Boolean  @default(false)
 }
 
 model Answer {
@@ -48,9 +49,9 @@ model Game {
 }
 
 model Tag {
-    id          Int     @id @unique @default(autoincrement())
-    name        String  @unique
-    quizzes     Quiz[]
+    id      Int    @id @unique @default(autoincrement())
+    name    String @unique
+    quizzes Quiz[]
 }
 
 model Account {

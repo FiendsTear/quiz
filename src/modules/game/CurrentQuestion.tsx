@@ -38,6 +38,7 @@ export default function CurrentQuestion(props: {
   if (answerSent && !props.isHost) return <div>{t("Waiting for others")}</div>;
   return (
     <div className="flex flex-col">
+      <div>{questionData.hasMultipleCorrectAnswers}</div>
       <div className="text-center">{questionData.body}</div>
       <ul className="grid grid-cols-1 gap-3 justify-center">
         {questionData.answers.map((answer) => (
