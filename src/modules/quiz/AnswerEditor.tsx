@@ -50,6 +50,7 @@ export default function AnswerEditor(props: {
         if (res.data) {
           const parseRes = validAnswerSchema.safeParse(res.data);
           if (!parseRes.success)
+          parseRes.error
             setAnswerError(answerID, parseRes.error.issues);
           else {
             setAnswerError(answerID, []);
