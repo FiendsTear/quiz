@@ -30,7 +30,6 @@ model Question {
     order                     Int
     answerWeight              Float    @default(1)
     answers                   Answer[]
-    hasMultipleCorrectAnswers Boolean  @default(false)
 }
 
 model Answer {

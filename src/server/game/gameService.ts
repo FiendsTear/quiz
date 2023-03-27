@@ -1,14 +1,14 @@
 import { EventEmitter } from "events";
-import type { Question, Answer, User } from "@prisma/client";
+import type { Question, Answer } from "@prisma/client";
 import type { GameWithAnswers } from "./gameRepository";
 import { createGame, getGamesByID } from "./gameRepository";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
 import type { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
-import { Session } from "next-auth";
-import { CreateGameDTO } from "./dto.ts/createGameDTO";
+import type { Session } from "next-auth";
+import type { CreateGameDTO } from "./dto.ts/createGameDTO";
 import { customAlphabet } from "nanoid";
-import { EnterGameDTO } from "./dto.ts/enterGameDTO";
+import type { EnterGameDTO } from "./dto.ts/enterGameDTO";
 enum GameStatus {
   Created,
   Ongoing,
@@ -40,6 +40,7 @@ type GameState = {
   currentQuestion: Question & {
     answers: Answer[];
     timerValue: number;
+    hasMultipleCorrectAnswers: boolean;
   };
   players: Player[];
   playersAnsweredCount: number;
@@ -84,7 +85,15 @@ export async function addGame(input: CreateGameDTO) {
   const gameState: GameState = {
     status: GameStatus.Created,
     players: [],
-    currentQuestion: { ...gameData.quiz.questions[0], ...{ timerValue: 15 } },
+    currentQuestion: {
+      ...gameData.quiz.questions[0],
+      ...{ timerValue: 15 },
+      ...{
+        hasMultipleCorrectAnswers: calcMultiCorrectAnswers(
+          gameData.quiz.questions[0].answers
+        ),
+      },
+    },
     playersAnsweredCount: 0,
     currentCorrectAnswers: [],
     correctAnswerTimeout: null,
@@ -105,6 +114,14 @@ export function startGame(gameID: number) {
   game.gameState.status = GameStatus.Ongoing;
   emitState(game);
   return game.gameState;
+}
+
+function calcMultiCorrectAnswers(answers: Answer[]) {
+  let count = 0;
+  for (let i = 0; i < answers.length; i++) {
+    if (answers[i].isCorrect) count++;
+  }
+  return count > 1 ? true : false;
 }
 
 export function subscribeToGame(gameID: number) {
@@ -221,6 +238,11 @@ export function nextQuestion(game: IActiveGame) {
     gameState.currentQuestion = {
       ...gameData.quiz.questions[currentQuestionIndex + 1],
       ...{ timerValue: 15 },
+      ...{
+        hasMultipleCorrectAnswers: calcMultiCorrectAnswers(
+          gameData.quiz.questions[currentQuestionIndex + 1].answers
+        ),
+      },
     };
   }
   emitState(game);
