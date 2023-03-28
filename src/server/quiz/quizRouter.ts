@@ -5,6 +5,7 @@ import {
   getQuizzes,
   filterQuizzes,
   createQuiz,
+  deleteQuiz,
 } from "./services/quizService";
 import { quizDTO } from "./dto/quizDTO";
 import { questionDTO } from "./dto/questionDTO";
@@ -52,6 +53,11 @@ export const quizRouter = createTRPCRouter({
   addOrUpdateQuiz: protectedProcedure
     .input(quizDTO)
     .mutation(({ input, ctx }) => addOrUpdateQuiz(input, ctx.session)),
+  deleteQuiz: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ input }) => {
+      await deleteQuiz(input);
+    }),
 
   //questions
   getQuestion: protectedProcedure

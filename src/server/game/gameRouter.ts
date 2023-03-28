@@ -43,10 +43,16 @@ export const gameRouter = createWSRouter({
   enter: protectedWSProcedure.input(enterGameDTO).mutation(({ ctx, input }) => {
     const player = ctx.session.user;
     const gameState = enterGame(input, player);
-    ctx.req?.socket.on("close", () => {
-      leaveGame(input.gameID, player.id);
-    });
+    // ctx.req?.socket.on("close", () => {
+    //   leaveGame(input.gameID, player.id);
+    // });
     return gameState;
+  }),
+
+  leave: protectedWSProcedure.input(z.number()).mutation(({ ctx, input }) => {
+    const player = ctx.session.user;
+    console.log('received leave message');
+    // leaveGame(input, player.id);
   }),
 
   // host started a game

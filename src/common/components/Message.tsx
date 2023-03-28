@@ -1,4 +1,5 @@
 import { useTranslation } from "next-i18next";
+import { ModalWindow } from "./ModalWindow";
 
 export default function Message(props: {
   messageString: string;
@@ -8,7 +9,7 @@ export default function Message(props: {
   const { messageString, confirmSelect, cancelSelect } = props;
   const { t } = useTranslation("common");
   return (
-    <section className="absolute w-full h-full flex items-center justify-center isolate bg-stone-800/60">
+    <ModalWindow exit={() => (cancelSelect ? cancelSelect() : "")}>
       <form className="grid">
         <div className="bg-white flex flex-col items-center rounded-lg p-6">
           <p>{messageString}</p>
@@ -22,6 +23,6 @@ export default function Message(props: {
           </div>
         </div>
       </form>
-    </section>
+    </ModalWindow>
   );
 }

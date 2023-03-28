@@ -43,6 +43,7 @@ export default function NewQuizPage() {
 
   const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
+  const deleteQuizMutation = trpc.quiz.deleteQuiz.useMutation();
 
   if (!isReady || !getQuizQuery.data) return <Loading />;
 
@@ -132,6 +133,14 @@ export default function NewQuizPage() {
     );
   }
 
+  function deleteQuiz() {
+    deleteQuizMutation.mutate(+quizID, {
+      onSuccess: () => {
+        push(`/profile`).catch((err) => console.error(err));
+      },
+    });
+  }
+
   const { data } = getQuizQuery;
 
   return (
@@ -194,6 +203,9 @@ export default function NewQuizPage() {
             })}
           ></input>
           <label htmlFor="quiz-isPrivate">{t("Private quiz")}</label>
+          <button type="button" className="warning" onClick={deleteQuiz}>
+            {t("Delete quiz")}
+          </button>
           <button
             disabled={data.isPublished}
             type="button"

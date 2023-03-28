@@ -108,3 +108,7 @@ export async function filterQuizzes(
   await prisma.$disconnect();
   return quizzes;
 }
+
+export async function deleteQuiz(quizID: number) {
+  await prisma.quiz.delete({ where: { id: quizID } });
+}

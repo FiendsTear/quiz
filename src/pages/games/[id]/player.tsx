@@ -7,6 +7,7 @@ import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 import ErrorComponent from "../../../common/components/Errror";
+import isBrowser from "../../../common/helpers/isBrowser";
 
 export default function PlayerGamePage() {
   const { query, isReady, push } = useRouter();
@@ -26,6 +27,15 @@ export default function PlayerGamePage() {
     onError(err) {
       setErrored(err.message);
     },
+  });
+
+  const leaveMutation = trpc.game.leave.useMutation();
+  useEffect(() => {
+    if (isBrowser()) {
+      window.onblur = () => {
+        leaveMutation.mutate(0);
+      };
+    }
   });
 
   const [connected, setConnected] = useState(false);
