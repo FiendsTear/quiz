@@ -13,6 +13,7 @@ import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import { useQuizStore } from "./quizStore";
 import { validQuestionSchema } from "./quizSchema";
+import Button, { ButtonVariant } from "../../common/components/Button";
 
 export type QuestionInput = RouterInputs["quiz"]["addOrUpdateQuestion"];
 
@@ -91,26 +92,26 @@ export default function QuestionEditor(props: { questionID: number }) {
 
   return (
     <form className="bordered p-4">
-      <div className="flex gap-4 items-start">
-        <div className="w-3/4">
+      <div className="flex gap-4 items-start content-center">
+        <div className="grow h-full flex flex-col">
           <label htmlFor="question-body">{t("Question text")}</label>
-          <input
+          <textarea
             id="question-body"
-            type="text"
+            className="grow"
             {...register("body", {
               onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ body: e.target.value });
               }, 700),
             })}
-          ></input>
+          ></textarea>
           <span className="issue">{issues ? issues["body"] : ""}</span>
         </div>
-        <div className="w-1/4">
+        <div className="flex flex-col w-28 self-stretch">
           <label htmlFor="answer-weight">{t("Answer weight")}</label>
           <input
             id="answer-weight"
             type="number"
-            className="mb-3"
+            className="block grow text-center text-lg"
             {...register("answerWeight", {
               onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ answerWeight: Number(e.target.value) });
@@ -118,13 +119,13 @@ export default function QuestionEditor(props: { questionID: number }) {
             })}
           ></input>
         </div>
-        <button
-          type="button"
-          className="warning aspect-square"
+        <Button
+          variant={ButtonVariant.WARNING}
+          className="aspect-square"
           onClick={deleteQuestion}
         >
           <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
-        </button>
+        </Button>
       </div>
       <ul className="flex flex-col gap-2 mb-3">
         {data.answers.map((answer) => {
@@ -137,21 +138,22 @@ export default function QuestionEditor(props: { questionID: number }) {
                 answerID={answer.id}
                 className="grow"
               ></AnswerEditor>
-              <button
-                type="button"
-                className="warning"
-                onClick={() => deleteAnswer(answer.id)}
-                title="Delete answer"
+              <Button
+                attr={{
+                  onClick: () => deleteAnswer(answer.id),
+                  title: "Delete answer",
+                }}
+                variant={ButtonVariant.WARNING}
               >
                 <FontAwesomeIcon icon={faTrashCan} />
-              </button>
+              </Button>
               <div className="w-full h-px bg-stone-300"></div>
             </li>
           );
         })}
         <span className="issue">{issues ? issues["answers"] : ""}</span>
       </ul>
-      <button type="button" onClick={createAnswer}>
+      <button atrtype="button" onClick={createAnswer}>
         {t("Add answer variant")}
       </button>
     </form>

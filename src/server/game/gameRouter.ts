@@ -6,7 +6,7 @@ import { createGameDTO } from "./dto.ts/createGameDTO";
 import { enterGameDTO } from "./dto.ts/enterGameDTO";
 import {
   addGame,
-  addPlayerAnswer,
+  addPlayerAnswer as addPlayerAnswers,
   enterGame,
   getActiveGames,
   getGameState,
@@ -63,7 +63,7 @@ export const gameRouter = createWSRouter({
   answer: protectedWSProcedure
     .input(addPlayerAnswerDTO)
     .mutation(({ input, ctx }) => {
-      return addPlayerAnswer(input, ctx.session.user.id);
+      return addPlayerAnswers(input, ctx.session.user.id);
     }),
 
   nextQuestion: protectedWSProcedure.input(z.number()).mutation(({ input }) => {

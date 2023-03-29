@@ -5,6 +5,7 @@ import { useTranslation } from "next-i18next";
 import { ModalWindow } from "../../common/components/ModalWindow";
 import { SubmitHandler } from "react-hook-form";
 import { SyntheticEvent, useState } from "react";
+import Button from "../../common/components/Button";
 
 export default function GameSettings(props: {
   quiz: Quiz;
@@ -22,7 +23,7 @@ export default function GameSettings(props: {
   const { t } = useTranslation();
   const mutation = trpc.game.create.useMutation({
     onSuccess: async (data) => {
-        await push(`/games/${data}/host`);
+      await push(`/games/${data}/host`);
     },
   });
 
@@ -55,11 +56,9 @@ export default function GameSettings(props: {
             <label htmlFor="private_game">{t("Private game")}</label>
           </div>
           <div className="flex w-100 gap-6 justify-between items-end">
-            <button onClick={() => cancelSelect()}>{t("Cancel")}</button>
+            <Button onClick={() => cancelSelect()}>{t("Cancel")}</Button>
             {userId && userId === quiz.userId && (
-              <button type="button" onClick={() => editQuiz()}>
-                {t("Edit Quiz")}
-              </button>
+              <Button onClick={() => editQuiz()}>{t("Edit Quiz")}</Button>
             )}
             {quiz.isPublished && (
               <button type="submit">{t("Create game")}</button>

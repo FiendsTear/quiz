@@ -3,11 +3,17 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { debounce } from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark, faPlus, faMinus, faCheck } from "@fortawesome/free-solid-svg-icons";
+import {
+  faXmark,
+  faPlus,
+  faMinus,
+  faCheck,
+} from "@fortawesome/free-solid-svg-icons";
 import type { CreateTagDTO } from "@/server/quiz/dto/createTagDTO";
 import type { Tag } from "@prisma/client";
 import Dropdown from "@/common/components/Dropdown";
 import { useTranslation } from "next-i18next";
+import Button from "../../common/components/Button";
 
 export default function TagEditor(props: {
   tags: Tag[] | undefined;
@@ -41,7 +47,7 @@ export default function TagEditor(props: {
       { quizID: props.quizID, tagID: tag.id },
       {
         onSuccess: () => resetOnSuccess(),
-        onError: () => setError(true)
+        onError: () => setError(true),
       }
     );
   }
@@ -59,17 +65,12 @@ export default function TagEditor(props: {
     e.preventDefault();
     const similarTags = getSimilarTags.data;
     if (similarTags?.length) {
-      for (let i = 0; i < similarTags.length; i++) 
+      for (let i = 0; i < similarTags.length; i++)
         if (tagName === similarTags[i].name.toLowerCase()) {
           attachTagToQuiz(similarTags[i]);
           break;
-        } 
-        else 
-          if (i === similarTags.length-1)
-            createNewTag();
-    }
-    else
-      createNewTag();
+        } else if (i === similarTags.length - 1) createNewTag();
+    } else createNewTag();
   }
 
   function createNewTag() {
@@ -78,7 +79,7 @@ export default function TagEditor(props: {
         { ...newTag },
         {
           onSuccess: () => resetOnSuccess(),
-          onError: () => setError(true)
+          onError: () => setError(true),
         }
       );
   }
@@ -97,24 +98,25 @@ export default function TagEditor(props: {
         <li>{t("Tags")}:</li>
         {props.tags?.map((tag) => {
           return (
-            <li className="flex-none	bg-emerald-300 rounded-md pl-1" key={tag.id}>
+            <li
+              className="flex-none	bg-emerald-300 rounded-md pl-1"
+              key={tag.id}
+            >
               {tag.name}
-              <button
-                type="button"
-                className="ml-1"
-                onClick={() => removeTagFromQuiz(tag.id)}
+              <Button
+                attr={{
+                  onClick: () => removeTagFromQuiz(tag.id),
+                  className: "ml-1",
+                }}
               >
                 <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
-              </button>
+              </Button>
             </li>
           );
         })}
         {!isTagAdding && (
           <li>
-            <button
-              type="button"
-              onClick={() => setTagAdding(true)}
-            >
+            <button type="button" onClick={() => setTagAdding(true)}>
               <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
             </button>
           </li>
@@ -123,7 +125,7 @@ export default function TagEditor(props: {
           <li className="flex items-center gap-1 h-full">
             <Dropdown
               className="h-full lowercase"
-              options={(tagName.length > 2) ? getSimilarTags.data : []}
+              options={tagName.length > 2 ? getSimilarTags.data : []}
               handleClick={attachTagToQuiz}
               {...register("name", {
                 onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -132,13 +134,21 @@ export default function TagEditor(props: {
                 }, 700),
               })}
             ></Dropdown>
-            <button className="ml-1" type="submit" disabled={newTag.name.length < 3}>
+            <button
+              className="ml-1"
+              type="submit"
+              disabled={newTag.name.length < 3}
+            >
               <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
             </button>
             <button type="reset" onClick={() => resetOnSuccess()}>
               <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
             </button>
-            {isError && <span className="text-red-500">{t("This tag is already attached")}</span>}
+            {isError && (
+              <span className="text-red-500">
+                {t("This tag is already attached")}
+              </span>
+            )}
           </li>
         )}
       </ul>

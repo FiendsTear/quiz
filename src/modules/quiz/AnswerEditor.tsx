@@ -65,8 +65,9 @@ export default function AnswerEditor(props: {
   return (
     <section className={props.className}>
       <label htmlFor={bodyInputID}>{t("Answer text")}</label>
-      <textarea
+      <input
         id={bodyInputID}
+        type='text'
         maxLength={validAnswerParameters.body.maxLength}
         {...register(`body`, {
           onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {

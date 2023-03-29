@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { RouterInputs } from "../../../utils/trpc";
-import { trpc } from "../../../utils/trpc";
+import { trpc, RouterOutputs } from "../../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { debounce } from "lodash";
@@ -16,8 +16,8 @@ import {
   validAnswerSchema,
 } from "../../../modules/quiz/quizSchema";
 import { useQuizStore } from "@/modules/quiz/quizStore";
-import type { Answer } from "@prisma/client";
 
+type AnswerData = RouterOutputs["quiz"]["getAnswer"];
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
 
 export default function NewQuizPage() {
@@ -65,7 +65,7 @@ export default function NewQuizPage() {
     quizData.questions.map((question) => {
       const questionData = ctx.quiz.getQuestion.getData(question.id);
       if (!questionData) return;
-      const answers: Answer[] | undefined = [];
+      const answers: AnswerData[] = [];
       // validate and consolidate question answers
       questionData.answers.map((answer) => {
         const answerData = ctx.quiz.getAnswer.getData(answer.id);
@@ -77,8 +77,8 @@ export default function NewQuizPage() {
           setAnswerError(answer.id, answerParseRes.error.issues);
         }
       });
-      questionData.answers = answers;
-      const parseRes = validQuestionSchema.safeParse(questionData);
+      const dataToParse = { ...questionData, ...{ answers } };
+      const parseRes = validQuestionSchema.safeParse(dataToParse);
       if (!parseRes.success) {
         quizValidForPublication = false;
         setQuestionError(question.id, parseRes.error.issues);
@@ -151,8 +151,10 @@ export default function NewQuizPage() {
           confirmSelect={() => toProfilePage()}
         />
       )}
-      <h1>{t("Edit Quiz")}</h1>
-      <label htmlFor="quiz-name">{t("Quiz name")}</label>
+      {/* <h1>{t("Edit Quiz")}</h1> */}
+      <label htmlFor="quiz-name" className="text-lg">
+        {t("Quiz name")}
+      </label>
       <input
         id="quiz-name"
         type="text"
@@ -172,7 +174,7 @@ export default function NewQuizPage() {
       ></TagEditor>
       <span className="issue">{issues ? issues["tags"] : ""}</span>
       <span className="issue">{issues ? issues["questions"] : ""}</span>
-      <ul className="flex flex-col gap-5">
+      <ul className="flex flex-col gap-5 w-2/3 m-auto">
         {data.questions.map((question) => {
           return (
             <QuestionEditor

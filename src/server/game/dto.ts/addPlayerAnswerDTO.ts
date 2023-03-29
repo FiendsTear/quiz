@@ -1,6 +1,6 @@
 import { z } from "zod";
 export const addPlayerAnswerDTO = z.object({
   gameID: z.number(),
-  answerID: z.number().nullable(),
+  answersID: z.array(z.number()),
 });
 export type AddPlayerAnswerDTO = z.infer<typeof addPlayerAnswerDTO>;

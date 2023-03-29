@@ -4,6 +4,7 @@ import Userpic from "./Userpic";
 import { useTranslation } from "next-i18next";
 
 import { Rubik } from "@next/font/google";
+import Button from "./Button";
 const rubik = Rubik({ subsets: ["cyrillic", "latin"] });
 
 export default function Header() {
@@ -27,11 +28,11 @@ export default function Header() {
             </>
           )}
         </Link>
-        <button
+        <Button
           onClick={sessionData ? () => void signOut() : () => void signIn()}
         >
           {sessionData ? t("Sign out") : t("Sign in")}
-        </button>
+        </Button>
       </section>
     </header>
   );

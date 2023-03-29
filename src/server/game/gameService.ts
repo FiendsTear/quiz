@@ -29,7 +29,7 @@ enum GameEvents {
 
 type Player = {
   id: string;
-  currentAnswerID?: number | null;
+  currentAnswersID?: number[];
   score: number;
   name: string;
   image?: string | null;
@@ -167,7 +167,7 @@ export function addPlayerAnswer(dto: AddPlayerAnswerDTO, playerID: string) {
   const game = getGame(dto.gameID);
   const player = getPlayer(game?.gameState, playerID);
 
-  player.currentAnswerID = dto.answerID;
+  player.currentAnswersID = dto.answersID;
   emitState(game);
 
   game.gameState.playersAnsweredCount++;
@@ -208,7 +208,7 @@ function finishQuestion(game: IActiveGame) {
 
   gameState.players.forEach((player) => {
     currentCorrectAnswers.forEach((answer) => {
-      if (answer.id === player.currentAnswerID) {
+      if (player.currentAnswersID?.includes(answer.id)) {
         player.score = player.score + currentQuestion.answerWeight;
       }
     });

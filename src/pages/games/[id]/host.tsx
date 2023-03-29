@@ -86,10 +86,15 @@ export default function HostGamePage() {
 
   return (
     <section>
-      <canvas ref={QRCanvas} />
-      <button type="button" onClick={copyLink}>
-        {t("Copy link")}
-      </button>
+      {gameState.status === GameStatus.Created && (
+        <div>
+          <canvas ref={QRCanvas} />
+          <button type="button" onClick={copyLink}>
+            {t("Copy link")}
+          </button>
+        </div>
+      )}
+
       <div>Players:</div>
       <ul className="grid grid-cols-auto-200 gap-4">
         {gameState.players?.map((player) => {

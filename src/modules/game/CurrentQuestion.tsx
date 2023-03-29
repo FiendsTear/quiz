@@ -1,14 +1,12 @@
 import { trpc } from "@/utils/trpc";
-import type { Question, Answer } from "@prisma/client";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import { useTranslation } from "next-i18next";
 import Timer from "./Timer";
+import { RouterOutputs } from "../../utils/trpc";
+import Button from "../../common/components/Button";
 
-type QuestionData = Question & {
-  answers: Answer[];
-  timerValue: number;
-};
+type QuestionData = RouterOutputs["game"]["getGameState"]["currentQuestion"];
 
 export default function CurrentQuestion(props: {
   questionData: QuestionData;
@@ -17,6 +15,7 @@ export default function CurrentQuestion(props: {
   const { questionData } = props;
   const { query } = useRouter();
   const [answerSent, setAnswerSent] = useState<boolean>(false);
+  const [selectedAnswersID, setSelectedAnswers] = useState<number[]>([]);
   const { t } = useTranslation();
   //   const [questionTimer, setTimer] = useState<ReturnType<
   //     typeof setTimeout
@@ -28,9 +27,25 @@ export default function CurrentQuestion(props: {
     },
   });
 
-  function sendAnswer(answerID: number | null) {
+  function selectAnswer(answerID: number) {
+    const answerIndex = selectedAnswersID.findIndex(
+      (selectedAnswerID) => selectedAnswerID === answerID
+    );
+    if (answerIndex === -1) {
+      setSelectedAnswers([...selectedAnswersID, answerID]);
+      return;
+    }
+    const copy = [...selectedAnswersID];
+    copy.splice(answerIndex, 1);
+    setSelectedAnswers(copy);
+  }
+
+  function sendAnswers() {
     if (!answerSent) {
-      answerMutation.mutate({ gameID: Number(query.id), answerID });
+      answerMutation.mutate({
+        gameID: Number(query.id),
+        answersID: selectedAnswersID,
+      });
     }
   }
 
@@ -42,23 +57,24 @@ export default function CurrentQuestion(props: {
       <ul className="grid grid-cols-1 gap-3 justify-center">
         {questionData.answers.map((answer) => (
           <li
-            className=""
             key={answer.id}
-            onClick={() => sendAnswer(answer.id)}
+            className={
+              selectedAnswersID.includes(answer.id)
+                ? "bg-indigo-500"
+                : "bg-amber-100 hover:bg-amber-200"
+            }
           >
-            <button
-              type="button"
-              className="w-full bg-amber-100 hover:bg-amber-200"
-            >
+            <Button onClick={() => selectAnswer(answer.id)} className="w-full">
               {answer.body}
-            </button>
+            </Button>
           </li>
         ))}
       </ul>
-      <Timer
+      {/* <Timer
         secondsToExpire={questionData.timerValue}
-        onExpire={() => sendAnswer(null)}
-      />
+        onExpire={() => sendAnswers()}
+      /> */}
+      <Button onClick={sendAnswers}>{t("Send answers")}</Button>
     </div>
   );
 }

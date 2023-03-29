@@ -1,5 +1,6 @@
 import { useTranslation } from "next-i18next";
 import { ModalWindow } from "./ModalWindow";
+import Button from "./Button";
 
 export default function Message(props: {
   messageString: string;
@@ -14,11 +15,11 @@ export default function Message(props: {
         <div className="bg-white flex flex-col items-center rounded-lg p-6">
           <p>{messageString}</p>
           <div className="flex gap-2">
-            <button onClick={() => confirmSelect()}>{t("Ok")}</button>
+            <Button attr={{ onClick: () => confirmSelect() }}>{t("Ok")}</Button>
             {cancelSelect && (
-              <button type="button" onClick={() => cancelSelect()}>
+              <Button attr={{ onClick: () => cancelSelect() }}>
                 {t("Cancel")}
-              </button>
+              </Button>
             )}
           </div>
         </div>

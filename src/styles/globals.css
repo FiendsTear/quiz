@@ -38,11 +38,6 @@
         @apply text-base;
     }
 
-    button.warning {
-        @apply bg-red-300;
-        @apply hover:bg-red-400;
-    }
-
     textarea {
         @apply resize-y;
     }
@@ -51,17 +46,6 @@
         @apply border-none;
         @apply bg-fuchsia-100;
         @apply rounded-lg;
-    }
-
-    button {
-        @apply bg-emerald-300;
-        @apply hover:bg-emerald-200;
-        @apply border-none;
-        @apply rounded-md;
-        @apply text-inherit;
-        @apply p-1;
-        @apply cursor-pointer;
-        font-family: inherit;
     }
 
     button:disabled {
