@@ -7,6 +7,7 @@ import GameSettings from "@/modules/game/GameSettings";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
+import Button from "../../common/components/Button";
 
 export default function ProfilePage() {
   const { data: sessionData } = useSession();
@@ -54,7 +55,7 @@ export default function ProfilePage() {
                 className={
                   quiz.isPublished
                     ? quiz.isPrivate
-                      ? "text-fuchsia-700"
+                      ? "text-rose-700"
                       : "text-emerald-700"
                     : "text-gray-600"
                 }
@@ -69,9 +70,12 @@ export default function ProfilePage() {
           );
         })}
         <li className="bordered flex flex-col">
-          <button className="w-full h-full p-5" onClick={handleNewQuiz}>
+          <Button
+            attr={{ className: "w-full h-full p-5" }}
+            onClick={handleNewQuiz}
+          >
             {t("Сreate New Quiz")}
-          </button>
+          </Button>
         </li>
       </ul>
     </article>

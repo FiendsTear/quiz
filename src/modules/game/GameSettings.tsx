@@ -42,7 +42,7 @@ export default function GameSettings(props: {
         <h3>{t("Game settings")}</h3>
         <form
           className="grow w-full grid gap-4 grid-rows-2"
-          onSubmit={createGame}
+          //   onSubmit={createGame}
         >
           <div>
             <input
@@ -61,7 +61,7 @@ export default function GameSettings(props: {
               <Button onClick={() => editQuiz()}>{t("Edit Quiz")}</Button>
             )}
             {quiz.isPublished && (
-              <button type="submit">{t("Create game")}</button>
+              <Button onClick={createGame}>{t("Create game")}</Button>
             )}
           </div>
         </form>

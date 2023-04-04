@@ -11,7 +11,7 @@ import Dropdown from "@/common/components/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "lodash";
-
+import Button from "../../common/components/Button";
 
 export default function GamesPage() {
   const { push } = useRouter();
@@ -70,21 +70,27 @@ export default function GamesPage() {
           cancelSelect={() => selectQuiz(null)}
         />
       )}
-      <section>
-        <button onClick={() => setTab(GameTabs.Find)}>{t("Find")}</button>
-        <button onClick={() => setTab(GameTabs.Create)}>{t("Create")}</button>
+      <section className="flex justify-around w-full">
+        <Button
+          onClick={() => setTab(GameTabs.Find)}
+          attr={{ className: "grow" }}
+        >
+          {t("Find")}
+        </Button>
+        <Button
+          onClick={() => setTab(GameTabs.Create)}
+          attr={{ className: "grow" }}
+        >
+          {t("Create")}
+        </Button>
       </section>
       {currentTab === GameTabs.Create && (
         <section>
           <div className="flex items-center gap-2">
             <h2>{t("New game")}</h2>
-            <button
-              type="button"
-              className=""
-              onClick={() => setFilterVisible(!isFilterVisible)}
-            >
+            <Button onClick={() => setFilterVisible(!isFilterVisible)}>
               <FontAwesomeIcon icon={faFilter}></FontAwesomeIcon>
-            </button>
+            </Button>
           </div>
           {isFilterVisible && (
             <div className="mb-6">
@@ -98,13 +104,12 @@ export default function GamesPage() {
                       key={tag.id}
                     >
                       {tag.name}
-                      <button
-                        type="button"
-                        className="ml-1"
+                      <Button
+                        attr={{ className: "ml-1" }}
                         onClick={() => filterRemoveTag(tag)}
                       >
                         <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
-                      </button>
+                      </Button>
                     </li>
                   );
                 })}
@@ -178,9 +183,9 @@ export default function GamesPage() {
           <ul className="grid grid-cols-auto-200 gap-4 justify-center">
             {gamesQuery.data?.map((game) => (
               <li key={game.id}>
-                <button onClick={() => handleGameEnter(game.id)}>
+                <Button onClick={() => handleGameEnter(game.id)}>
                   {t("Enter Game")} {game.id}
-                </button>
+                </Button>
               </li>
             ))}
           </ul>

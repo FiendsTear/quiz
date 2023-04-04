@@ -16,6 +16,7 @@ import {
   validAnswerSchema,
 } from "../../../modules/quiz/quizSchema";
 import { useQuizStore } from "@/modules/quiz/quizStore";
+import Button, { ButtonVariant } from "../../../common/components/Button";
 
 type AnswerData = RouterOutputs["quiz"]["getAnswer"];
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
@@ -185,12 +186,9 @@ export default function NewQuizPage() {
         })}
       </ul>
       <div className="flex justify-between">
-        <button
-          type="button"
-          onClick={() => handleNewQuestion(data.questions.length)}
-        >
+        <Button onClick={() => handleNewQuestion(data.questions.length)}>
           {t("Add Question")}
-        </button>
+        </Button>
         <div className="flex items-center gap-2">
           <input
             id="quiz-isPrivate"
@@ -205,16 +203,12 @@ export default function NewQuizPage() {
             })}
           ></input>
           <label htmlFor="quiz-isPrivate">{t("Private quiz")}</label>
-          <button type="button" className="warning" onClick={deleteQuiz}>
+          <Button variant={ButtonVariant.WARNING} onClick={deleteQuiz}>
             {t("Delete quiz")}
-          </button>
-          <button
-            disabled={data.isPublished}
-            type="button"
-            onClick={handlePublish}
-          >
+          </Button>
+          <Button attr={{ disabled: data.isPublished }} onClick={handlePublish}>
             {t("Publish quiz")}
-          </button>
+          </Button>
         </div>
       </div>
     </article>

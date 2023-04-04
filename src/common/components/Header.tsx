@@ -13,7 +13,7 @@ export default function Header() {
 
   return (
     <header
-      className={`flex bg-emerald-400 items-center p-2 ${rubik.className}`}
+      className={`flex bg-emerald-700 items-center p-2 ${rubik.className}`}
     >
       <section className="flex gap-2">
         <Link href="/">{t("Home")}</Link>

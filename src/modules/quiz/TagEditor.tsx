@@ -61,7 +61,7 @@ export default function TagEditor(props: {
     );
   }
 
-  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function updateTags(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const similarTags = getSimilarTags.data;
     if (similarTags?.length) {
@@ -93,7 +93,7 @@ export default function TagEditor(props: {
   }
 
   return (
-    <form onSubmit={(e) => onSubmit(e)}>
+    <form>
       <ul className="flex items-center gap-2 m-0">
         <li>{t("Tags")}:</li>
         {props.tags?.map((tag) => {
@@ -104,9 +104,10 @@ export default function TagEditor(props: {
             >
               {tag.name}
               <Button
+                onClick={() => removeTagFromQuiz(tag.id)}
                 attr={{
-                  onClick: () => removeTagFromQuiz(tag.id),
                   className: "ml-1",
+                  title: "Remove tag",
                 }}
               >
                 <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
@@ -116,9 +117,9 @@ export default function TagEditor(props: {
         })}
         {!isTagAdding && (
           <li>
-            <button type="button" onClick={() => setTagAdding(true)}>
+            <Button onClick={() => setTagAdding(true)}>
               <FontAwesomeIcon icon={faPlus}></FontAwesomeIcon>
-            </button>
+            </Button>
           </li>
         )}
         {isTagAdding && (
@@ -134,16 +135,15 @@ export default function TagEditor(props: {
                 }, 700),
               })}
             ></Dropdown>
-            <button
-              className="ml-1"
-              type="submit"
-              disabled={newTag.name.length < 3}
+            <Button
+              attr={{ className: "ml-1", disabled: newTag.name.length < 3 }}
+              onClick={updateTags}
             >
               <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
-            </button>
-            <button type="reset" onClick={() => resetOnSuccess()}>
+            </Button>
+            <Button attr={{ type: "reset" }} onClick={() => resetOnSuccess()}>
               <FontAwesomeIcon icon={faMinus}></FontAwesomeIcon>
-            </button>
+            </Button>
             {isError && (
               <span className="text-red-500">
                 {t("This tag is already attached")}

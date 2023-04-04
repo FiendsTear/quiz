@@ -8,6 +8,7 @@ import Userpic from "../../../common/components/Userpic";
 import { useTranslation } from "next-i18next";
 import QRCode from "qrcode";
 import ErrorComponent from "../../../common/components/Errror";
+import Button from "../../../common/components/Button";
 
 export default function HostGamePage() {
   const { query, isReady } = useRouter();
@@ -76,9 +77,9 @@ export default function HostGamePage() {
             questionData={gameState.currentQuestion}
             isHost={true}
           ></CurrentQuestion>
-          <button onClick={() => nextQuestionMutation.mutate(gameID)}>
+          <Button onClick={() => nextQuestionMutation.mutate(gameID)}>
             Next question
-          </button>
+          </Button>
         </article>
       );
     }
@@ -89,9 +90,7 @@ export default function HostGamePage() {
       {gameState.status === GameStatus.Created && (
         <div>
           <canvas ref={QRCanvas} />
-          <button type="button" onClick={copyLink}>
-            {t("Copy link")}
-          </button>
+          <Button onClick={copyLink}>{t("Copy link")}</Button>
         </div>
       )}
 
@@ -109,9 +108,7 @@ export default function HostGamePage() {
           );
         })}
       </ul>
-      <button type="button" onClick={() => startMutation.mutate(gameID)}>
-        Start game
-      </button>
+      <Button onClick={() => startMutation.mutate(gameID)}>Start game</Button>
     </section>
   );
 }

@@ -15,11 +15,9 @@ export default function Message(props: {
         <div className="bg-white flex flex-col items-center rounded-lg p-6">
           <p>{messageString}</p>
           <div className="flex gap-2">
-            <Button attr={{ onClick: () => confirmSelect() }}>{t("Ok")}</Button>
+            <Button onClick={() => confirmSelect()}>{t("Ok")}</Button>
             {cancelSelect && (
-              <Button attr={{ onClick: () => cancelSelect() }}>
-                {t("Cancel")}
-              </Button>
+              <Button onClick={() => cancelSelect()}>{t("Cancel")}</Button>
             )}
           </div>
         </div>

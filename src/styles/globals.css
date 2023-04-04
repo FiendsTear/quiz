@@ -19,7 +19,7 @@
     }
 
     body {
-        @apply text-stone-700;
+        @apply text-stone-100;
     }
 
     input[type=text],
@@ -28,11 +28,11 @@
         @apply w-full;
         @apply outline-1;
         @apply outline;
-        @apply outline-fuchsia-300;
+        @apply outline-rose-300;
         @apply rounded;
-        @apply focus-visible:outline-fuchsia-500;
+        @apply focus-visible:outline-rose-500;
         @apply shadow;
-        @apply shadow-fuchsia-100;
+        @apply shadow-rose-100;
         @apply border-none;
         font-family: inherit;
         @apply text-base;
@@ -44,7 +44,7 @@
 
     fieldset {
         @apply border-none;
-        @apply bg-fuchsia-100;
+        @apply bg-rose-100;
         @apply rounded-lg;
     }
 
@@ -56,7 +56,8 @@
     a {
         @apply no-underline;
         @apply text-inherit;
-        @apply hover:bg-indigo-400;
+        @apply hover:text-rose-300;
+        @apply active:text-rose-100;
         @apply rounded-lg;
         @apply p-1;
         @apply text-sm;

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useTranslation } from "next-i18next";
 import Timer from "./Timer";
 import { RouterOutputs } from "../../utils/trpc";
-import Button from "../../common/components/Button";
+import Button, { ButtonVariant } from "../../common/components/Button";
 
 type QuestionData = RouterOutputs["game"]["getGameState"]["currentQuestion"];
 
@@ -56,15 +56,13 @@ export default function CurrentQuestion(props: {
       <div className="text-center">{questionData.body}</div>
       <ul className="grid grid-cols-1 gap-3 justify-center">
         {questionData.answers.map((answer) => (
-          <li
-            key={answer.id}
-            className={
-              selectedAnswersID.includes(answer.id)
-                ? "bg-indigo-500"
-                : "bg-amber-100 hover:bg-amber-200"
-            }
-          >
-            <Button onClick={() => selectAnswer(answer.id)} className="w-full">
+          <li key={answer.id}>
+            <Button
+              variant={ButtonVariant.SELECTION}
+              selected={selectedAnswersID.includes(answer.id)}
+              onClick={() => selectAnswer(answer.id)}
+              attr={{ className: "w-full" }}
+            >
               {answer.body}
             </Button>
           </li>

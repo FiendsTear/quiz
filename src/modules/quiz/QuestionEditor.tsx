@@ -121,7 +121,7 @@ export default function QuestionEditor(props: { questionID: number }) {
         </div>
         <Button
           variant={ButtonVariant.WARNING}
-          className="aspect-square"
+          attr={{ className: "aspect-square" }}
           onClick={deleteQuestion}
         >
           <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
@@ -139,8 +139,8 @@ export default function QuestionEditor(props: { questionID: number }) {
                 className="grow"
               ></AnswerEditor>
               <Button
+                onClick={() => deleteAnswer(answer.id)}
                 attr={{
-                  onClick: () => deleteAnswer(answer.id),
                   title: "Delete answer",
                 }}
                 variant={ButtonVariant.WARNING}
@@ -153,9 +153,7 @@ export default function QuestionEditor(props: { questionID: number }) {
         })}
         <span className="issue">{issues ? issues["answers"] : ""}</span>
       </ul>
-      <button atrtype="button" onClick={createAnswer}>
-        {t("Add answer variant")}
-      </button>
+      <Button onClick={createAnswer}>{t("Add answer variant")}</Button>
     </form>
   );
 }
