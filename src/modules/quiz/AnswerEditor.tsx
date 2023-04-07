@@ -63,37 +63,33 @@ export default function AnswerEditor(props: {
   const isCorrectInputID = `answer-isCorrect-${answerID}`;
 
   return (
-    <section className={props.className}>
-      <label htmlFor={bodyInputID}>{t("Answer text")}</label>
+    <section className={`${props.className} flex gap-5 items-start`}>
+      {/* <label htmlFor={bodyInputID}>{t("Answer text")}</label> */}
+      <div className="grow">
+        <input
+          id={bodyInputID}
+          type="text"
+          maxLength={validAnswerParameters.body.maxLength}
+          {...register(`body`, {
+            onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+              handleAnswerChange({ body: e.target.value });
+            }, 500),
+          })}
+        />
+        <span className="issue">{issues ? issues["body"] : ""}</span>
+      </div>
       <input
-        id={bodyInputID}
-        type='text'
-        maxLength={validAnswerParameters.body.maxLength}
-        {...register(`body`, {
-          onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-            handleAnswerChange({ body: e.target.value });
-          }, 500),
+        id={isCorrectInputID}
+        type="checkbox"
+        className="h-5 aspect-square block"
+        {...register(`isCorrect`, {
+          onChange: debounce(
+            (e: React.ChangeEvent<HTMLInputElement>) =>
+              handleAnswerChange({ isCorrect: e.target.checked }),
+            500
+          ),
         })}
-      />
-      <span className="issue">{issues ? issues["body"] : ""}</span>
-      <section className="flex justify-between">
-        <div>
-          <input
-            id={isCorrectInputID}
-            type="checkbox"
-            {...register(`isCorrect`, {
-              onChange: debounce(
-                (e: React.ChangeEvent<HTMLInputElement>) =>
-                  handleAnswerChange({ isCorrect: e.target.checked }),
-                500
-              ),
-            })}
-          ></input>
-          <label htmlFor={isCorrectInputID}>
-            {t("Is this answer correct?")}
-          </label>
-        </div>
-      </section>
+      ></input>
     </section>
   );
 }

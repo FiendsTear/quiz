@@ -153,43 +153,36 @@ export default function NewQuizPage() {
         />
       )}
       {/* <h1>{t("Edit Quiz")}</h1> */}
-      <label htmlFor="quiz-name" className="text-lg">
-        {t("Quiz name")}
-      </label>
-      <input
-        id="quiz-name"
-        type="text"
-        defaultValue={data.name}
-        className="mb-3"
-        {...register("name", {
-          onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-            handleQuizChange({ name: e.target.value });
-          }, 700),
-        })}
-      ></input>
+      <div className="flex">
+        <label htmlFor="quiz-name" className="text-lg min-w-[7rem]">
+          {t("Quiz name")}
+        </label>
+        <input
+          id="quiz-name"
+          type="text"
+          defaultValue={data.name}
+          className="mb-3"
+          {...register("name", {
+            onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+              handleQuizChange({ name: e.target.value });
+            }, 700),
+          })}
+        ></input>
+      </div>
+
       <span className="issue">{issues ? issues["name"] : ""}</span>
-      <TagEditor
-        tags={data.tags}
-        quizID={+quizID}
-        refetchQuiz={refetchQuiz}
-      ></TagEditor>
-      <span className="issue">{issues ? issues["tags"] : ""}</span>
-      <span className="issue">{issues ? issues["questions"] : ""}</span>
-      <ul className="flex flex-col gap-5 w-2/3 m-auto">
-        {data.questions.map((question) => {
-          return (
-            <QuestionEditor
-              key={question.id}
-              questionID={question.id}
-            ></QuestionEditor>
-          );
-        })}
-      </ul>
-      <div className="flex justify-between">
-        <Button onClick={() => handleNewQuestion(data.questions.length)}>
-          {t("Add Question")}
-        </Button>
-        <div className="flex items-center gap-2">
+      <section className="flex justify-between">
+        <div>
+          <TagEditor
+            tags={data.tags}
+            quizID={+quizID}
+            refetchQuiz={refetchQuiz}
+          ></TagEditor>
+          <span className="issue mb-5 block">
+            {issues ? issues["tags"] : ""}
+          </span>
+        </div>
+        <div>
           <input
             id="quiz-isPrivate"
             type="checkbox"
@@ -203,14 +196,44 @@ export default function NewQuizPage() {
             })}
           ></input>
           <label htmlFor="quiz-isPrivate">{t("Private quiz")}</label>
-          <Button variant={ButtonVariant.WARNING} onClick={deleteQuiz}>
+        </div>
+      </section>
+
+      <section className="w-2/3 mx-auto">
+        <span className="issue">{issues ? issues["questions"] : ""}</span>
+        <ul className="flex flex-col gap-5 m-auto mb-5">
+          {data.questions.map((question) => {
+            return (
+              <li key={question.id}>
+                <QuestionEditor questionID={question.id}></QuestionEditor>
+              </li>
+            );
+          })}
+          <li>
+            <Button
+              attr={{ className: "w-full" }}
+              onClick={() => handleNewQuestion(data.questions.length)}
+            >
+              {t("Add Question")}
+            </Button>
+          </li>
+        </ul>
+        <div className="flex items-center justify-between">
+          <Button
+            variant={ButtonVariant.WARNING}
+            onClick={deleteQuiz}
+            attr={{ className: "text-lg" }}
+          >
             {t("Delete quiz")}
           </Button>
-          <Button attr={{ disabled: data.isPublished }} onClick={handlePublish}>
+          <Button
+            attr={{ disabled: data.isPublished, className: "text-lg" }}
+            onClick={handlePublish}
+          >
             {t("Publish quiz")}
           </Button>
         </div>
-      </div>
+      </section>
     </article>
   );
 }

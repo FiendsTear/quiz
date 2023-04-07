@@ -22,13 +22,13 @@ export default function Button(
 ) {
   function getButtonAttributes(): ButtonHTMLAttributes<HTMLButtonElement> {
     const commonAttr: ButtonHTMLAttributes<HTMLButtonElement> = {
-      className: "border-none rounded-md text-inherit p-1 cursor-pointer",
+      className: "border-none rounded-md text-inherit p-1 cursor-pointer shadow-teal-300 shadow-md",
     };
     let variantAttr: ButtonHTMLAttributes<HTMLButtonElement> = {};
     switch (props.variant) {
       case ButtonVariant.WARNING:
         variantAttr = {
-          className: "bg-rose-300 hover:bg-rose-600 text-stone-600",
+          className: "bg-rose-300 hover:bg-rose-400 text-stone-600",
           type: "button",
         };
         break;
@@ -39,7 +39,7 @@ export default function Button(
         break;
       default:
         variantAttr = {
-          className: "bg-teal-400 hover:bg-teal-500",
+          className: "bg-amber-100 hover:bg-amber-200",
           type: "button",
         };
         break;

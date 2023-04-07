@@ -12,9 +12,7 @@ export default function Header() {
   const { t } = useTranslation("common");
 
   return (
-    <header
-      className={`flex bg-teal-300 items-center p-2 ${rubik.className}`}
-    >
+    <header className={`flex bg-teal-200 items-center p-2 ${rubik.className}`}>
       <section className="flex gap-2">
         <Link href="/">{t("Home")}</Link>
         <Link href="/games">{t("Games")}</Link>
@@ -30,6 +28,7 @@ export default function Header() {
         </Link>
         <Button
           onClick={sessionData ? () => void signOut() : () => void signIn()}
+          attr={{ className: "bg-inherit shadow-none hover:bg-teal-400" }}
         >
           {sessionData ? t("Sign out") : t("Sign in")}
         </Button>

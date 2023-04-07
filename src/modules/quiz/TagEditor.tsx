@@ -13,7 +13,7 @@ import type { CreateTagDTO } from "@/server/quiz/dto/createTagDTO";
 import type { Tag } from "@prisma/client";
 import Dropdown from "@/common/components/Dropdown";
 import { useTranslation } from "next-i18next";
-import Button from "../../common/components/Button";
+import Button, { ButtonVariant } from "../../common/components/Button";
 
 export default function TagEditor(props: {
   tags: Tag[] | undefined;
@@ -93,17 +93,15 @@ export default function TagEditor(props: {
   }
 
   return (
-    <form>
+    <form className="text-sm">
       <ul className="flex items-center gap-2 m-0">
         <li>{t("Tags")}:</li>
         {props.tags?.map((tag) => {
           return (
-            <li
-              className="flex-none	bg-teal-300 rounded-md pl-1"
-              key={tag.id}
-            >
+            <li className="flex-none bg-teal-300 rounded-md pl-1" key={tag.id}>
               {tag.name}
               <Button
+                variant={ButtonVariant.WARNING}
                 onClick={() => removeTagFromQuiz(tag.id)}
                 attr={{
                   className: "ml-1",

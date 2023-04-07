@@ -20,6 +20,7 @@
 
     body {
         @apply text-stone-800;
+        @apply font-[450];
     }
 
 
@@ -27,15 +28,14 @@
     input[type=number],
     textarea {
         @apply bg-amber-50;
-        @apply text-stone-700;
+        @apply text-stone-800;
         @apply w-full;
-        /* @apply outline-1; */
-        @apply outline-none;
-        /* @apply outline-amber-600; */
+        @apply outline;
+        @apply outline-1;
+        @apply outline-teal-300;
         @apply rounded;
-        /* @apply focus-visible:outline-amber-900; */
-        @apply shadow;
-        @apply shadow-teal-300;
+        /* @apply shadow; */
+        /* @apply shadow-teal-300; */
         @apply border-none;
         font-family: inherit;
         @apply text-base;
@@ -59,8 +59,8 @@
     a {
         @apply no-underline;
         @apply text-inherit;
-        @apply hover:text-rose-300;
-        @apply active:text-rose-100;
+        @apply hover:text-rose-600;
+        @apply active:text-rose-500;
         @apply rounded-lg;
         @apply p-1;
         @apply text-sm;
@@ -78,7 +78,7 @@
         @apply rounded-lg;
     }
 
-    h1 {
+    h1, h2, h3, h4, h5, h6 {
         @apply m-0;
     }
 

@@ -26,9 +26,8 @@ export default function QuestionEditor(props: { questionID: number }) {
   const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
   const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
 
-  const issues = useQuizStore(
-    (state) => state.questionsErrors[props.questionID]
-  );
+  let issues = useQuizStore((state) => state.questionsErrors[props.questionID]);
+  if (!issues) issues = {};
   const setQuestionError = useQuizStore((state) => state.setQuestionError);
   const questionSchema = validQuestionSchema.omit({ answers: true });
 
@@ -92,7 +91,7 @@ export default function QuestionEditor(props: { questionID: number }) {
 
   return (
     <form className="bordered p-4">
-      <div className="flex gap-4 items-start content-center">
+      <div className="flex gap-4 items-start content-center mb-4">
         <div className="grow h-full flex flex-col">
           <label htmlFor="question-body">{t("Question text")}</label>
           <textarea
@@ -104,9 +103,9 @@ export default function QuestionEditor(props: { questionID: number }) {
               }, 700),
             })}
           ></textarea>
-          <span className="issue">{issues ? issues["body"] : ""}</span>
+          <span className="issue">{issues["body"]}</span>
         </div>
-        <div className="flex flex-col w-28 self-stretch">
+        <div className="flex w-32 flex-col self-stretch">
           <label htmlFor="answer-weight">{t("Answer weight")}</label>
           <input
             id="answer-weight"
@@ -118,22 +117,27 @@ export default function QuestionEditor(props: { questionID: number }) {
               }, 700),
             })}
           ></input>
+          <span className="issue invisible">{issues["body"] ? "i" : ""}</span>
         </div>
         <Button
           variant={ButtonVariant.WARNING}
-          attr={{ className: "aspect-square" }}
+          attr={{ className: "aspect-square", title: "Delete question" }}
           onClick={deleteQuestion}
         >
           <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
         </Button>
       </div>
-      <ul className="flex flex-col gap-2 mb-3">
+      <section className="flex justify-between">
+        <span>Answers</span>
+        <div className="flex">
+          <span>Correct?</span>
+          <span className="invisible">del</span>
+        </div>
+      </section>
+      <ul className="flex flex-col gap-2 mb-3 ">
         {data.answers.map((answer) => {
           return (
-            <li
-              key={answer.id}
-              className="flex items-end gap-x-5 gap-y-1 flex-wrap"
-            >
+            <li key={answer.id} className="flex gap-x-5 gap-y-1 items-start">
               <AnswerEditor
                 answerID={answer.id}
                 className="grow"
@@ -147,11 +151,10 @@ export default function QuestionEditor(props: { questionID: number }) {
               >
                 <FontAwesomeIcon icon={faTrashCan} />
               </Button>
-              <div className="w-full h-px bg-stone-300"></div>
             </li>
           );
         })}
-        <span className="issue">{issues ? issues["answers"] : ""}</span>
+        <span className="issue">{issues["answers"]}</span>
       </ul>
       <Button onClick={createAnswer}>{t("Add answer variant")}</Button>
     </form>
