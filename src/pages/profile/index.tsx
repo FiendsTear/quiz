@@ -45,7 +45,7 @@ export default function ProfilePage() {
             <li
               key={quiz.id}
               onClick={() => selectQuiz(quiz)}
-              className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
+              className="flex flex-col justify-between bordered hover:bg-teal-200 cursor-pointer gap-2 p-4"
             >
               <span className="block">{quiz.name}</span>
               <span className="opacity-60">
@@ -56,7 +56,7 @@ export default function ProfilePage() {
                   quiz.isPublished
                     ? quiz.isPrivate
                       ? "text-rose-700"
-                      : "text-emerald-700"
+                      : "text-teal-700"
                     : "text-gray-600"
                 }
               >

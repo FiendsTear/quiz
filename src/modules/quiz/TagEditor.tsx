@@ -99,7 +99,7 @@ export default function TagEditor(props: {
         {props.tags?.map((tag) => {
           return (
             <li
-              className="flex-none	bg-emerald-300 rounded-md pl-1"
+              className="flex-none	bg-teal-300 rounded-md pl-1"
               key={tag.id}
             >
               {tag.name}

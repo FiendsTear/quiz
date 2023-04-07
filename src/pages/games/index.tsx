@@ -100,7 +100,7 @@ export default function GamesPage() {
                 {tags.map((tag) => {
                   return (
                     <li
-                      className="flex-none	bg-emerald-300 rounded-md pl-1"
+                      className="flex-none	bg-teal-300 rounded-md pl-1"
                       key={tag.id}
                     >
                       {tag.name}
@@ -151,7 +151,7 @@ export default function GamesPage() {
               <li
                 key={quiz.id}
                 onClick={() => selectQuiz(quiz)}
-                className="flex flex-col justify-between bordered hover:bg-emerald-200 cursor-pointer gap-2 p-4"
+                className="flex flex-col justify-between bordered hover:bg-teal-200 cursor-pointer gap-2 p-4"
               >
                 <span>{quiz.name}</span>
                 <span className="opacity-60">

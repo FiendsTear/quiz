@@ -19,20 +19,23 @@
     }
 
     body {
-        @apply text-stone-100;
+        @apply text-stone-800;
     }
+
 
     input[type=text],
     input[type=number],
     textarea {
+        @apply bg-amber-50;
+        @apply text-stone-700;
         @apply w-full;
-        @apply outline-1;
-        @apply outline;
-        @apply outline-rose-300;
+        /* @apply outline-1; */
+        @apply outline-none;
+        /* @apply outline-amber-600; */
         @apply rounded;
-        @apply focus-visible:outline-rose-500;
+        /* @apply focus-visible:outline-amber-900; */
         @apply shadow;
-        @apply shadow-rose-100;
+        @apply shadow-teal-300;
         @apply border-none;
         font-family: inherit;
         @apply text-base;
@@ -71,7 +74,7 @@
     .bordered {
         @apply border;
         @apply border-solid;
-        @apply border-emerald-500;
+        @apply border-teal-500;
         @apply rounded-lg;
     }
 

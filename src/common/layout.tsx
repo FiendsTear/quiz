@@ -8,7 +8,7 @@ export default function Layout({ children }: any) {
     <>
       <Header />
       <main
-        className={`bg-emerald-50 grid relative grow px-5 py-3 overflow-y-auto ${rubik.className}`}
+        className={`bg-teal-50 grid relative grow px-5 py-3 overflow-y-auto ${rubik.className}`}
       >
         {children}
       </main>

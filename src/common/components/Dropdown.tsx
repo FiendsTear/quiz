@@ -36,7 +36,7 @@ const Dropdown = forwardRef<Ref, Props>(({ id, name, options, handleClick, ...re
             {options?.map((option) => {
               return (
                 <li
-                  className="cursor-pointer p-1 border-solid border-0 hover:bg-emerald-200"
+                  className="cursor-pointer p-1 border-solid border-0 hover:bg-teal-200"
                   key={option.id}
                   onClick={() => {
                     handleClick(option);

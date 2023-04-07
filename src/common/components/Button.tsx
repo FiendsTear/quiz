@@ -28,7 +28,7 @@ export default function Button(
     switch (props.variant) {
       case ButtonVariant.WARNING:
         variantAttr = {
-          className: "bg-rose-600 hover:bg-rose-400",
+          className: "bg-rose-300 hover:bg-rose-600 text-stone-600",
           type: "button",
         };
         break;
@@ -39,7 +39,7 @@ export default function Button(
         break;
       default:
         variantAttr = {
-          className: "bg-emerald-600 hover:bg-emerald-500",
+          className: "bg-teal-400 hover:bg-teal-500",
           type: "button",
         };
         break;
