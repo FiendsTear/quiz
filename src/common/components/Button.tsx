@@ -22,7 +22,8 @@ export default function Button(
 ) {
   function getButtonAttributes(): ButtonHTMLAttributes<HTMLButtonElement> {
     const commonAttr: ButtonHTMLAttributes<HTMLButtonElement> = {
-      className: "border-none rounded-md text-inherit p-1 cursor-pointer shadow-teal-300 shadow-md",
+      className:
+        "border-none rounded-md text-inherit p-1 cursor-pointer shadow-teal-300 shadow-md shadow-[3px_3px_5px]",
     };
     let variantAttr: ButtonHTMLAttributes<HTMLButtonElement> = {};
     switch (props.variant) {
@@ -34,7 +35,9 @@ export default function Button(
         break;
       case ButtonVariant.SELECTION:
         variantAttr = {
-          className: props.selected ? "bg-amber-300" : "bg-amber-200",
+          className: props.selected
+            ? "bg-amber-300 shadow-[inset_3px_3px_5px] shadow-amber-500"
+            : "bg-amber-200",
         };
         break;
       default:

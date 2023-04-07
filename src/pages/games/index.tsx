@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "lodash";
 import Button from "../../common/components/Button";
+import GetCommonLayout from '../../common/getCommonLayout';
 
 export default function GamesPage() {
   const { push } = useRouter();
@@ -198,3 +199,5 @@ export default function GamesPage() {
 export async function getStaticProps({ locale }: { locale: string }) {
   return getTranslations({ locale });
 }
+
+GamesPage.getLayout = GetCommonLayout;

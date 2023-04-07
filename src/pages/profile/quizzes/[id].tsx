@@ -17,6 +17,7 @@ import {
 } from "../../../modules/quiz/quizSchema";
 import { useQuizStore } from "@/modules/quiz/quizStore";
 import Button, { ButtonVariant } from "../../../common/components/Button";
+import GetCommonLayout from '../../../common/getCommonLayout';
 
 type AnswerData = RouterOutputs["quiz"]["getAnswer"];
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
@@ -239,3 +240,4 @@ export default function NewQuizPage() {
 }
 
 export const getServerSideProps = getTranslations;
+NewQuizPage.getLayout = GetCommonLayout;

@@ -2,13 +2,14 @@ import { GameStatus, trpc } from "@/utils/trpc";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
 import type { RouterOutputs } from "../../../utils/trpc";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ReactElement } from "react";
 import { getTranslations } from "@/common/getTranslations";
 import Userpic from "../../../common/components/Userpic";
 import { useTranslation } from "next-i18next";
 import QRCode from "qrcode";
 import ErrorComponent from "../../../common/components/Errror";
 import Button from "../../../common/components/Button";
+import GameLayout from "../../../modules/game/GameLayout";
 
 export default function HostGamePage() {
   const { query, isReady } = useRouter();
@@ -86,14 +87,7 @@ export default function HostGamePage() {
   }
 
   return (
-    <section>
-      {gameState.status === GameStatus.Created && (
-        <div>
-          <canvas ref={QRCanvas} />
-          <Button onClick={copyLink}>{t("Copy link")}</Button>
-        </div>
-      )}
-
+    <section className="w-full h-full">
       <div>Players:</div>
       <ul className="grid grid-cols-auto-200 gap-4">
         {gameState.players?.map((player) => {
@@ -108,9 +102,34 @@ export default function HostGamePage() {
           );
         })}
       </ul>
-      <Button onClick={() => startMutation.mutate(gameID)}>Start game</Button>
+      <Button
+        onClick={() => startMutation.mutate(gameID)}
+        attr={{
+          className:
+            "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl",
+        }}
+      >
+        Start game
+      </Button>
+      {gameState.status === GameStatus.Created && (
+        <div className="absolute bottom-3 right-3 flex gap-5">
+          <section className="flex flex-col gap-2">
+            <h3>Invite</h3>
+            <Button onClick={copyLink}>{t("Copy link")}</Button>
+          </section>
+
+          <section>
+            <h3 className="text-center">Join game</h3>
+            <canvas ref={QRCanvas} />
+          </section>
+        </div>
+      )}
     </section>
   );
 }
+
+HostGamePage.getLayout = function getLayout(page: ReactElement) {
+  return <GameLayout>{page}</GameLayout>;
+};
 
 export const getServerSideProps = getTranslations;

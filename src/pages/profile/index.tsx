@@ -8,6 +8,7 @@ import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
 import Button from "../../common/components/Button";
+import GetCommonLayout from '../../common/getCommonLayout';
 
 export default function ProfilePage() {
   const { data: sessionData } = useSession();
@@ -83,3 +84,5 @@ export default function ProfilePage() {
 }
 
 export const getServerSideProps = getTranslations;
+
+ProfilePage.getLayout = GetCommonLayout;

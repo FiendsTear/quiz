@@ -1,5 +1,5 @@
 import { GameStatus, trpc } from "@/utils/trpc";
-import { useState, useEffect } from "react";
+import { useState, useEffect, ReactElement } from "react";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
@@ -8,6 +8,7 @@ import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 import ErrorComponent from "../../../common/components/Errror";
 import isBrowser from "../../../common/helpers/isBrowser";
+import GameLayout from "../../../modules/game/GameLayout";
 
 export default function PlayerGamePage() {
   const { query, isReady, push } = useRouter();
@@ -86,7 +87,10 @@ export default function PlayerGamePage() {
     );
   }
 
-  return <section>Waiting for start</section>;
+  return <section className="w-full h-full flex justify-center items-center">Waiting for start</section>;
 }
 
 export const getServerSideProps = getTranslations;
+PlayerGamePage.getLayout = function getLayout(page: ReactElement) {
+  return <GameLayout>{page}</GameLayout>;
+};
