@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "concurrently \"next dev -p 3001\" \"tsx watch src/server/websockets/wsServer.ts --tsconfig tsconfig.server.json\"",
+    "dev:ws": "tsx watch src/server/websockets/wsServer.ts --tsconfig tsconfig.server.json",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
