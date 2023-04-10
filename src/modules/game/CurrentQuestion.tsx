@@ -51,17 +51,18 @@ export default function CurrentQuestion(props: {
 
   if (answerSent && !props.isHost) return <div>{t("Waiting for others")}</div>;
   return (
-    <div className="flex flex-col">
-      <div>{questionData.hasMultipleCorrectAnswers}</div>
-      <div className="text-center">{questionData.body}</div>
-      <ul className="grid grid-cols-1 gap-3 justify-center">
+    <div className="flex flex-col justify-between h-full w-2/3 mx-auto">
+      <div className="grow flex justify-center items-center text-3xl">
+        {questionData.body}
+      </div>
+      <ul className="grid grid-cols-2 gap-3 justify-center">
         {questionData.answers.map((answer) => (
           <li key={answer.id}>
             <Button
               variant={ButtonVariant.SELECTION}
               selected={selectedAnswersID.includes(answer.id)}
               onClick={() => selectAnswer(answer.id)}
-              attr={{ className: "w-full" }}
+              attr={{ className: "w-full py-3 text-lg" }}
             >
               {answer.body}
             </Button>
@@ -72,7 +73,7 @@ export default function CurrentQuestion(props: {
         secondsToExpire={questionData.timerValue}
         onExpire={() => sendAnswers()}
       /> */}
-      <Button onClick={sendAnswers}>{t("Send answers")}</Button>
+      <Button onClick={sendAnswers} attr={{className: "text-lg"}}>{t("Send answers")}</Button>
     </div>
   );
 }

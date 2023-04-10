@@ -87,7 +87,7 @@ export default function HostGamePage() {
   }
 
   return (
-    <section className="w-full h-full flex justify-between p-5 box-border">
+    <section className="w-full h-full flex justify-between box-border">
       <div className="h-full flex flex-col">
         <h3>Players</h3>
         <ul className="flex flex-col grow self-stretch flex-wrap gap-4 min-h-0">

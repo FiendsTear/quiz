@@ -8,7 +8,7 @@ import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
 import Button from "../../common/components/Button";
-import GetCommonLayout from '../../common/getCommonLayout';
+import GetCommonLayout from "../../common/getCommonLayout";
 
 export default function ProfilePage() {
   const { data: sessionData } = useSession();
@@ -70,7 +70,7 @@ export default function ProfilePage() {
             </li>
           );
         })}
-        <li className="bordered flex flex-col">
+        <li>
           <Button
             attr={{ className: "w-full h-full p-5" }}
             onClick={handleNewQuiz}
