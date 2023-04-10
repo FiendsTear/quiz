@@ -25,7 +25,7 @@ function getBaseUrl() {
   }
 
   // assume localhost
-  return `http://192.168.1.46:${process.env.PORT ?? 3000}`;
+  return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
 const { publicRuntimeConfig } = getConfig();
