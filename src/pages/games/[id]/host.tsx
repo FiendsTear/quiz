@@ -87,43 +87,44 @@ export default function HostGamePage() {
   }
 
   return (
-    <section className="w-full h-full">
-      <div>Players:</div>
-      <ul className="grid grid-cols-auto-200 gap-4">
-        {gameState.players?.map((player) => {
-          return (
-            <li
-              key={player.id}
-              className="flex flex-col text-center items-center bordered gap-2 p-4"
-            >
-              <Userpic src={player.image} size={64} />
-              {player.name}
-            </li>
-          );
-        })}
-      </ul>
-      <Button
-        onClick={() => startMutation.mutate(gameID)}
-        attr={{
-          className:
-            "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-3xl",
-        }}
-      >
-        Start game
-      </Button>
-      {gameState.status === GameStatus.Created && (
-        <div className="absolute bottom-3 right-3 flex gap-5">
-          <section className="flex flex-col gap-2">
-            <h3>Invite</h3>
-            <Button onClick={copyLink}>{t("Copy link")}</Button>
-          </section>
+    <section className="w-full h-full flex justify-between p-5 box-border">
+      <div className="h-full flex flex-col">
+        <h3>Players</h3>
+        <ul className="flex flex-col grow self-stretch flex-wrap gap-4 min-h-0">
+          {gameState.players?.map((player) => {
+            return (
+              <li
+                key={player.id}
+                className="flex flex-col text-center items-center bordered gap-2 p-4"
+              >
+                <Userpic src={player.image} size={64} />
+                <span>{player.name}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+      <div className="flex flex-col justify-end gap-5">
+        <Button
+          onClick={() => startMutation.mutate(gameID)}
+          attr={{ className: "text-xl" }}
+        >
+          Start game
+        </Button>
+        {gameState.status === GameStatus.Created && (
+          <div className="bottom-3 right-3 flex gap-5">
+            <section className="flex flex-col gap-2">
+              <h3>Invite</h3>
+              <Button onClick={copyLink}>{t("Copy link")}</Button>
+            </section>
 
-          <section>
-            <h3 className="text-center">Join game</h3>
-            <canvas ref={QRCanvas} />
-          </section>
-        </div>
-      )}
+            <section>
+              <h3 className="text-center">Join game</h3>
+              <canvas ref={QRCanvas} />
+            </section>
+          </div>
+        )}
+      </div>
     </section>
   );
 }

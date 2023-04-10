@@ -7,11 +7,14 @@ module.exports = {
         "neg-5": "-1.25rem",
         "neg-3": "-0.75rem",
       },
+      animation: {
+        countdown: "countdown 15s ease forwards",
+      },
       gridTemplateColumns: {
         "auto-200": "repeat(auto-fill, 200px)",
       },
-      animation: {
-        countdown: "countdown 15s ease forwards",
+      gridTemplateRows: {
+        "auto-100": "repeat(auto-fill, 100px)",
       },
       keyframes: {
         countdown: {
