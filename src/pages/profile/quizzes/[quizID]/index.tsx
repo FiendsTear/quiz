@@ -1,23 +1,21 @@
 import React, { useState } from "react";
-import type { RouterInputs } from "../../../utils/trpc";
-import { trpc, RouterOutputs } from "../../../utils/trpc";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import { debounce } from "lodash";
-import QuestionEditor from "../../../modules/quiz/QuestionEditor";
 import TagEditor from "@/modules/quiz/TagEditor";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
-import Loading from "../../../common/components/Loading";
-import Message from "../../../common/components/Message";
-import { validQuizSchema } from "../../../modules/quiz/quizSchema";
-import {
-  validQuestionSchema,
-  validAnswerSchema,
-} from "../../../modules/quiz/quizSchema";
+
 import { useQuizStore } from "@/modules/quiz/quizStore";
-import Button, { ButtonVariant } from "../../../common/components/Button";
-import GetCommonLayout from '../../../common/getCommonLayout';
+import { RouterInputs, RouterOutputs } from '@/utils/trpc';
+import { trpc } from "@/utils/trpc";
+import Loading from '@/common/components/Loading';
+import { validAnswerSchema, validQuestionSchema, validQuizSchema } from '@/modules/quiz/quizSchema';
+import Message from '@/common/components/Message';
+import QuestionEditor from '@/modules/quiz/QuestionEditor';
+import Button from '@/common/components/Button';
+import { ButtonVariant } from '@/common/components/Button';
+import GetCommonLayout from '@/common/getCommonLayout';
 
 type AnswerData = RouterOutputs["quiz"]["getAnswer"];
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
@@ -28,7 +26,7 @@ export default function NewQuizPage() {
   const { register } = useForm<QuizInput>();
 
   const { t } = useTranslation("common");
-  const quizID = query.id as string;
+  const quizID = query.quizID as string;
 
   const getQuizQuery = trpc.quiz.getQuiz.useQuery(quizID, {
     enabled: isReady,
