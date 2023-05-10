@@ -9,10 +9,14 @@ export type QuizIssues = {
   [key in keyof NonNullable<Partial<RouterOutputs["quiz"]["getQuiz"]>>]: string;
 };
 export type AnswerIssues = {
-  [key in keyof NonNullable<Partial<RouterOutputs["quiz"]["getAnswer"]>>]: string;
+  [key in keyof NonNullable<
+    Partial<RouterOutputs["quiz"]["getAnswer"]>
+  >]: string;
 };
 export type QuestionIssues = {
-  [key in keyof NonNullable<Partial<RouterOutputs["quiz"]["getQuestion"]>>]: string;
+  [key in keyof NonNullable<
+    Partial<RouterOutputs["quiz"]["getQuestion"]>
+  >]: string;
 };
 interface QuizFormState {
   quizErrors: QuizIssues;
@@ -36,7 +40,10 @@ export const useQuizStore = create<QuizFormState>()(
         produce<QuizFormState>((draft) => {
           const answerIssues: AnswerIssues = {};
           issues.forEach((issue) => {
-            answerIssues[issue.path[issue.path.length - 1]] = issue.message;
+            const path = issue.path[issue.path.length - 1];
+            answerIssues[
+              issue.path[issue.path.length - 1] as keyof AnswerIssues
+            ] = issue.message;
           });
           draft.answersErrors[answerID] = answerIssues;
         })
@@ -47,7 +54,9 @@ export const useQuizStore = create<QuizFormState>()(
         produce<QuizFormState>((draft) => {
           const questionIssues: QuestionIssues = {};
           issues.forEach((issue) => {
-            questionIssues[issue.path[issue.path.length - 1]] = issue.message;
+            questionIssues[
+              issue.path[issue.path.length - 1] as keyof QuestionIssues
+            ] = issue.message;
           });
           draft.questionsErrors[questionID] = questionIssues;
         })
@@ -58,7 +67,8 @@ export const useQuizStore = create<QuizFormState>()(
         produce<QuizFormState>((draft) => {
           const quizIssues: QuizIssues = {};
           issues.forEach((issue) => {
-            quizIssues[issue.path[issue.path.length - 1]] = issue.message;
+            quizIssues[issue.path[issue.path.length - 1] as keyof QuizIssues] =
+              issue.message;
           });
           draft.quizErrors = quizIssues;
         })
