@@ -151,7 +151,7 @@ export default function NewQuizPage() {
           confirmSelect={() => toProfilePage()}
         />
       )}
-      {/* <h1>{t("Edit Quiz")}</h1> */}
+      {/* <h1>{t("View Quiz")}</h1> */}
       <div className="flex">
         <label htmlFor="quiz-name" className="text-lg min-w-[7rem]">
           {t("Quiz name")}

@@ -58,7 +58,7 @@ export default function GameSettings(props: {
           <div className="flex w-100 gap-6 justify-between items-end">
             <Button onClick={() => cancelSelect()}>{t("Cancel")}</Button>
             {userId && userId === quiz.userId && (
-              <Button onClick={() => editQuiz()}>{t("Edit Quiz")}</Button>
+              <Button onClick={() => editQuiz()}>{t("View Quiz")}</Button>
             )}
             {quiz.isPublished && (
               <Button onClick={createGame}>{t("Create game")}</Button>

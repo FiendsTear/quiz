@@ -10,7 +10,6 @@ import {
   enterGame,
   getActiveGames,
   getGameState,
-  leaveGame,
   startGame,
   subscribeToGame,
 } from "./gameService";
@@ -51,7 +50,7 @@ export const gameRouter = createWSRouter({
 
   leave: protectedWSProcedure.input(z.number()).mutation(({ ctx, input }) => {
     const player = ctx.session.user;
-    console.log('received leave message');
+    console.log("received leave message");
     // leaveGame(input, player.id);
   }),
 

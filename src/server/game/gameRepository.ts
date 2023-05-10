@@ -25,5 +25,8 @@ export async function createGame(quizID: number) {
 export type GameWithAnswers = Prisma.PromiseReturnType<typeof createGame>;
 
 export async function getGamesByID(gamesID: number[]) {
-  return await prisma.game.findMany({ where: { id: { in: gamesID } } });
+  return await prisma.game.findMany({
+    include: { quiz: { select: { name: true } } },
+    where: { id: { in: gamesID } },
+  });
 }

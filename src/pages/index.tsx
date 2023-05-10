@@ -4,7 +4,7 @@ import GetCommonLayout from '../common/getCommonLayout';
 
 export default function IndexPage() {
   const { t } = useTranslation("common");
-  return <>{t("App description")}</>;
+  return <p className="text-center w-2/3 mx-auto">{t("App description")}</p>;
 }
 
 export async function getStaticProps({ locale }: { locale: string }) {

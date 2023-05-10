@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { debounce } from "lodash";
 import Button from "../../common/components/Button";
-import GetCommonLayout from '../../common/getCommonLayout';
+import GetCommonLayout from "../../common/getCommonLayout";
 
 export default function GamesPage() {
   const { push } = useRouter();
@@ -71,16 +71,16 @@ export default function GamesPage() {
           cancelSelect={() => selectQuiz(null)}
         />
       )}
-      <section className="flex justify-around w-full">
+      <section className="flex justify-around w-full rounded-full overflow-hidden">
         <Button
           onClick={() => setTab(GameTabs.Find)}
-          attr={{ className: "grow" }}
+          attr={{ className: "grow rounded-none" }}
         >
           {t("Find")}
         </Button>
         <Button
           onClick={() => setTab(GameTabs.Create)}
-          attr={{ className: "grow" }}
+          attr={{ className: "grow rounded-none" }}
         >
           {t("Create")}
         </Button>
@@ -165,28 +165,25 @@ export default function GamesPage() {
       )}
 
       {currentTab === GameTabs.Find && (
-        <section>
-          <h2>{t("Enter Game")}</h2>
-          {/* <div>
-            <label htmlFor="room_code">{t("Room code")}</label>
-            <input
-              id="room_code"
-              type="text"
-              onChange={(e) => setAccessCode(e.target.value)}
-            />
-            <canvas id="qr_code"></canvas>
-            <button type="button" onClick={handleGameEnter()}>
-              {t("Enter")}
-            </button>
-          </div> */}
+        <section className="w-full h-full flex flex-col">
           {!gamesQuery.data ||
-            (!gamesQuery.data.length && <div>{t("Games not found")}</div>)}
+            (!gamesQuery.data.length && (
+              <div className="grow flex justify-center items-center">
+                {t("Games not found")}
+              </div>
+            ))}
           <ul className="grid grid-cols-auto-200 gap-4 justify-center">
             {gamesQuery.data?.map((game) => (
-              <li key={game.id}>
-                <Button onClick={() => handleGameEnter(game.id)}>
+              <li
+                key={game.id}
+                className="flex flex-col bordered p-2 gap-2"
+                onClick={() => handleGameEnter(game.id)}
+              >
+                <span className="text-center">{game.quiz.name}</span>
+                {/* <span className="text-center">{game.}</span> */}
+                {/* <Button>
                   {t("Enter Game")} {game.id}
-                </Button>
+                </Button> */}
               </li>
             ))}
           </ul>

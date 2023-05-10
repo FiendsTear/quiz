@@ -1,7 +1,7 @@
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { trpc } from "../../utils/trpc";
+import { trpc, RouterOutputs } from "../../utils/trpc";
 import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
 import { getTranslations } from "@/common/getTranslations";
@@ -29,6 +29,14 @@ export default function ProfilePage() {
     });
   }
 
+  function handleClick(quiz: RouterOutputs["quiz"]["getUserQuizzes"][number]) {
+    if (quiz.isPublished) {
+      selectQuiz(quiz);
+      return null;
+    }
+    push(`profile/quizzes/${quiz.id}`).catch((err) => console.error(err));
+  }
+
   if (query.isLoading) return <Loading />;
   return (
     <article className="h-full">
@@ -45,7 +53,7 @@ export default function ProfilePage() {
           return (
             <li
               key={quiz.id}
-              onClick={() => selectQuiz(quiz)}
+              onClick={() => handleClick(quiz)}
               className="flex flex-col justify-between bordered hover:bg-teal-200 cursor-pointer gap-2 p-4"
             >
               <span className="block">{quiz.name}</span>

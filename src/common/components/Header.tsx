@@ -14,8 +14,8 @@ export default function Header() {
   return (
     <header className={`flex bg-teal-200 items-center p-2 ${rubik.className}`}>
       <section className="flex gap-2">
-        <Link href="/">{t("Home")}</Link>
-        <Link href="/games">{t("Games")}</Link>
+        <Link className="text-lg" href="/">InQuiz</Link>
+        <Link className="flex items-center" href="/games">{t("Games")}</Link>
       </section>
       <section className="flex grow justify-end gap-4">
         <Link className="flex items-center gap-2" href="/profile">
