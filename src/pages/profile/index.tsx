@@ -47,7 +47,7 @@ export default function ProfilePage() {
           userId={sessionData?.user.id}
         />
       )}
-      <h1>{t("Profile")}</h1>
+      <h1>{t("My quizzes")}</h1>
       <ul className="grid grid-cols-auto-200 justify-center gap-4">
         {query.data?.map((quiz) => {
           return (

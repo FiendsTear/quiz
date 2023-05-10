@@ -71,7 +71,7 @@ export default function GamesPage() {
           cancelSelect={() => selectQuiz(null)}
         />
       )}
-      <section className="flex justify-around w-full rounded-full overflow-hidden">
+      <section className="flex justify-around w-full rounded-full overflow-hidden mb-3">
         <Button
           onClick={() => setTab(GameTabs.Find)}
           attr={{ className: "grow rounded-none" }}
@@ -87,61 +87,66 @@ export default function GamesPage() {
       </section>
       {currentTab === GameTabs.Create && (
         <section>
-          <div className="flex items-center gap-2">
-            <h2>{t("New game")}</h2>
+          <div className="flex items-center gap-2 mb-3">
+            <h3>{t("Select quiz")}</h3>
             <Button onClick={() => setFilterVisible(!isFilterVisible)}>
               <FontAwesomeIcon icon={faFilter}></FontAwesomeIcon>
             </Button>
           </div>
           {isFilterVisible && (
-            <div className="mb-6">
-              <h3 className="m-0 mb-3">{t("Filter")}:</h3>
-              <label htmlFor="filter-tags">{t("Tags")}:</label>
-              <ul className="flex items-center gap-2 m-0 mb-3">
-                {tags.map((tag) => {
-                  return (
-                    <li
-                      className="flex-none	bg-teal-300 rounded-md pl-1"
-                      key={tag.id}
-                    >
-                      {tag.name}
-                      <Button
-                        attr={{ className: "ml-1" }}
-                        onClick={() => filterRemoveTag(tag)}
+            <div className="mb-6 flex flex-col gap-3">
+              <h4 className="m-0">{t("Filter")}</h4>
+              <div className="flex gap-2 items-center ">
+                <label htmlFor="filter-tags">{t("Tags")}</label>
+                <ul className="flex grow items-center gap-2 m-0">
+                  {tags.map((tag) => {
+                    return (
+                      <li
+                        className="flex-none bg-teal-300 rounded-md pl-1"
+                        key={tag.id}
                       >
-                        <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
-                      </Button>
-                    </li>
-                  );
-                })}
-                <li className="grow min-w-max	flex items-center gap-1">
-                  <Dropdown
-                    id="filter-tags"
-                    className="w-all lowercase"
-                    options={tagName.length ? tagsQuery.data : []}
-                    handleClick={filterAddTag}
-                    {...register("tagName", {
-                      onChange: debounce(
-                        (e: React.ChangeEvent<HTMLInputElement>) =>
-                          setTagName(e.target.value),
-                        700
-                      ),
-                    })}
-                  ></Dropdown>
-                </li>
-              </ul>
-              <label htmlFor="filter-quiz">{t("Quiz name")}:</label>
-              <input
-                id="filter-quiz"
-                type="text"
-                {...register("quizName", {
-                  onChange: debounce(
-                    (e: React.ChangeEvent<HTMLInputElement>) =>
-                      setQuizName(e.target.value),
-                    700
-                  ),
-                })}
-              />
+                        {tag.name}
+                        <Button
+                          attr={{ className: "ml-1" }}
+                          onClick={() => filterRemoveTag(tag)}
+                        >
+                          <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
+                        </Button>
+                      </li>
+                    );
+                  })}
+                  <li className="grow min-w-max flex items-center gap-1">
+                    <Dropdown
+                      id="filter-tags"
+                      className="w-all lowercase"
+                      options={tagName.length ? tagsQuery.data : []}
+                      handleClick={filterAddTag}
+                      {...register("tagName", {
+                        onChange: debounce(
+                          (e: React.ChangeEvent<HTMLInputElement>) =>
+                            setTagName(e.target.value),
+                          700
+                        ),
+                      })}
+                    ></Dropdown>
+                  </li>
+                </ul>
+              </div>
+              <div className="flex">
+                <label htmlFor="filter-quiz">{t("Quiz name")}</label>
+                <input
+                  id="filter-quiz"
+                  type="text"
+                  className="grow"
+                  {...register("quizName", {
+                    onChange: debounce(
+                      (e: React.ChangeEvent<HTMLInputElement>) =>
+                        setQuizName(e.target.value),
+                      700
+                    ),
+                  })}
+                />
+              </div>
             </div>
           )}
 

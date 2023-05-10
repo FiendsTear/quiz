@@ -60,10 +60,10 @@ export const authOptions: NextAuthOptions = {
     },
   },
   providers: [
-    VKProvider({
-      clientId: env.VK_CLIENT_ID,
-      clientSecret: env.VK_CLIENT_SECRET,
-    }),
+    // VKProvider({
+    //   clientId: env.VK_CLIENT_ID,
+    //   clientSecret: env.VK_CLIENT_SECRET,
+    // }),
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,

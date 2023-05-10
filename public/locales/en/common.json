@@ -1,5 +1,5 @@
 {
-    "Profile": "Profile",
+    "My quizzes": "My quizzes",
     "Cancel": "Cancel",
     "Ok": "Ok",
     "Сreate New Quiz": "Сreate New Quiz",
@@ -8,7 +8,7 @@
     "Private quiz": "Private quiz",
     "Add Question": "Add Question",
     "Quiz name": "Quiz name",
-    "New game": "New game",
+    "Select quiz": "Select quiz",
     "Find": "Find",
     "Create": "Create",
     "Quizzes not found": "Quizzes not found",
@@ -36,5 +36,6 @@
     "Game settings": "Game settings",
     "Room code": "Room code",
     "Enter": "Enter",
-    "App description": "InQuiz is a platform for creating and playing quizzes. Compete with your friends or random players, make your your lessons more fun and interactive, or catch your audience's attention wiht fun little game. We'll provide tools for that."
+    "App description": "InQuiz is a platform for creating and playing quizzes. Compete with your friends or random players, make your your lessons more fun and interactive, or catch your audience's attention wiht fun little game. We'll provide tools for that.",
+    "Feedback": "Feedback"
 }
