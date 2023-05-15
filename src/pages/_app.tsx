@@ -13,7 +13,7 @@ import { ReactElement, ReactNode } from "react";
 import { NextPage } from "next";
 config.autoAddCss = false;
 
-export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
+export type NextPageWithLayout<P = object, IP = P> = NextPage<P, IP> & {
   getLayout?: (page: ReactElement) => ReactNode;
 };
 

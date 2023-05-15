@@ -1,9 +1,9 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-      "module": "commonjs",
+      "module": "ES6",
       "outDir": "dist",
-      "target": "ES2019",
+      "target": "ES6",
       "lib": ["ES2019", "DOM"],
       "isolatedModules": false,
       "noEmit": false

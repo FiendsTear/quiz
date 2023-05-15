@@ -167,7 +167,7 @@ export default function QuestionEditorPage() {
         secondsToExpire={questionData.timerValue}
         onExpire={() => sendAnswers()}
       /> */}
-        <Button onClick={() => {}} attr={{ className: "text-lg" }}>
+        <Button onClick={() => {console.log('sending answers')}} attr={{ className: "text-lg" }}>
           {t("Send answers")}
         </Button>
       </form>

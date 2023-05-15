@@ -1,3 +1,4 @@
+import { clientEnv } from "@/env/client.mjs";
 import type { AppRouter } from "@/server/mainRouter";
 import {
   createWSClient,
@@ -28,8 +29,8 @@ function getBaseUrl() {
   return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
-const { publicRuntimeConfig } = getConfig();
-const { WS_URL } = publicRuntimeConfig;
+// const { publicRuntimeConfig } = getConfig();
+// const { NEXT_PUBLIC_WS_URL } = publicRuntimeConfig;
 function getEndingLink(ctx: NextPageContext | undefined) {
   if (typeof window === "undefined") {
     return httpBatchLink({
@@ -47,7 +48,7 @@ function getEndingLink(ctx: NextPageContext | undefined) {
     });
   }
   const client = createWSClient({
-    url: WS_URL,
+    url: clientEnv.NEXT_PUBLIC_WS_URL,
   });
   return wsLink<AppRouter>({
     client,
@@ -67,7 +68,7 @@ export const trpc = createTRPCNext<AppRouter>({
         }),
         splitLink({
           condition(op) {
-            return op.path.split('.')[0] === 'game';
+            return op.path.split(".")[0] === "game";
           },
           true: getEndingLink(ctx),
           false: httpBatchLink({
