@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { EventEmitter } from "events";
 import type { Question, Answer } from "@prisma/client";
 import type { GameWithAnswers } from "./gameRepository.js";
@@ -7,8 +9,11 @@ import { observable } from "@trpc/server/observable";
 import type { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO.js";
 import type { Session } from "next-auth";
 import type { CreateGameDTO } from "./dto.ts/createGameDTO.js";
-import { customAlphabet } from "nanoid";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import { customAlphabet } from 'nanoid';
 import type { EnterGameDTO } from "./dto.ts/enterGameDTO.js";
+
 enum GameStatus {
   Created,
   Ongoing,
