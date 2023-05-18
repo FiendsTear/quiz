@@ -12,11 +12,11 @@ import { prisma } from "./db.js";
 import { env } from "../env/server.js";
 import { OAuthConfig, OAuthUserConfig, Provider } from "next-auth/providers/index.js";
 
-const GoogleProvider = (
-  Google as unknown as {
-    default: { (arg0: OAuthUserConfig<GoogleProfile>): Provider };
-  }
-).default;
+// const GoogleProvider = (
+//   Google as unknown as {
+//     default: { (arg0: OAuthUserConfig<GoogleProfile>): Provider };
+//   }
+// ).default;
 /**
  * Module augmentation for `next-auth` types.
  * Allows us to add custom properties to the `session` object and keep type
@@ -70,7 +70,7 @@ export const authOptions: NextAuthOptions = {
     //   clientId: env.VK_CLIENT_ID,
     //   clientSecret: env.VK_CLIENT_SECRET,
     // }),
-    GoogleProvider({
+    Google({
       clientId: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
     }),
