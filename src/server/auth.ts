@@ -6,11 +6,17 @@ import {
 } from "next-auth";
 
 import VKProvider from "next-auth/providers/vk";
-import GoogleProvider from "next-auth/providers/google";
+import Google, { GoogleProfile } from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./db.js";
 import { env } from "../env/server.js";
+import { OAuthConfig, OAuthUserConfig, Provider } from "next-auth/providers/index.js";
 
+const GoogleProvider = (
+  Google as unknown as {
+    default: { (arg0: OAuthUserConfig<GoogleProfile>): Provider };
+  }
+).default;
 /**
  * Module augmentation for `next-auth` types.
  * Allows us to add custom properties to the `session` object and keep type

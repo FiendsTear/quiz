@@ -32,12 +32,13 @@ const config = {
    */
   i18n,
   webpack: (config) => {
+    config.experiments = { ...config.experiments, topLevelAwait: true };
     config.resolve.extensionAlias = {
       ".js": [".ts", ".tsx", ".js"],
     };
     return config;
   },
-  
+
   publicRuntimeConfig: {
     APP_URL: process.env.APP_URL,
     WS_URL: process.env.WS_URL,
