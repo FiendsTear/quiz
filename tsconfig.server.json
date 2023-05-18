@@ -7,7 +7,7 @@
       "lib": ["ES2019", "DOM"],
       "isolatedModules": false,
       "allowSyntheticDefaultImports": true,
-      "noEmit": true
+      "noEmit": false
     },
     "include": ["src/server/server.ts"]
   }

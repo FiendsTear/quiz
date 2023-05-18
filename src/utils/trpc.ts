@@ -1,4 +1,3 @@
-import { clientEnv } from "@/env/client.js";
 import type { AppRouter } from "@/server/mainRouter";
 import {
   createWSClient,
@@ -48,7 +47,7 @@ function getEndingLink(ctx: NextPageContext | undefined) {
     });
   }
   const client = createWSClient({
-    url: clientEnv.NEXT_PUBLIC_WS_URL,
+    url: process.env.NEXT_PUBLIC_WS_URL || "",
   });
   return wsLink<AppRouter>({
     client,

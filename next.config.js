@@ -1,13 +1,12 @@
-// @ts-check
-
 /**
  * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation.
  * This is especially useful for Docker builds.
  */
-!process.env.SKIP_ENV_VALIDATION && (await import("./src/env/server.js"));
 
-const { default: i18nConfig } = await import("./next-i18next.config.cjs");
-const { i18n } = i18nConfig;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const i18nConfig = require("./next-i18next.config.js");
+// const { default: i18nConfig } = await import("./next-i18next.config.js");
+// const { i18n } = i18nConfig;
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -30,7 +29,7 @@ const config = {
    *
    * @see https://github.com/vercel/next.js/issues/41980
    */
-  i18n,
+  i18n: i18nConfig.i18n,
   webpack: (config) => {
     config.experiments = { ...config.experiments, topLevelAwait: true };
     config.resolve.extensionAlias = {
@@ -44,4 +43,4 @@ const config = {
     WS_URL: process.env.WS_URL,
   },
 };
-export default config;
+module.exports = config;

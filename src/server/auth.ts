@@ -9,7 +9,6 @@ import VKProvider from "next-auth/providers/vk";
 import Google from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "./db.js";
-import { env } from "../env/server.js";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -65,8 +64,8 @@ export const authOptions: NextAuthOptions = {
     //   clientSecret: env.VK_CLIENT_SECRET,
     // }),
     Google({
-      clientId: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      clientId: process.env.GOOGLE_CLIENT_ID || "",
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || "",
     }),
     /**
      * ...add more providers here
