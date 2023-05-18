@@ -1,7 +1,7 @@
 import { trpc } from "@/utils/trpc";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { debounce } from "lodash";
+import lodash from "lodash";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faXmark,
@@ -127,7 +127,7 @@ export default function TagEditor(props: {
               options={tagName.length > 2 ? getSimilarTags.data : []}
               handleClick={attachTagToQuiz}
               {...register("name", {
-                onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+                onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                   setTagName(e.target.value);
                   refetchTags();
                 }, 700),

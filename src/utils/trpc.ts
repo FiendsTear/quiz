@@ -1,4 +1,4 @@
-import { clientEnv } from "@/env/client.mjs";
+import { clientEnv } from "@/env/client.js";
 import type { AppRouter } from "@/server/mainRouter";
 import {
   createWSClient,

@@ -5,7 +5,7 @@ import http from "http";
 import next from "next";
 // import next from "next";
 import { parse } from "url";
-import ws from "ws";
+import { WebSocketServer } from "ws";
 // import { createWSContext } from "./trpc";
 // import { appRouter } from "./mainRouter";
 
@@ -19,7 +19,7 @@ void app.prepare().then(() => {
     const parsedUrl = parse(req.url!, true);
     void handle(req, res, parsedUrl);
   });
-  const wss = new ws.Server({ server });
+  const wss = new WebSocketServer({ server });
   const handler = applyWSSHandler({
     wss,
     router: appRouter,

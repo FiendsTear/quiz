@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import Dropdown from "@/common/components/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
-import { debounce } from "lodash";
+import lodash from "lodash";
 import Button from "../../common/components/Button";
 import GetCommonLayout from "../../common/getCommonLayout";
 
@@ -122,7 +122,7 @@ export default function GamesPage() {
                       options={tagName.length ? tagsQuery.data : []}
                       handleClick={filterAddTag}
                       {...register("tagName", {
-                        onChange: debounce(
+                        onChange: lodash.debounce(
                           (e: React.ChangeEvent<HTMLInputElement>) =>
                             setTagName(e.target.value),
                           700
@@ -139,7 +139,7 @@ export default function GamesPage() {
                   type="text"
                   className="grow"
                   {...register("quizName", {
-                    onChange: debounce(
+                    onChange: lodash.debounce(
                       (e: React.ChangeEvent<HTMLInputElement>) =>
                         setQuizName(e.target.value),
                       700

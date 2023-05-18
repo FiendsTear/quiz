@@ -1,9 +1,9 @@
 import { z } from "zod";
-import { createWSRouter, protectedWSProcedure } from "../trpc";
-import { addPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
-import { nextQuestion, getGame } from "./gameService";
-import { createGameDTO } from "./dto.ts/createGameDTO";
-import { enterGameDTO } from "./dto.ts/enterGameDTO";
+import { createWSRouter, protectedWSProcedure } from "../trpc.js";
+import { addPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO.js";
+import { nextQuestion, getGame } from "./gameService.js";
+import { createGameDTO } from "./dto.ts/createGameDTO.js";
+import { enterGameDTO } from "./dto.ts/enterGameDTO.js";
 import {
   addGame,
   addPlayerAnswer as addPlayerAnswers,
@@ -12,7 +12,7 @@ import {
   getGameState,
   startGame,
   subscribeToGame,
-} from "./gameService";
+} from "./gameService.js";
 
 export const gameRouter = createWSRouter({
   getActiveGames: protectedWSProcedure.query(async ({}) => {

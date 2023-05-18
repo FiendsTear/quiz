@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
-import { debounce } from "lodash";
+import lodash from "lodash";
 import TagEditor from "@/modules/quiz/TagEditor";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
@@ -162,7 +162,7 @@ export default function NewQuizPage() {
           defaultValue={data.name}
           className="mb-3"
           {...register("name", {
-            onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
               handleQuizChange({ name: e.target.value });
             }, 700),
           })}
@@ -187,7 +187,7 @@ export default function NewQuizPage() {
             type="checkbox"
             defaultChecked={data.isPrivate}
             {...register(`isPrivate`, {
-              onChange: debounce(
+              onChange: lodash.debounce(
                 (e: React.ChangeEvent<HTMLInputElement>) =>
                   handleQuizChange({ isPrivate: e.target.checked }),
                 500

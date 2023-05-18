@@ -1,6 +1,6 @@
 import { RouterInputs, trpc } from "../../utils/trpc";
 import React from "react";
-import { debounce } from "lodash";
+import lodash from "lodash";
 import { useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
 import type { QuestionDTO } from "@/server/quiz/dto/questionDTO";
@@ -98,7 +98,7 @@ export default function QuestionEditor(props: { questionID: number }) {
             id="question-body"
             className="grow"
             {...register("body", {
-              onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+              onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ body: e.target.value });
               }, 700),
             })}
@@ -112,7 +112,7 @@ export default function QuestionEditor(props: { questionID: number }) {
             type="number"
             className="block grow text-center text-lg"
             {...register("answerWeight", {
-              onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+              onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ answerWeight: Number(e.target.value) });
               }, 700),
             })}

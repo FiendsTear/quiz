@@ -2,7 +2,7 @@ import type { RouterInputs } from "../../utils/trpc";
 import { trpc } from "../../utils/trpc";
 import type { Answer } from "@prisma/client";
 import React from "react";
-import { debounce } from "lodash";
+import lodash from "lodash";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
@@ -71,7 +71,7 @@ export default function AnswerEditor(props: {
           type="text"
           maxLength={validAnswerParameters.body.maxLength}
           {...register(`body`, {
-            onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+            onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
               handleAnswerChange({ body: e.target.value });
             }, 500),
           })}
@@ -83,7 +83,7 @@ export default function AnswerEditor(props: {
         type="checkbox"
         className="h-5 aspect-square block"
         {...register(`isCorrect`, {
-          onChange: debounce(
+          onChange: lodash.debounce(
             (e: React.ChangeEvent<HTMLInputElement>) =>
               handleAnswerChange({ isCorrect: e.target.checked }),
             500

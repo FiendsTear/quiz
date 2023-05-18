@@ -1,14 +1,14 @@
 import { EventEmitter } from "events";
 import type { Question, Answer } from "@prisma/client";
-import type { GameWithAnswers } from "./gameRepository";
-import { createGame, getGamesByID } from "./gameRepository";
+import type { GameWithAnswers } from "./gameRepository.js";
+import { createGame, getGamesByID } from "./gameRepository.js";
 import { TRPCError } from "@trpc/server";
 import { observable } from "@trpc/server/observable";
-import type { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO";
+import type { AddPlayerAnswerDTO } from "./dto.ts/addPlayerAnswerDTO.js";
 import type { Session } from "next-auth";
-import type { CreateGameDTO } from "./dto.ts/createGameDTO";
+import type { CreateGameDTO } from "./dto.ts/createGameDTO.js";
 import { customAlphabet } from "nanoid";
-import type { EnterGameDTO } from "./dto.ts/enterGameDTO";
+import type { EnterGameDTO } from "./dto.ts/enterGameDTO.js";
 enum GameStatus {
   Created,
   Ongoing,

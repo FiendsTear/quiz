@@ -1,11 +1,12 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-      "module": "ES6",
+      "module": "ESNext",
       "outDir": "dist",
-      "target": "ES6",
+      "target": "ESNext",
       "lib": ["ES2019", "DOM"],
       "isolatedModules": false,
+      "allowSyntheticDefaultImports": true,
       "noEmit": false
     },
     "include": ["next-env.d.ts", "src/**/*.ts", "src/**/*.tsx"]

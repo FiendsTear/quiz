@@ -1,8 +1,8 @@
 import type { Prisma } from "@prisma/client";
-import type { QuizDTO } from "../dto/quizDTO";
-import type { FilterQuizDTO } from "../dto/filterQuizDTO";
+import type { QuizDTO } from "../dto/quizDTO.js";
+import type { FilterQuizDTO } from "../dto/filterQuizDTO.js";
 import type { Session } from "next-auth";
-import { prisma } from "../../db";
+import { prisma } from "../../db.js";
 import { TRPCError } from "@trpc/server";
 
 export async function createQuiz(session: Session) {

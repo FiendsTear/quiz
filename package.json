@@ -2,9 +2,10 @@
     "name": "quiz",
     "version": "0.1.0",
     "private": true,
+    "type": "module",
     "scripts": {
-        "dev": "concurrently \"next dev -p 3001\" \"tsx watch src/server/websockets/wsServer.ts --tsconfig tsconfig.server.json\"",
-        "dev:ws": "tsx watch src/server/websockets/wsServer.ts --tsconfig tsconfig.server.json",
+        "dev": "concurrently \"next dev -p 3001\" \"tsx src/server/websockets/wsServer.ts --project tsconfig.server.json\"",
+        "dev:ws": "ts-node-dev src/server/websockets/wsServer.ts",
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
@@ -62,6 +63,7 @@
         "postcss": "^8.4.21",
         "prisma": "^4.9.0",
         "tailwindcss": "^3.2.4",
+        "ts-node-dev": "^2.0.0",
         "tsx": "^3.12.2"
     }
 }

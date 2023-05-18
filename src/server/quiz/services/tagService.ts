@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import type { CreateTagDTO } from '../dto/createTagDTO';
-import type { TagDTO } from '../dto/tagDTO';
+import type { CreateTagDTO } from '../dto/createTagDTO.js';
+import type { TagDTO } from '../dto/tagDTO.js';
 
 const prisma = new PrismaClient();
 

@@ -1,7 +1,7 @@
-import { quizRouter } from "./quiz/quizRouter";
-import { createTRPCRouter } from "./trpc";
+import { quizRouter } from "./quiz/quizRouter.js";
+import { createTRPCRouter } from "./trpc.js";
 // import { userRouter } from "./user/userRouter";
-import { gameRouter } from "./game/gameRouter";
+import { gameRouter } from "./game/gameRouter.js";
 export const appRouter = createTRPCRouter({
   quiz: quizRouter,
   // user: userRouter,

@@ -1,4 +1,4 @@
-import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc";
+import { protectedProcedure, createTRPCRouter, publicProcedure } from "../trpc.js";
 import {
   addOrUpdateQuiz,
   getQuiz,
@@ -6,30 +6,30 @@ import {
   filterQuizzes,
   createQuiz,
   deleteQuiz,
-} from "./services/quizService";
-import { quizDTO } from "./dto/quizDTO";
-import { questionDTO } from "./dto/questionDTO";
+} from "./services/quizService.js";
+import { quizDTO } from "./dto/quizDTO.js";
+import { questionDTO } from "./dto/questionDTO.js";
 import {
   addOrUpdateQuestion,
   deleteQuestion,
   getQuestion,
-} from "./services/questionService";
-import { answerDTO } from "./dto/createAnswerDTO";
+} from "./services/questionService.js";
+import { answerDTO } from "./dto/createAnswerDTO.js";
 import {
   addOrUpdateAnswer,
   deleteAnswer,
   getAnswer,
-} from "./services/answerService";
-import { filterQuizDTO } from "./dto/filterQuizDTO";
-import { createTagDTO } from "./dto/createTagDTO";
-import { tagDTO } from "./dto/tagDTO";
+} from "./services/answerService.js";
+import { filterQuizDTO } from "./dto/filterQuizDTO.js";
+import { createTagDTO } from "./dto/createTagDTO.js";
+import { tagDTO } from "./dto/tagDTO.js";
 import {
   getSimilarTags,
   createTag,
   attachTag,
   removeTag,
   getTags,
-} from "./services/tagService";
+} from "./services/tagService.js";
 import { z } from "zod";
 
 export const quizRouter = createTRPCRouter({

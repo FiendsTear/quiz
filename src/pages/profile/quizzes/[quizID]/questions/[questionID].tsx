@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useTranslation } from "next-i18next";
 import { RouterInputs } from "../../../../../utils/trpc";
 import { useForm } from "react-hook-form";
-import { debounce } from "lodash";
+import lodash from "lodash";
 import { useQuizStore } from "../../../../../modules/quiz/quizStore";
 import { validQuestionSchema } from "../../../../../modules/quiz/quizSchema";
 import { QuestionDTO } from "../../../../../server/quiz/dto/questionDTO";
@@ -116,7 +116,7 @@ export default function QuestionEditorPage() {
             type="number"
             className="block grow text-center text-lg"
             {...register("answerWeight", {
-              onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+              onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                 handleQuestionChange({ answerWeight: Number(e.target.value) });
               }, 700),
             })}
@@ -130,7 +130,7 @@ export default function QuestionEditorPage() {
               id="question-body"
               className="grow text-center center"
               {...register("body", {
-                onChange: debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+                onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                   handleQuestionChange({ body: e.target.value });
                 }, 700),
               })}

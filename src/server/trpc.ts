@@ -18,8 +18,8 @@
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next";
 import { type Session } from "next-auth";
 
-import { getServerAuthSession } from "./auth";
-import { prisma } from "./db";
+import { getServerAuthSession } from "./auth.js";
+import { prisma } from "./db.js";
 
 import type { NodeHTTPCreateContextFnOptions } from "@trpc/server/dist/adapters/node-http";
 import type { IncomingMessage } from "http";

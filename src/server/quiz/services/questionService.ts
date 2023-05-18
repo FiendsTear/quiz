@@ -1,7 +1,7 @@
-import type { QuestionDTO } from "../dto/questionDTO";
-import { unpublishQuiz } from "./quizService";
-import { prisma } from "../../db";
-import { omit } from "lodash";
+import type { QuestionDTO } from "../dto/questionDTO.js";
+import { unpublishQuiz } from "./quizService.js";
+import { prisma } from "../../db.js";
+import lodash from "lodash";
 
 export async function getQuestion(questionID: number) {
   const question = await prisma.question.findUnique({
@@ -29,7 +29,7 @@ export async function addOrUpdateQuestion(input: QuestionDTO) {
     include: { quiz: true },
   });
   if (question.quiz.isPublished) await unpublishQuiz(question.quiz.id);
-  const response = omit(question, "quiz");
+  const response = lodash.omit(question, "quiz");
   return response;
 }
 
