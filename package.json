@@ -6,14 +6,12 @@
     "scripts": {
         "dev": "concurrently \"next dev -p 3001\" \"tsx src/server/websockets/wsServer.ts --project tsconfig.server.json\"",
         "dev:ws": "ts-node-dev src/server/websockets/wsServer.ts",
-        "build": "next build",
-        "start": "next start",
+        "build": "run-s build:*",
+        "start": "cross-env NODE_ENV=production node dist/server/server.js",
         "lint": "next lint",
         "migrate": "prisma migrate dev",
         "build:1-next": "cross-env NODE_ENV=production next build",
-        "build:2-server": "tsc --project tsconfig.server.json",
-        "prod:build": "run-s build:*",
-        "prod:start": "cross-env NODE_ENV=production node dist/server/server.js"
+        "build:2-server": "tsc --project tsconfig.server.json"
     },
     "dependencies": {
         "@fortawesome/fontawesome-svg-core": "^6.3.0",
