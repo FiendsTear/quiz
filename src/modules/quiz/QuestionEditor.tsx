@@ -44,7 +44,7 @@ export default function QuestionEditor(props: { questionID: number }) {
       { ...data, ...changedValue },
       {
         onSuccess: () => {
-          refetchQuestion();
+        //   refetchQuestion();
         },
       }
     );

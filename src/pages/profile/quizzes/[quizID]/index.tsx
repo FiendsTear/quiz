@@ -52,7 +52,7 @@ export default function NewQuizPage() {
       { ...{ id: +quizID }, isPublished: false, ...changedValue },
       {
         onSuccess: () => {
-          refetchQuiz();
+        //   refetchQuiz();
         },
       }
     );

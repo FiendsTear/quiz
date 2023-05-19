@@ -51,7 +51,7 @@ export default function QuestionEditorPage() {
       { ...data, ...changedValue },
       {
         onSuccess: () => {
-          refetchQuestion();
+        //   refetchQuestion();
         },
       }
     );
