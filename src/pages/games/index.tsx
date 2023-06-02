@@ -1,18 +1,16 @@
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
-import { useState, useEffect } from "react";
-import type { Quiz, Tag } from "@prisma/client";
+import { useState } from "react";
+import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
 import { getTranslations } from "@/common/getTranslations";
 import { useTranslation } from "next-i18next";
 import type { FilterQuizDTO } from "@/server/quiz/dto/filterQuizDTO";
-import { useForm } from "react-hook-form";
-import Dropdown from "@/common/components/Dropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFilter, faXmark } from "@fortawesome/free-solid-svg-icons";
-import lodash from "lodash";
+import { faFilter } from "@fortawesome/free-solid-svg-icons";
 import Button from "../../common/components/Button";
 import GetCommonLayout from "../../common/getCommonLayout";
+import GameFilter from '@/modules/game/GameFilter';
 
 export default function GamesPage() {
   const { push } = useRouter();
@@ -25,37 +23,13 @@ export default function GamesPage() {
   const [selectedQuiz, selectQuiz] = useState<Quiz | null>(null);
 
   const [isFilterVisible, setFilterVisible] = useState<boolean>(false);
-  const [tags, setTags] = useState<Tag[]>([]);
-  const [tagName, setTagName] = useState<string>("");
-  const [quizName, setQuizName] = useState<string>("");
 
-  const filter: FilterQuizDTO = { tags, quizName };
-
-  const { register } = useForm<FilterQuizDTO & { tagName: string }>({
-    values: { ...filter, tagName },
-  });
+  const [quizFilter, setQuizFilter] = useState<FilterQuizDTO>({ tags: [], quizName: '' });
 
   const { t } = useTranslation("common");
 
   const gamesQuery = trpc.game.getActiveGames.useQuery();
-  const quizQuery = trpc.quiz.getPublishedQuizzes.useQuery(filter);
-
-  const tagsQuery = trpc.quiz.getTags.useQuery(tagName);
-
-  function filterAddTag(newTag: Tag) {
-    let isTagRepeated = false;
-    tags.forEach((tag) => {
-      if (tag.id === newTag.id) isTagRepeated = true;
-    });
-    if (!isTagRepeated) {
-      setTags([...tags, newTag]);
-      setTagName("");
-    }
-  }
-
-  function filterRemoveTag(removeTag: Tag) {
-    setTags(tags.filter((tag) => tag.id !== removeTag.id));
-  }
+  const quizQuery = trpc.quiz.getPublishedQuizzes.useQuery(quizFilter);
 
   function handleGameEnter(gameID: number, accessCode?: string) {
     let url = `/games/${gameID}/player`;
@@ -94,60 +68,7 @@ export default function GamesPage() {
             </Button>
           </div>
           {isFilterVisible && (
-            <div className="mb-6 flex flex-col gap-3">
-              <h4 className="m-0">{t("Filter")}</h4>
-              <div className="flex gap-2 items-center ">
-                <label htmlFor="filter-tags">{t("Tags")}</label>
-                <ul className="flex grow items-center gap-2 m-0">
-                  {tags.map((tag) => {
-                    return (
-                      <li
-                        className="flex-none bg-teal-300 rounded-md pl-1"
-                        key={tag.id}
-                      >
-                        {tag.name}
-                        <Button
-                          attr={{ className: "ml-1" }}
-                          onClick={() => filterRemoveTag(tag)}
-                        >
-                          <FontAwesomeIcon icon={faXmark}></FontAwesomeIcon>
-                        </Button>
-                      </li>
-                    );
-                  })}
-                  <li className="grow min-w-max flex items-center gap-1">
-                    <Dropdown
-                      id="filter-tags"
-                      className="w-all lowercase"
-                      options={tagName.length ? tagsQuery.data : []}
-                      handleClick={filterAddTag}
-                      {...register("tagName", {
-                        onChange: lodash.debounce(
-                          (e: React.ChangeEvent<HTMLInputElement>) =>
-                            setTagName(e.target.value),
-                          700
-                        ),
-                      })}
-                    ></Dropdown>
-                  </li>
-                </ul>
-              </div>
-              <div className="flex">
-                <label htmlFor="filter-quiz">{t("Quiz name")}</label>
-                <input
-                  id="filter-quiz"
-                  type="text"
-                  className="grow"
-                  {...register("quizName", {
-                    onChange: lodash.debounce(
-                      (e: React.ChangeEvent<HTMLInputElement>) =>
-                        setQuizName(e.target.value),
-                      700
-                    ),
-                  })}
-                />
-              </div>
-            </div>
+            <GameFilter onSubmit={filter => setQuizFilter(filter)}></GameFilter>
           )}
 
           {!quizQuery.data ||

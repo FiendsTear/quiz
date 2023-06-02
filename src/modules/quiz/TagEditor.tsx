@@ -23,6 +23,8 @@ export default function TagEditor(props: {
   const [isTagAdding, setTagAdding] = useState<boolean>(false);
   const [isError, setError] = useState<boolean>(false);
   const [tagName, setTagName] = useState<string>("");
+  const [allowedToFetch, setAllowedToFetch] = useState(true);
+  const [similarTags, setSimilarTags] = useState<Tag[]>([]);
   const newTag: CreateTagDTO = { quizID: props.quizID, name: tagName };
   const { register } = useForm<CreateTagDTO>({
     values: newTag,
@@ -30,7 +32,10 @@ export default function TagEditor(props: {
 
   const { t } = useTranslation("common");
 
-  const getSimilarTags = trpc.quiz.getSimilarTags.useQuery(newTag);
+  const getSimilarTags = trpc.quiz.getSimilarTags.useQuery(newTag, {
+    enabled: allowedToFetch,
+    onSuccess: (e) => setSimilarTags(e),
+  });
 
   const attachTag = trpc.quiz.attachTag.useMutation();
 
@@ -39,7 +44,13 @@ export default function TagEditor(props: {
   const createTag = trpc.quiz.createTag.useMutation();
 
   function refetchTags() {
-    getSimilarTags.refetch().catch((err) => console.error(err));
+    if (allowedToFetch)
+      getSimilarTags.refetch().catch((err) => console.error(err));
+  }
+
+  function active(tag: Tag) {
+    if (allowedToFetch) setAllowedToFetch(false);
+    setTagName(tag.name);
   }
 
   function attachTagToQuiz(tag: Tag) {
@@ -63,7 +74,6 @@ export default function TagEditor(props: {
 
   function updateTags(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    const similarTags = getSimilarTags.data;
     if (similarTags?.length) {
       for (let i = 0; i < similarTags.length; i++)
         if (tagName === similarTags[i].name.toLowerCase()) {
@@ -95,7 +105,7 @@ export default function TagEditor(props: {
   return (
     <form className="text-sm">
       <ul className="flex items-center gap-2 m-0">
-        <li>{t("Tags")}:</li>
+        <li><label htmlFor="quiz-tags">{t("Tags")}:</label></li>
         {props.tags?.map((tag) => {
           return (
             <li className="flex-none bg-teal-300 rounded-md pl-1" key={tag.id}>
@@ -123,18 +133,20 @@ export default function TagEditor(props: {
         {isTagAdding && (
           <li className="flex items-center gap-1 h-full">
             <Dropdown
+              id="quiz-tags"
               className="h-full lowercase"
-              options={tagName.length > 2 ? getSimilarTags.data : []}
+              options={tagName.length > 2 ? similarTags : []}
               handleClick={attachTagToQuiz}
+              handleActive={active}
               {...register("name", {
                 onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
                   setTagName(e.target.value);
-                  refetchTags();
+                  if (!allowedToFetch) setAllowedToFetch(true);
                 }, 700),
               })}
             ></Dropdown>
             <Button
-              attr={{ className: "ml-1", disabled: newTag.name.length < 3 }}
+              attr={{ type: "submit", className: "ml-1", disabled: newTag.name.length < 3 }}
               onClick={updateTags}
             >
               <FontAwesomeIcon icon={faCheck}></FontAwesomeIcon>
