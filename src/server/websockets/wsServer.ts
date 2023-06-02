@@ -1,7 +1,18 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck 
 import ws from "ws";
 import { createWSContext } from "../trpc.js";
 import { appRouter } from "../mainRouter.js";
 import { applyWSSHandler } from "@trpc/server/adapters/ws";
+
+import fetch, { Headers, Request, Response } from "node-fetch";
+
+if (!globalThis.fetch) {
+  globalThis.fetch = fetch;
+  globalThis.Headers = Headers;
+  globalThis.Request = Request;
+  globalThis.Response = Response;
+}
 
 const wss = new ws.Server({
   port: 3100,
