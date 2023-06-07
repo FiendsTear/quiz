@@ -9,6 +9,8 @@ import Loading from "../../../common/components/Loading";
 import ErrorComponent from "../../../common/components/Errror";
 import isBrowser from "../../../common/helpers/isBrowser";
 import GameLayout from "../../../modules/game/GameLayout";
+import { boolean } from "zod";
+import Message from "../../../common/components/Message";
 
 export default function PlayerGamePage() {
   const { query, isReady, push } = useRouter();
@@ -17,6 +19,7 @@ export default function PlayerGamePage() {
   //   const gameState = useGameState(gameID);
   const { t } = useTranslation("common");
 
+  const [message, setMessage] = useState<boolean>();
   const [gameState, setGameState] = useState<
     RouterOutputs["game"]["getGameState"]
   >({} as RouterOutputs["game"]["getGameState"]);
@@ -54,6 +57,18 @@ export default function PlayerGamePage() {
     if (!connected) enterMutation.mutate({ gameID, accessCode });
   }, [isReady]);
 
+  useEffect(() => {
+    if (gameState.status === GameStatus.Ongoing) {
+      document.onvisibilitychange = () => {
+        console.log("hidden");
+      };
+      window.onblur = () => {
+        console.log("blur");
+      };
+      setMessage(true);
+    }
+  }, [gameState, gameState.status]);
+
   const [errored, setErrored] = useState<string>("");
   if (errored) return <ErrorComponent message={errored}></ErrorComponent>;
 
@@ -68,12 +83,21 @@ export default function PlayerGamePage() {
     );
   }
 
-  if (gameState.status === GameStatus.Ongoing)
+  if (gameState.status === GameStatus.Ongoing) {
     return (
-      <CurrentQuestion
-        questionData={gameState.currentQuestion}
-      ></CurrentQuestion>
+      <section>
+        {message && (
+          <Message
+            messageString={t("Cheat warning")}
+            confirmSelect={() => setMessage(false)}
+          />
+        )}
+        <CurrentQuestion
+          questionData={gameState.currentQuestion}
+        ></CurrentQuestion>
+      </section>
     );
+  }
 
   if (gameState.status === GameStatus.Finished) {
     return (
@@ -87,7 +111,11 @@ export default function PlayerGamePage() {
     );
   }
 
-  return <section className="w-full h-full flex justify-center items-center">Waiting for start</section>;
+  return (
+    <section className="w-full h-full flex justify-center items-center">
+      Waiting for start
+    </section>
+  );
 }
 
 export const getServerSideProps = getTranslations;

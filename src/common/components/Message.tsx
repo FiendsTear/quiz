@@ -7,6 +7,7 @@ export default function Message(props: {
   confirmSelect: { (): void };
   cancelSelect?: { (): void };
 }) {
+  console.log('rendering message');
   const { messageString, confirmSelect, cancelSelect } = props;
   const { t } = useTranslation("common");
   return (
