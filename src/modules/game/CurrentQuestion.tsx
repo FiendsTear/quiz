@@ -1,6 +1,6 @@
 import { trpc } from "@/utils/trpc";
 import { useRouter } from "next/router";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "next-i18next";
 import Timer from "./Timer";
 import { RouterOutputs } from "../../utils/trpc";
@@ -40,6 +40,21 @@ export default function CurrentQuestion(props: {
     setSelectedAnswers(copy);
   }
 
+  useEffect(() => {
+    document.onvisibilitychange = () => {
+      if (!answerSent) {
+        setSelectedAnswers([]);
+        sendAnswers();
+      }
+    };
+    window.onblur = () => {
+      if (!answerSent) {
+        setSelectedAnswers([]);
+        sendAnswers();
+      }
+    };
+  });
+
   function sendAnswers() {
     if (!answerSent) {
       answerMutation.mutate({
@@ -73,7 +88,9 @@ export default function CurrentQuestion(props: {
         secondsToExpire={questionData.timerValue}
         onExpire={() => sendAnswers()}
       /> */}
-      <Button onClick={sendAnswers} attr={{className: "text-lg"}}>{t("Send answers")}</Button>
+      <Button onClick={sendAnswers} attr={{ className: "text-lg" }}>
+        {t("Send answers")}
+      </Button>
     </div>
   );
 }

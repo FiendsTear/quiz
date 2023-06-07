@@ -59,12 +59,6 @@ export default function PlayerGamePage() {
 
   useEffect(() => {
     if (gameState.status === GameStatus.Ongoing) {
-      document.onvisibilitychange = () => {
-        console.log("hidden");
-      };
-      window.onblur = () => {
-        console.log("blur");
-      };
       setMessage(true);
     }
   }, [gameState, gameState.status]);
