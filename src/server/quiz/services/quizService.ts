@@ -4,6 +4,7 @@ import type { FilterQuizDTO } from "../dto/filterQuizDTO.js";
 import type { Session } from "next-auth";
 import { prisma } from "../../db.js";
 import { TRPCError } from "@trpc/server";
+import { CreateRatingDTO } from '../dto/createRatingDTO.js';
 
 export async function createQuiz(session: Session) {
   const userQuizzesCount = await prisma.quiz.count({
@@ -111,4 +112,46 @@ export async function filterQuizzes(
 
 export async function deleteQuiz(quizID: number) {
   await prisma.quiz.delete({ where: { id: quizID } });
+}
+
+export async function rateQuiz(input: CreateRatingDTO, session: Session) {
+  const rating = await prisma.rating.upsert({
+    where: {
+      userId_quizId: {
+        userId: session.user.id,
+        quizId: input.quizID,
+      },
+    },
+    create: {
+      userId: session.user.id,
+      quizId: input.quizID,
+      value: input.value,
+      date: new Date(),
+    },
+    update: {
+      value: input.value,
+      date: new Date(),
+    }
+  });
+  const aggregation = await prisma.rating.aggregate({
+    _avg: {
+      value: true,
+    },
+    _count: {
+      value: true,
+    },
+    where: {
+      quizId: input.quizID,
+    }
+  })
+  const quiz = await prisma.quiz.update({
+    where: {
+      id: input.quizID,
+    },
+    data: {
+      ratings_avg: aggregation._avg.value || 0,
+      ratings_count: aggregation._count.value,
+    },
+  })
+  return quiz;
 }

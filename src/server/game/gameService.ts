@@ -42,6 +42,7 @@ type Player = {
 
 type GameState = {
   status: GameStatus;
+  quizID: number;
   currentQuestion: Question & {
     answers: Answer[];
     timerValue: number;
@@ -89,6 +90,7 @@ export async function addGame(input: CreateGameDTO) {
   }
   const gameState: GameState = {
     status: GameStatus.Created,
+    quizID: gameData.quiz.id,
     players: [],
     currentQuestion: {
       ...gameData.quiz.questions[0],

@@ -6,6 +6,7 @@ import {
   filterQuizzes,
   createQuiz,
   deleteQuiz,
+  rateQuiz,
 } from "./services/quizService.js";
 import { quizDTO } from "./dto/quizDTO.js";
 import { questionDTO } from "./dto/questionDTO.js";
@@ -30,6 +31,7 @@ import {
   removeTag,
   getTags,
 } from "./services/tagService.js";
+import { createRatingDTO } from './dto/createRatingDTO.js';
 import { z } from "zod";
 
 export const quizRouter = createTRPCRouter({
@@ -59,6 +61,11 @@ export const quizRouter = createTRPCRouter({
       await deleteQuiz(input);
     }),
 
+  //rating
+  rateQuiz: protectedProcedure
+    .input(createRatingDTO)
+    .mutation(({ input, ctx }) => rateQuiz(input, ctx.session)),
+    
   //questions
   getQuestion: protectedProcedure
     .input(z.number())

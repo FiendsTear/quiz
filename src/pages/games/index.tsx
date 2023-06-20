@@ -84,6 +84,11 @@ export default function GamesPage() {
                 <span className="opacity-60">
                   {quiz.tags.map((tag) => tag.name).join(", ")}
                 </span>
+                {(quiz.ratings_count > 0) ? (
+                  <span className="text-sm italic">{t("Rating")}: {quiz.ratings_avg}/5 ({quiz.ratings_count})</span>
+                ) : (
+                  <span className="text-sm italic">{t("No ratings")}</span>
+                )}
               </li>
             ))}
           </ul>

@@ -86,4 +86,16 @@
         @apply text-red-600;
         @apply text-xs;
     }
+
+    .rating_number {
+        @apply cursor-pointer;
+        @apply rounded-full;
+        @apply flex;
+        @apply justify-center;
+        @apply items-center;
+        @apply w-2;
+        @apply h-2;
+        @apply p-4;
+        @apply hover:bg-emerald-400;
+    }
 }

@@ -33,6 +33,14 @@ export default function PlayerGamePage() {
     },
   });
 
+  const [rateVisible, setRateVisible] = useState(true);
+  const rateValues = [1,2,3,4,5];
+  const rateMutation = trpc.quiz.rateQuiz.useMutation({
+    onSuccess() {
+      setRateVisible(false);
+    }
+  });
+
   const leaveMutation = trpc.game.leave.useMutation();
   useEffect(() => {
     if (isBrowser()) {
@@ -96,11 +104,25 @@ export default function PlayerGamePage() {
   if (gameState.status === GameStatus.Finished) {
     return (
       <section>
+        <h3>{t("Results")}</h3>
         {gameState.players.map((player) => {
           return (
             <div key={player.id}>{`${player.name}   ${player.score}`}</div>
           );
         })}
+        {rateVisible && (
+          <>
+            <h3>{t("Rate this quiz")}</h3>
+            <div className="flex gap-2">
+              {rateValues.map((value) => {
+                return (
+                  <span className="rating_number" key={value} onClick={() => rateMutation.mutate({ value, quizID: gameState.quizID })}>{value}</span>
+                )
+              })}
+            </div>
+          </>
+        )}
+
       </section>
     );
   }
