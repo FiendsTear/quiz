@@ -2,20 +2,24 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import lodash from "lodash";
-import TagEditor from "@/modules/quiz/TagEditor";
-import { getTranslations } from "@/common/getTranslations";
+import TagEditor from "@/modules/quiz/components/TagEditor";
+import { getTranslations } from "@/common/helpers/getTranslations";
 import { useTranslation } from "next-i18next";
 
 import { useQuizStore } from "@/modules/quiz/quizStore";
-import { RouterInputs, RouterOutputs } from '@/utils/trpc';
+import { RouterInputs, RouterOutputs } from "@/utils/trpc";
 import { trpc } from "@/utils/trpc";
-import Loading from '@/common/components/Loading';
-import { validAnswerSchema, validQuestionSchema, validQuizSchema } from '@/modules/quiz/quizSchema';
-import Message from '@/common/components/Message';
-import QuestionEditor from '@/modules/quiz/QuestionEditor';
-import Button from '@/common/components/Button';
-import { ButtonVariant } from '@/common/components/Button';
-import GetCommonLayout from '@/common/getCommonLayout';
+import Loading from "@/common/components/Loading";
+import {
+  validAnswerSchema,
+  validQuestionSchema,
+  validQuizSchema,
+} from "@/modules/quiz/quizSchema";
+import Message from "@/common/components/Message";
+import QuestionEditor from "@/modules/quiz/components/QuestionEditor";
+import Button from "@/common/components/Button";
+import { ButtonVariant } from "@/common/components/Button";
+import GetCommonLayout from "@/common/getCommonLayout";
 
 type AnswerData = RouterOutputs["quiz"]["getAnswer"];
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
@@ -52,7 +56,7 @@ export default function NewQuizPage() {
       { ...{ id: +quizID }, isPublished: false, ...changedValue },
       {
         onSuccess: () => {
-        //   refetchQuiz();
+          //   refetchQuiz();
         },
       }
     );
@@ -151,26 +155,48 @@ export default function NewQuizPage() {
           confirmSelect={() => toProfilePage()}
         />
       )}
-      {/* <h1>{t("View Quiz")}</h1> */}
-      <div className="flex">
-        <label htmlFor="quiz-name" className="text-lg min-w-[7rem]">
-          {t("Quiz name")}
-        </label>
-        <input
-          id="quiz-name"
-          type="text"
-          defaultValue={data.name}
-          className="mb-3"
-          {...register("name", {
-            onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-              handleQuizChange({ name: e.target.value });
-            }, 700),
-          })}
-        ></input>
-      </div>
 
-      <span className="issue">{issues ? issues["name"] : ""}</span>
-      <section className="flex justify-between">
+      {/* <h1>{t("View Quiz")}</h1> */}
+      <header className="flex w-2/3 mx-auto">
+        <div className="grow">
+          <label htmlFor="quiz-name" className="text-lg min-w-[7rem]">
+            {t("Quiz name")}
+          </label>
+          <input
+            id="quiz-name"
+            type="text"
+            defaultValue={data.name}
+            className="mb-3"
+            {...register("name", {
+              onChange: lodash.debounce(
+                (e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleQuizChange({ name: e.target.value });
+                },
+                700
+              ),
+            })}
+          ></input>
+          <span className="issue">{issues ? issues["name"] : ""}</span>
+        </div>
+      </header>
+      {/* <aside className="fixed top-10">
+        <Button
+          onClick={() => push(`/profile/quizzes/${quizID}`)}
+          attr={{ className: "mr-2" }}
+        >
+          <FontAwesomeIcon
+            icon={faBars}
+            title="to basic view"
+          ></FontAwesomeIcon>
+        </Button>
+        <Button onClick={() => push(`/profile/quizzes/${quizID}/advanced`)}>
+          <FontAwesomeIcon
+            icon={faLayerGroup}
+            title="to advanced view"
+          ></FontAwesomeIcon>
+        </Button>
+      </aside> */}
+      <section className="flex justify-between w-2/3 mx-auto">
         <div>
           <TagEditor
             tags={data.tags}

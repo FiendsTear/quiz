@@ -1,8 +1,6 @@
 import { z } from "zod";
-export const answerDTO = z.object({
-  id: z.number().optional().default(0),
-  body: z.string().nullable().optional(),
-  isCorrect: z.boolean().optional().default(false),
+export const createAnswerDTO = z.object({
   questionID: z.number().optional(),
+  order: z.number(),
 });
-export type AnswerDTO = z.infer<typeof answerDTO>;
+export type CreateAnswerDTO = z.infer<typeof createAnswerDTO>;

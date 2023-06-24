@@ -15,9 +15,10 @@ import {
   deleteQuestion,
   getQuestion,
 } from "./services/questionService.js";
-import { answerDTO } from "./dto/createAnswerDTO.js";
+import { createAnswerDTO } from "./dto/createAnswerDTO.js";
 import {
-  addOrUpdateAnswer,
+  createAnswer,
+  updateAnswer,
   deleteAnswer,
   getAnswer,
 } from "./services/answerService.js";
@@ -33,6 +34,7 @@ import {
 } from "./services/tagService.js";
 import { createRatingDTO } from './dto/createRatingDTO.js';
 import { z } from "zod";
+import { updateAnswerDTO } from "./dto/updateAnswerDTO.js";
 
 export const quizRouter = createTRPCRouter({
   // quizzes
@@ -65,7 +67,7 @@ export const quizRouter = createTRPCRouter({
   rateQuiz: protectedProcedure
     .input(createRatingDTO)
     .mutation(({ input, ctx }) => rateQuiz(input, ctx.session)),
-    
+
   //questions
   getQuestion: protectedProcedure
     .input(z.number())
@@ -81,9 +83,12 @@ export const quizRouter = createTRPCRouter({
   getAnswer: protectedProcedure
     .input(z.number())
     .query(({ input }) => getAnswer(input)),
-  addOrUpdateAnswer: protectedProcedure
-    .input(answerDTO)
-    .mutation(({ input }) => addOrUpdateAnswer(input)),
+  createAnswer: protectedProcedure
+    .input(createAnswerDTO)
+    .mutation(({ input }) => createAnswer(input)),
+  updateAnswer: protectedProcedure
+    .input(updateAnswerDTO)
+    .mutation(({ input }) => updateAnswer(input)),
   deleteAnswer: protectedProcedure
     .input(z.number())
     .mutation(({ input }) => deleteAnswer(input)),

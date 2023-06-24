@@ -3,7 +3,7 @@ import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
 import type { RouterOutputs } from "../../../utils/trpc";
 import { useState, useEffect, useRef, ReactElement } from "react";
-import { getTranslations } from "@/common/getTranslations";
+import { getTranslations } from "@/common/helpers/getTranslations";
 import Userpic from "../../../common/components/Userpic";
 import { useTranslation } from "next-i18next";
 import QRCode from "qrcode";

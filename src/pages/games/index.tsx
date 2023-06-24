@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import { useState } from "react";
 import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
-import { getTranslations } from "@/common/getTranslations";
+import { getTranslations } from "@/common/helpers/getTranslations";
 import { useTranslation } from "next-i18next";
 import type { FilterQuizDTO } from "@/server/quiz/dto/filterQuizDTO";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

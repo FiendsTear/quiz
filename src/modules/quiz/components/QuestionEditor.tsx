@@ -1,19 +1,19 @@
-import { RouterInputs, trpc } from "../../utils/trpc";
+import { RouterInputs, trpc } from "../../../utils/trpc";
 import React from "react";
 import lodash from "lodash";
 import { useForm } from "react-hook-form";
 import AnswerEditor from "./AnswerEditor";
 import type { QuestionDTO } from "@/server/quiz/dto/questionDTO";
 
-import Loading from "../../common/components/Loading";
+import Loading from "../../../common/components/Loading";
 import { useTranslation } from "next-i18next";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
-import { useQuizStore } from "./quizStore";
-import { validQuestionSchema } from "./quizSchema";
-import Button, { ButtonVariant } from "../../common/components/Button";
+import { useQuizStore } from "../quizStore";
+import { validQuestionSchema } from "../quizSchema";
+import Button, { ButtonVariant } from "../../../common/components/Button";
 
 export type QuestionInput = RouterInputs["quiz"]["addOrUpdateQuestion"];
 
@@ -23,7 +23,7 @@ export default function QuestionEditor(props: { questionID: number }) {
   const mutation = trpc.quiz.addOrUpdateQuestion.useMutation();
   const getQuestionQuery = trpc.quiz.getQuestion.useQuery(props.questionID, {});
   const questionDeletion = trpc.quiz.deleteQuestion.useMutation();
-  const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
+  const createAnswerMutation = trpc.quiz.createAnswer.useMutation();
   const answerDeletion = trpc.quiz.deleteAnswer.useMutation();
 
   let issues = useQuizStore((state) => state.questionsErrors[props.questionID]);
@@ -32,7 +32,7 @@ export default function QuestionEditor(props: { questionID: number }) {
   const questionSchema = validQuestionSchema.omit({ answers: true });
 
   // form state
-  const { register, getValues, setValue } = useForm<QuestionInput>({
+  const { register } = useForm<QuestionInput>({
     values: getQuestionQuery.data,
   });
 
@@ -44,7 +44,7 @@ export default function QuestionEditor(props: { questionID: number }) {
       { ...data, ...changedValue },
       {
         onSuccess: () => {
-        //   refetchQuestion();
+          //   refetchQuestion();
         },
       }
     );
@@ -67,8 +67,8 @@ export default function QuestionEditor(props: { questionID: number }) {
   }
 
   function createAnswer() {
-    answerMutation.mutate(
-      { questionID: props.questionID },
+    createAnswerMutation.mutate(
+      { questionID: props.questionID, order: data.answers.length + 1 },
       {
         onSuccess: () => {
           refetchQuestion();
@@ -98,9 +98,12 @@ export default function QuestionEditor(props: { questionID: number }) {
             id="question-body"
             className="grow"
             {...register("body", {
-              onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-                handleQuestionChange({ body: e.target.value });
-              }, 700),
+              onChange: lodash.debounce(
+                (e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleQuestionChange({ body: e.target.value });
+                },
+                700
+              ),
             })}
           ></textarea>
           <span className="issue">{issues["body"]}</span>
@@ -112,9 +115,14 @@ export default function QuestionEditor(props: { questionID: number }) {
             type="number"
             className="block grow text-center text-lg"
             {...register("answerWeight", {
-              onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-                handleQuestionChange({ answerWeight: Number(e.target.value) });
-              }, 700),
+              onChange: lodash.debounce(
+                (e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleQuestionChange({
+                    answerWeight: Number(e.target.value),
+                  });
+                },
+                700
+              ),
             })}
           ></input>
           <span className="issue invisible">{issues["body"] ? "i" : ""}</span>

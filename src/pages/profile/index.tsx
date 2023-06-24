@@ -4,17 +4,19 @@ import { useState } from "react";
 import { trpc, RouterOutputs } from "../../utils/trpc";
 import type { Quiz } from "@prisma/client";
 import GameSettings from "@/modules/game/GameSettings";
-import { getTranslations } from "@/common/getTranslations";
+import { getTranslations } from "@/common/helpers/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../common/components/Loading";
 import Button from "../../common/components/Button";
 import GetCommonLayout from "../../common/getCommonLayout";
+import QuizCard from "../../modules/quiz/components/QuizCard";
 
 export default function ProfilePage() {
   const { data: sessionData } = useSession();
   const { t } = useTranslation("common");
-  const { push } = useRouter();
   const [selectedQuiz, selectQuiz] = useState<Quiz | null>(null);
+
+  const { push } = useRouter();
 
   const query = trpc.quiz.getUserQuizzes.useQuery();
 
@@ -29,7 +31,7 @@ export default function ProfilePage() {
     });
   }
 
-  function handleClick(quiz: RouterOutputs["quiz"]["getUserQuizzes"][number]) {
+  function handleClick(quiz: Quiz) {
     if (quiz.isPublished) {
       selectQuiz(quiz);
       return null;
@@ -47,34 +49,12 @@ export default function ProfilePage() {
           userId={sessionData?.user.id}
         />
       )}
-      <h1>{t("My quizzes")}</h1>
+      {/* <h1>{t("My quizzes")}</h1> */}
       <ul className="grid grid-cols-auto-200 justify-center gap-4">
         {query.data?.map((quiz) => {
           return (
-            <li
-              key={quiz.id}
-              onClick={() => handleClick(quiz)}
-              className="flex flex-col justify-between bordered hover:bg-teal-200 cursor-pointer gap-2 p-4"
-            >
-              <span className="block">{quiz.name}</span>
-              <span className="opacity-60">
-                {quiz.tags.map((tag) => tag.name).join(", ")}
-              </span>
-              <span
-                className={
-                  quiz.isPublished
-                    ? quiz.isPrivate
-                      ? "text-rose-700"
-                      : "text-teal-700"
-                    : "text-gray-600"
-                }
-              >
-                {quiz.isPublished
-                  ? quiz.isPrivate
-                    ? t("Private")
-                    : t("Published")
-                  : t("Unpublished")}
-              </span>
+            <li key={quiz.id} onClick={() => handleClick(quiz)}>
+              <QuizCard quiz={quiz}></QuizCard>
             </li>
           );
         })}

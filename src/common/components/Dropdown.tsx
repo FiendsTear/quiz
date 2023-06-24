@@ -2,7 +2,7 @@ import { ReactNode, useState } from "react";
 import { forwardRef } from "react";
 import type { Tag } from "@prisma/client";
 import Loading from "./Loading";
-import { useComponentVisible } from '../useComponentVisible';
+import { useComponentVisible } from '../hooks/useComponentVisible';
 
 interface Props {
   id?: string,

@@ -1,5 +1,5 @@
 import { useTranslation } from "next-i18next";
-import { getTranslations } from "../common/getTranslations";
+import { getTranslations } from "../common/helpers/getTranslations";
 import GetCommonLayout from '../common/getCommonLayout';
 
 export default function IndexPage() {

@@ -13,7 +13,7 @@ import type { CreateTagDTO } from "@/server/quiz/dto/createTagDTO";
 import type { Tag } from "@prisma/client";
 import Dropdown from "@/common/components/Dropdown";
 import { useTranslation } from "next-i18next";
-import Button, { ButtonVariant } from "../../common/components/Button";
+import Button, { ButtonVariant } from "../../../common/components/Button";
 
 export default function TagEditor(props: {
   tags: Tag[] | undefined;

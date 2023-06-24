@@ -5,24 +5,43 @@ import { useTranslation } from "next-i18next";
 
 import { Rubik } from "@next/font/google";
 import Button from "./Button";
+import { useRouter } from "next/router";
 const rubik = Rubik({ subsets: ["cyrillic", "latin"] });
 
 export default function Header() {
   const { data: sessionData } = useSession();
   const { t } = useTranslation("common");
+  const { pathname } = useRouter();
+  console.log(pathname);
 
   return (
     <header className={`flex bg-teal-200 items-center p-2 ${rubik.className}`}>
       <section className="flex gap-2">
-        <Link className="text-lg" href="/">inQuiz</Link>
-        <Link className="flex items-center" href="/games">{t("Games")}</Link>
+        <Link className="text-lg" href="/">
+          inQuiz
+        </Link>
+        <Link
+          className={
+            "flex items-center" + (pathname === "/games" ? " bg-rose-300" : "")
+          }
+          href="/games"
+        >
+          {t("Games")}
+        </Link>
       </section>
       <section className="flex grow justify-end gap-4">
-        <Link className="flex items-center gap-2" href="/profile">
+        <Link
+          className={
+            "flex items-center gap-2" +
+            (pathname === "/profile" ? " bg-rose-300" : "")
+          }
+          href="/profile"
+        >
           {sessionData && (
             <>
-              <Userpic src={sessionData.user?.image} size={32} />
-              <span>{sessionData.user?.name}</span>
+              <span>{t("My quizzes")}</span>
+              {/* <Userpic src={sessionData.user?.image} size={32} />
+              <span>{sessionData.user?.name}</span> */}
             </>
           )}
         </Link>

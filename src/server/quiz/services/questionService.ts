@@ -6,7 +6,7 @@ import lodash from "lodash";
 export async function getQuestion(questionID: number) {
   const question = await prisma.question.findUnique({
     where: { id: questionID },
-    include: { answers: { select: { id: true } } },
+    include: { answers: { select: { id: true }, orderBy: { order: "asc" } } },
   });
   if (!question) return undefined;
   return question;

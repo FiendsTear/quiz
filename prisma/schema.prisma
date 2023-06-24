@@ -11,28 +11,29 @@ datasource db {
 }
 
 model Quiz {
-    id              Int         @id @unique @default(autoincrement())
-    name            String
-    userId          String?
-    user            User?       @relation(fields: [userId], references: [id])
-    isPublished     Boolean     @default(false)
-    isPrivate       Boolean     @default(false)
-    tags            Tag[]
-    questions       Question[]
-    ratings         Rating[]
-    ratings_avg     Float       @default(0)
-    ratings_count   Int         @default(0)
-    Game            Game[]
+    id            Int        @id @unique @default(autoincrement())
+    name          String
+    userId        String?
+    user          User?      @relation(fields: [userId], references: [id])
+    isPublished   Boolean    @default(false)
+    isPrivate     Boolean    @default(false)
+    tags          Tag[]
+    questions     Question[]
+    ratings       Rating[]
+    ratings_avg   Float      @default(0)
+    ratings_count Int        @default(0)
+    Game          Game[]
 }
 
 model Rating {
-    id           Int        @id @unique @default(autoincrement())
-    quizId       Int
-    quiz         Quiz       @relation(fields: [quizId], references: [id], onDelete: Cascade)
-    userId       String
-    user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-    value        Int
-    date         DateTime   @default(now())
+    id     Int      @id @unique @default(autoincrement())
+    quizId Int
+    quiz   Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+    userId String
+    user   User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    value  Int
+    date   DateTime @default(now())
+
     @@unique([userId, quizId])
 }
 
@@ -49,7 +50,8 @@ model Question {
 model Answer {
     id         Int      @id @unique @default(autoincrement())
     body       String?
-    isCorrect  Boolean
+    order      Int
+    isCorrect  Boolean  @default(false)
     question   Question @relation(fields: [questionID], references: [id], onDelete: Cascade)
     questionID Int
 }

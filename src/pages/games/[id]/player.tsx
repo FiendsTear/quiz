@@ -3,7 +3,7 @@ import { useState, useEffect, ReactElement } from "react";
 import CurrentQuestion from "../../../modules/game/CurrentQuestion";
 import { useRouter } from "next/router";
 import { RouterOutputs } from "../../../utils/trpc";
-import { getTranslations } from "@/common/getTranslations";
+import { getTranslations } from "@/common/helpers/getTranslations";
 import { useTranslation } from "next-i18next";
 import Loading from "../../../common/components/Loading";
 import ErrorComponent from "../../../common/components/Errror";

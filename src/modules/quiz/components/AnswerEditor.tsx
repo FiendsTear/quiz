@@ -1,15 +1,15 @@
-import type { RouterInputs } from "../../utils/trpc";
-import { trpc } from "../../utils/trpc";
+import type { RouterInputs } from "../../../utils/trpc";
+import { trpc } from "../../../utils/trpc";
 import type { Answer } from "@prisma/client";
 import React from "react";
 import lodash from "lodash";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "next-i18next";
-import Loading from "../../common/components/Loading";
-import { useQuizStore } from "./quizStore";
-import { validAnswerSchema, validAnswerParameters } from "./quizSchema";
+import Loading from "../../../common/components/Loading";
+import { useQuizStore } from "../quizStore";
+import { validAnswerSchema, validAnswerParameters } from "../quizSchema";
 
-export type AnswerInput = RouterInputs["quiz"]["addOrUpdateAnswer"];
+export type AnswerInput = RouterInputs["quiz"]["updateAnswer"];
 
 export default function AnswerEditor(props: {
   answerID: number;
@@ -21,7 +21,7 @@ export default function AnswerEditor(props: {
 
   // server state
   const answerQuery = trpc.quiz.getAnswer.useQuery(answerID);
-  const answerMutation = trpc.quiz.addOrUpdateAnswer.useMutation();
+  const answerMutation = trpc.quiz.updateAnswer.useMutation();
 
   const setAnswerError = useQuizStore((state) => state.setAnswerError);
   const issues = useQuizStore((state) => state.answersErrors[answerID]);
@@ -34,10 +34,10 @@ export default function AnswerEditor(props: {
 
   function handleAnswerChange(changedValue: Partial<Answer>) {
     answerMutation.mutate(
-      { ...data, ...changedValue },
+      { ...{ id: answerID }, ...changedValue },
       {
         onSuccess: () => {
-        //   refetchAnswer();
+          //   refetchAnswer();
         },
       }
     );
@@ -71,9 +71,12 @@ export default function AnswerEditor(props: {
           type="text"
           maxLength={validAnswerParameters.body.maxLength}
           {...register(`body`, {
-            onChange: lodash.debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-              handleAnswerChange({ body: e.target.value });
-            }, 500),
+            onChange: lodash.debounce(
+              (e: React.ChangeEvent<HTMLInputElement>) => {
+                handleAnswerChange({ body: e.target.value });
+              },
+              500
+            ),
           })}
         />
         <span className="issue">{issues ? issues["body"] : ""}</span>
