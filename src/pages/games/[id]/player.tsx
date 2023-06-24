@@ -69,7 +69,7 @@ export default function PlayerGamePage() {
     if (gameState.status === GameStatus.Ongoing) {
       setMessage(true);
     }
-  }, [gameState, gameState.status]);
+  }, [gameState.status]);
 
   const [errored, setErrored] = useState<string>("");
   if (errored) return <ErrorComponent message={errored}></ErrorComponent>;
