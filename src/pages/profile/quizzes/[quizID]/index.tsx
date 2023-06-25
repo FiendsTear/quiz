@@ -7,21 +7,17 @@ import { getTranslations } from "@/common/helpers/getTranslations";
 import { useTranslation } from "next-i18next";
 
 import { useQuizStore } from "@/modules/quiz/quizStore";
-import { RouterInputs, RouterOutputs } from "@/utils/trpc";
+import { RouterInputs } from "@/utils/trpc";
 import { trpc } from "@/utils/trpc";
 import Loading from "@/common/components/Loading";
-import {
-  validAnswerSchema,
-  validQuestionSchema,
-  validQuizSchema,
-} from "@/modules/quiz/quizSchema";
+import { validQuizSchema } from "@/modules/quiz/quizSchema";
 import Message from "@/common/components/Message";
 import QuestionEditor from "@/modules/quiz/components/QuestionEditor";
 import Button from "@/common/components/Button";
 import { ButtonVariant } from "@/common/components/Button";
 import GetCommonLayout from "@/common/getCommonLayout";
+import { usePublisher } from "../../../../modules/quiz/hooks/usePublisher";
 
-type AnswerData = RouterOutputs["quiz"]["getAnswer"];
 type QuizInput = RouterInputs["quiz"]["addOrUpdateQuiz"];
 
 export default function NewQuizPage() {
@@ -37,13 +33,10 @@ export default function NewQuizPage() {
     staleTime: 60,
   });
 
-  const setAnswerError = useQuizStore((state) => state.setAnswerError);
-  const setQuestionError = useQuizStore((state) => state.setQuestionError);
   const setQuizError = useQuizStore((state) => state.setQuizError);
   const issues = useQuizStore((state) => state.quizErrors);
 
-  const ctx = trpc.useContext();
-  //   const setError = useQuizStore(state => state.set);
+  const { publish } = usePublisher(quizID);
 
   const quizMutation = trpc.quiz.addOrUpdateQuiz.useMutation();
   const questionMutation = trpc.quiz.addOrUpdateQuestion.useMutation();
@@ -62,48 +55,9 @@ export default function NewQuizPage() {
     );
   }
 
-  function handlePublish() {
-    if (!getQuizQuery.data) return;
-    const quizData = getQuizQuery.data;
-    let quizValidForPublication = true;
-    quizData.questions.map((question) => {
-      const questionData = ctx.quiz.getQuestion.getData(question.id);
-      if (!questionData) return;
-      const answers: AnswerData[] = [];
-      // validate and consolidate question answers
-      questionData.answers.map((answer) => {
-        const answerData = ctx.quiz.getAnswer.getData(answer.id);
-        if (!answerData) return;
-        answers.push(answerData);
-        const answerParseRes = validAnswerSchema.safeParse(answerData);
-        if (!answerParseRes.success) {
-          quizValidForPublication = false;
-          setAnswerError(answer.id, answerParseRes.error.issues);
-        }
-      });
-      const dataToParse = { ...questionData, ...{ answers } };
-      const parseRes = validQuestionSchema.safeParse(dataToParse);
-      if (!parseRes.success) {
-        quizValidForPublication = false;
-        setQuestionError(question.id, parseRes.error.issues);
-      }
-    });
-
-    const quizParseRes = validQuizSchema.safeParse(quizData);
-    if (!quizParseRes.success) {
-      setQuizError(quizParseRes.error.issues);
-      quizValidForPublication = false;
-    }
-    if (quizValidForPublication) {
-      quizMutation.mutate(
-        { id: +quizID, isPublished: true },
-        {
-          onSuccess: () => {
-            setMessage(true);
-          },
-        }
-      );
-    }
+  async function handlePublish() {
+    const publishResult = await publish();
+    setMessage(publishResult);
   }
 
   function toProfilePage() {
@@ -156,7 +110,7 @@ export default function NewQuizPage() {
         />
       )}
 
-      {/* <h1>{t("View Quiz")}</h1> */}
+      {/* <h1>{t("Edit Quiz")}</h1> */}
       <header className="flex w-2/3 mx-auto">
         <div className="grow">
           <label htmlFor="quiz-name" className="text-lg min-w-[7rem]">

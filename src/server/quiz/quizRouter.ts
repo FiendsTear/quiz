@@ -7,6 +7,7 @@ import {
   createQuiz,
   deleteQuiz,
   rateQuiz,
+  unpublishQuiz,
 } from "./services/quizService.js";
 import { quizDTO } from "./dto/quizDTO.js";
 import { questionDTO } from "./dto/questionDTO.js";
@@ -61,6 +62,11 @@ export const quizRouter = createTRPCRouter({
     .input(z.number())
     .mutation(async ({ input }) => {
       await deleteQuiz(input);
+    }),
+  unpublishQuiz: protectedProcedure
+    .input(z.number())
+    .mutation(async ({ input }) => {
+      await unpublishQuiz(input);
     }),
 
   //rating

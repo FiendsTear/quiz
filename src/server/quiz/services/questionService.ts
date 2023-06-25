@@ -26,18 +26,19 @@ export async function addOrUpdateQuestion(input: QuestionDTO) {
       body: input.body,
       answerWeight: input.answerWeight,
     },
-    include: { quiz: true },
+    // include: { quiz: true },
   });
-  if (question.quiz.isPublished) await unpublishQuiz(question.quiz.id);
-  const response = lodash.omit(question, "quiz");
-  return response;
+  // if (question.quiz.isPublished) await unpublishQuiz(question.quiz.id);
+  // const response = lodash.omit(question, "quiz");
+  // return response;
+  return question;
 }
 
 export async function deleteQuestion(questionID: number) {
   const question = await prisma.question.delete({
     where: { id: questionID },
-    include: { quiz: true },
+    // include: { quiz: true },
   });
-  if (question.quiz.isPublished) await unpublishQuiz(question.quiz.id);
+  // if (question.quiz.isPublished) await unpublishQuiz(question.quiz.id);
   return question;
 }

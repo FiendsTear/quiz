@@ -21,16 +21,17 @@ export async function createAnswer(input: CreateAnswerDTO) {
     select: {
       question: {
         include: {
-          quiz: { select: { id: true, isPublished: true } },
+          // quiz: { select: { id: true, isPublished: true } },
           answers: { select: { isCorrect: true } },
         },
       },
     },
   });
-  if (answer.question.quiz.isPublished)
-    await unpublishQuiz(answer.question.quiz.id);
-  const response = lodash.omit(answer, "question");
-  return response;
+  // if (answer.question.quiz.isPublished)
+  //   await unpublishQuiz(answer.question.quiz.id);
+  // const response = lodash.omit(answer, "question");
+  // return response;
+  return answer;
 }
 
 export async function updateAnswer(input: UpdateAnswerDTO) {
@@ -41,26 +42,27 @@ export async function updateAnswer(input: UpdateAnswerDTO) {
     include: {
       question: {
         include: {
-          quiz: { select: { id: true, isPublished: true } },
+          // quiz: { select: { id: true, isPublished: true } },
           answers: { select: { isCorrect: true } },
         },
       },
     },
   })
-  if (answer.question.quiz.isPublished)
-    await unpublishQuiz(answer.question.quiz.id);
-  const response = lodash.omit(answer, "question");
-  return response;
+  // if (answer.question.quiz.isPublished)
+  //   await unpublishQuiz(answer.question.quiz.id);
+  // const response = lodash.omit(answer, "question");
+  // return response;
+  return answer;
 }
 
 export async function deleteAnswer(answerID: number) {
   const answer = await prisma.answer.delete({
     where: { id: answerID },
-    include: {
-      question: { include: { quiz: true } },
-    },
+    // include: {
+    //   question: { include: { quiz: true } },
+    // },
   });
-  if (answer.question.quiz.isPublished)
-    await unpublishQuiz(answer.question.quiz.id);
+  // if (answer.question.quiz.isPublished)
+  //   await unpublishQuiz(answer.question.quiz.id);
   return answer;
 }
