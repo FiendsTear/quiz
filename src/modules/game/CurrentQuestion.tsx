@@ -11,7 +11,7 @@ type QuestionData = RouterOutputs["game"]["getGameState"]["currentQuestion"];
 export default function CurrentQuestion(props: {
   questionData: QuestionData;
   isHost?: boolean;
-  warned: boolean;
+  warned?: boolean;
 }) {
   const { questionData } = props;
   const { query } = useRouter();
