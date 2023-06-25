@@ -34,11 +34,11 @@ export default function PlayerGamePage() {
   });
 
   const [rateVisible, setRateVisible] = useState(true);
-  const rateValues = [1,2,3,4,5];
+  const rateValues = [1, 2, 3, 4, 5];
   const rateMutation = trpc.quiz.rateQuiz.useMutation({
     onSuccess() {
       setRateVisible(false);
-    }
+    },
   });
 
   const leaveMutation = trpc.game.leave.useMutation();
@@ -65,8 +65,10 @@ export default function PlayerGamePage() {
     if (!connected) enterMutation.mutate({ gameID, accessCode });
   }, [isReady]);
 
+  // i will use simple solution to prevent multiple cheat warnings
+  let warned = false;
   useEffect(() => {
-    if (gameState.status === GameStatus.Ongoing) {
+    if (gameState.status === GameStatus.Ongoing && !warned) {
       setMessage(true);
     }
   }, [gameState.status]);
@@ -91,11 +93,15 @@ export default function PlayerGamePage() {
         {message && (
           <Message
             messageString={t("Cheat warning")}
-            confirmSelect={() => setMessage(false)}
+            confirmSelect={() => {
+              setMessage(false);
+              warned = true;
+            }}
           />
         )}
         <CurrentQuestion
           questionData={gameState.currentQuestion}
+          warned
         ></CurrentQuestion>
       </section>
     );
@@ -116,13 +122,20 @@ export default function PlayerGamePage() {
             <div className="flex gap-2">
               {rateValues.map((value) => {
                 return (
-                  <span className="rating_number" key={value} onClick={() => rateMutation.mutate({ value, quizID: gameState.quizID })}>{value}</span>
-                )
+                  <span
+                    className="rating_number"
+                    key={value}
+                    onClick={() =>
+                      rateMutation.mutate({ value, quizID: gameState.quizID })
+                    }
+                  >
+                    {value}
+                  </span>
+                );
               })}
             </div>
           </>
         )}
-
       </section>
     );
   }

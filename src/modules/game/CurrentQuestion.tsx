@@ -11,6 +11,7 @@ type QuestionData = RouterOutputs["game"]["getGameState"]["currentQuestion"];
 export default function CurrentQuestion(props: {
   questionData: QuestionData;
   isHost?: boolean;
+  warned: boolean;
 }) {
   const { questionData } = props;
   const { query } = useRouter();
@@ -41,19 +42,21 @@ export default function CurrentQuestion(props: {
   }
 
   useEffect(() => {
-    document.onvisibilitychange = () => {
-      if (!answerSent) {
-        setSelectedAnswers([]);
-        sendAnswers();
-      }
-    };
-    window.onblur = () => {
-      if (!answerSent) {
-        setSelectedAnswers([]);
-        sendAnswers();
-      }
-    };
-  });
+    if (props.warned === true) {
+      document.onvisibilitychange = () => {
+        if (!answerSent) {
+          setSelectedAnswers([]);
+          sendAnswers();
+        }
+      };
+      window.onblur = () => {
+        if (!answerSent) {
+          setSelectedAnswers([]);
+          sendAnswers();
+        }
+      };
+    }
+  }, [props.warned]);
 
   function sendAnswers() {
     if (!answerSent) {
