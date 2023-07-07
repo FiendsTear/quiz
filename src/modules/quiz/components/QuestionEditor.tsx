@@ -106,6 +106,22 @@ export default function QuestionEditor(props: { questionID: number }) {
               ),
             })}
           ></textarea>
+          <label htmlFor="answer-description">{t("Correct answer description")}</label>
+          <input
+            id="answer-description"
+            type="text"
+            className="block grow text-lg"
+            {...register("answerDescription", {
+              onChange: lodash.debounce(
+                (e: React.ChangeEvent<HTMLInputElement>) => {
+                  handleQuestionChange({
+                    answerDescription: e.target.value,
+                  });
+                },
+                700
+              ),
+            })}
+          ></input>
           <span className="issue">{issues["body"]}</span>
         </div>
         <div className="flex w-32 flex-col self-stretch">

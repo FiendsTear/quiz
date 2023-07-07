@@ -69,12 +69,13 @@ export default function HostGamePage() {
           {gameState.currentCorrectAnswers.length > 1 ?
             (<h3>{t("Correct answers")}</h3>) : (<h3>{t("Correct answer")}</h3>)
           }
-          <ul className="flex flex-col grow self-stretch flex-wrap gap-4 min-h-0">
+          <ul className="flex flex-col flex-wrap gap-4 min-h-0">
             {gameState.currentCorrectAnswers.map((answer) => (
               <li key={answer.id}
                 className="flex flex-col text-center items-center bordered gap-2 p-4">{answer.body}</li>
             ))}
           </ul>
+          <span className="text-center p-2">{gameState.currentQuestion.answerDescription}</span>
         </div>
       );
     } else {

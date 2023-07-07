@@ -20,11 +20,13 @@ export async function addOrUpdateQuestion(input: QuestionDTO) {
       // this here to make compiler stop complaining, should be re-done
       order: input.order ? input.order : 0,
       answerWeight: input.answerWeight,
+      answerDescription: input.answerDescription,
       quiz: { connect: { id: input.quizID } },
     },
     update: {
       body: input.body,
       answerWeight: input.answerWeight,
+      answerDescription: input.answerDescription,
     },
     // include: { quiz: true },
   });

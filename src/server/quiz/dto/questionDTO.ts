@@ -6,5 +6,6 @@ export const questionDTO = z.object({
   body: z.string().nullable().default(""),
   order: z.number().optional(),
   answerWeight: z.number().default(1),
+  answerDescription: z.string().nullable().default(""),
 });
 export type QuestionDTO = z.infer<typeof questionDTO>;
