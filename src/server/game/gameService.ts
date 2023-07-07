@@ -186,7 +186,7 @@ export function addPlayerAnswer(dto: AddPlayerAnswerDTO, playerID: string) {
 export function leaveGame(gameID: number, playerID: string) {
   const game = getGame(gameID);
   const { players } = game.gameState;
-  const playerIndex = players.findIndex((player) => (player.id = playerID));
+  const playerIndex = players.findIndex((player) => (player.id === playerID));
   players.splice(playerIndex, 1);
 }
 
@@ -198,7 +198,7 @@ export function getGame(gameID: number) {
 }
 
 function getPlayer(gameState: GameState, playerID: string) {
-  const player = gameState.players.find((player) => (player.id = playerID));
+  const player = gameState.players.find((player) => (player.id === playerID));
   if (!player)
     throw new TRPCError({ code: "BAD_REQUEST", message: "Player not found" });
   return player;
