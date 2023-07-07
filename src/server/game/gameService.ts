@@ -225,7 +225,7 @@ function finishQuestion(game: IActiveGame) {
 
   gameState.correctAnswerTimeout = setTimeout(() => {
     nextQuestion(game);
-  }, 2000);
+  }, 5000);
 }
 
 export function nextQuestion(game: IActiveGame) {

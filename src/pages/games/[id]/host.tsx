@@ -65,10 +65,16 @@ export default function HostGamePage() {
   if (gameState.status === GameStatus.Ongoing) {
     if (gameState.currentCorrectAnswers?.length) {
       return (
-        <div>
-          {gameState.currentCorrectAnswers.map((answer) => (
-            <div key={answer.id}>{answer.body}</div>
-          ))}
+        <div className="w-full h-full flex flex-col">
+          {gameState.currentCorrectAnswers.length > 1 ?
+            (<h3>{t("Correct answers")}</h3>) : (<h3>{t("Correct answer")}</h3>)
+          }
+          <ul className="flex flex-col grow self-stretch flex-wrap gap-4 min-h-0">
+            {gameState.currentCorrectAnswers.map((answer) => (
+              <li key={answer.id}
+                className="flex flex-col text-center items-center bordered gap-2 p-4">{answer.body}</li>
+            ))}
+          </ul>
         </div>
       );
     } else {

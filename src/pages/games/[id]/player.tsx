@@ -11,6 +11,8 @@ import isBrowser from "../../../common/helpers/isBrowser";
 import GameLayout from "../../../modules/game/GameLayout";
 import { boolean } from "zod";
 import Message from "../../../common/components/Message";
+import Userpic from '@/common/components/Userpic';
+import Timer from '@/modules/game/Timer';
 
 export default function PlayerGamePage() {
   const { query, isReady, push } = useRouter();
@@ -79,10 +81,36 @@ export default function PlayerGamePage() {
   if (!gameState) return <Loading />;
   if (gameState.currentCorrectAnswers?.length) {
     return (
-      <div>
-        {gameState.currentCorrectAnswers.map((answer) => (
-          <div key={answer.id}>{answer.body}</div>
-        ))}
+      <div className="w-full h-full flex flex-col">
+        {gameState.currentCorrectAnswers.length > 1 ? 
+          (<h3>{t("Correct answers")}</h3>) : (<h3>{t("Correct answer")}</h3>)
+        }
+        <ul className="flex flex-col grow self-stretch flex-wrap gap-4 min-h-0">
+          {gameState.currentCorrectAnswers.map((answer) => (
+            <li key={answer.id}
+              className="flex flex-col text-center items-center bordered gap-2 p-4">{answer.body}</li>
+          ))}
+        </ul>
+        <h3>{t("Current score")}</h3>
+        <ul className="flex flex-col grow self-stretch flex-wrap gap-4 min-h-0">
+          {gameState.players?.sort((a,b) => {
+            return b.score - a.score
+          }).map((player) => {
+            return (
+              <li
+                key={player.id}
+                className="flex flex-row items-center justify-between bordered gap-2 p-4"
+              >
+                <div className="flex items-center gap-4">
+                  <Userpic src={player.image} size={32} />
+                  <span>{player.name}</span>
+                </div>
+                <span>{player.score}</span>
+              </li>
+            );
+          })}
+        </ul>
+        <Timer secondsToExpire={5}/>
       </div>
     );
   }
@@ -111,11 +139,24 @@ export default function PlayerGamePage() {
     return (
       <section>
         <h3>{t("Results")}</h3>
-        {gameState.players.map((player) => {
-          return (
-            <div key={player.id}>{`${player.name}   ${player.score}`}</div>
-          );
-        })}
+        <ul className="flex flex-col grow self-stretch flex-wrap gap-4 min-h-0">
+          {gameState.players?.sort((a, b) => {
+            return b.score - a.score
+          }).map((player) => {
+            return (
+              <li
+                key={player.id}
+                className="flex flex-row items-center justify-between bordered gap-2 p-4"
+              >
+                <div className="flex items-center gap-4">
+                  <Userpic src={player.image} size={32} />
+                  <span>{player.name}</span>
+                </div>
+                <span>{player.score}</span>
+              </li>
+            );
+          })}
+        </ul>
         {rateVisible && (
           <>
             <h3>{t("Rate this quiz")}</h3>

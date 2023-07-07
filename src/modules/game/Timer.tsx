@@ -3,7 +3,7 @@ import { useTimer } from "react-timer-hook";
 
 export default function Timer(props: {
   secondsToExpire: number;
-  onExpire: () => void;
+  onExpire?: () => void;
 }) {
   const secondsToExpire = props.secondsToExpire;
   const timeToExpire = new Date();
