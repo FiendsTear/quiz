@@ -80,13 +80,13 @@ export default function HostGamePage() {
       );
     } else {
       return (
-        <article>
+        <article className="flex flex-col gap-5 h-full">
           <CurrentQuestion
             questionData={gameState.currentQuestion}
             isHost={true}
           ></CurrentQuestion>
-          <Button onClick={() => nextQuestionMutation.mutate(gameID)}>
-            Next question
+          <Button attr={{className: 'right-0 self-end'}} onClick={() => nextQuestionMutation.mutate(gameID)}>
+            {t('Next question')}
           </Button>
         </article>
       );

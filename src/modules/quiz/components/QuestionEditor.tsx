@@ -96,7 +96,7 @@ export default function QuestionEditor(props: { questionID: number }) {
           <label htmlFor="question-body">{t("Question text")}</label>
           <textarea
             id="question-body"
-            className="grow"
+            className="grow text-lg"
             {...register("body", {
               onChange: lodash.debounce(
                 (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,10 +107,9 @@ export default function QuestionEditor(props: { questionID: number }) {
             })}
           ></textarea>
           <label htmlFor="answer-description">{t("Correct answer description")}</label>
-          <input
+          <textarea
             id="answer-description"
-            type="text"
-            className="block grow text-lg"
+            className="block grow"
             {...register("answerDescription", {
               onChange: lodash.debounce(
                 (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -121,7 +120,7 @@ export default function QuestionEditor(props: { questionID: number }) {
                 700
               ),
             })}
-          ></input>
+          ></textarea>
           <span className="issue">{issues["body"]}</span>
         </div>
         <div className="flex w-32 flex-col self-stretch">
