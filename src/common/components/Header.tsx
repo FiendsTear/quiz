@@ -40,6 +40,7 @@ export default function Header() {
           {sessionData && (
             <>
               <span>{t("My quizzes")}</span>
+              {/* there used to be user's avatar here, but since it didn't contain anything other than user's quizzes, it was reworked to make ui less confusing */}
               {/* <Userpic src={sessionData.user?.image} size={32} />
               <span>{sessionData.user?.name}</span> */}
             </>

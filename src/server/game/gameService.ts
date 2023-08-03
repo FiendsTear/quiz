@@ -62,6 +62,7 @@ interface IActiveGame {
   emitter: EventEmitter;
 }
 
+// there's no way to tell if game was abandoned so this map here will be bloated quite soon after start
 const activeGames: Map<number, IActiveGame> = new Map();
 
 export async function getActiveGames() {
@@ -260,5 +261,6 @@ function emitState(game: IActiveGame) {
   const cloneGameState: Partial<GameState> = Object.assign({}, gameState);
   delete cloneGameState.playersAnsweredCount;
   delete cloneGameState.correctAnswerTimeout;
+  // so yeah, gameservice throws whole game state to all clients if anything changes
   emitter.emit(GameEvents.Changed, cloneGameState);
 }

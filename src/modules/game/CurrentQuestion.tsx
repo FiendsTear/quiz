@@ -42,6 +42,7 @@ export default function CurrentQuestion(props: {
   }
 
   useEffect(() => {
+    // something like anti-cheat system - send empty answer if user leaves game page
     if (props.warned === true) {
       document.onvisibilitychange = () => {
         if (!answerSent) {
@@ -87,10 +88,10 @@ export default function CurrentQuestion(props: {
           </li>
         ))}
       </ul>
-      {/* <Timer
+      <Timer
         secondsToExpire={questionData.timerValue}
         onExpire={() => sendAnswers()}
-      /> */}
+      />
       <Button onClick={sendAnswers} attr={{ className: "text-lg" }}>
         {t("Send answers")}
       </Button>

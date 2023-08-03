@@ -14,6 +14,10 @@ export function usePublisher(quizID: string) {
 	const setQuestionError = useQuizStore((state) => state.setQuestionError);
 	const setQuizError = useQuizStore((state) => state.setQuizError);
 
+	// this monstrosity collects all quiz data, throws it againt zod schema, then shows in editor
+	// need to validate before publishing to avoid showing everyone quiz drafrs or non-functioning quizzes
+	// hard to validate questions in their's own component because we don't know what answers they have, only id, 
+	// and we have to be sure there's at least one correct answer
 	async function validate() {
 		const quizData = (await getQuizQuery.refetch()).data;
 		if (!quizData) return false;

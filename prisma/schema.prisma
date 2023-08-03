@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
     provider = "prisma-client-js"
 }
@@ -70,6 +67,7 @@ model Tag {
     quizzes Quiz[]
 }
 
+// everything below are NextAuth prisma adapter models
 model Account {
     id                String  @id @default(cuid())
     userId            String

@@ -37,6 +37,7 @@ import { createRatingDTO } from './dto/createRatingDTO.js';
 import { z } from "zod";
 import { updateAnswerDTO } from "./dto/updateAnswerDTO.js";
 
+
 export const quizRouter = createTRPCRouter({
   // quizzes
   getQuizzes: publicProcedure.query(() => getQuizzes()),
